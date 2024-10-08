@@ -12,7 +12,7 @@
 setwd('~/Methylation_data/')
 
 library(tidyverse)
-
+library(sjmisc)
 # methy_rds = read_rds(file = "Methylated.cov.noZero.rds")
 # head(methy_rds)
 # 
@@ -52,8 +52,15 @@ Loc_data = read_csv('Methylation_location_data.csv')
 methy_data = bind_cols(Loc_data, 
                        methy)
 
+methy_rotate = methy_data %>% 
+  rotate_df()
+
 unmethy = read_csv('Unmethylated_cov_nozero.csv')
 unmethy_loc = read_csv('UnMethylation_location_data.csv')
 
 unmenthy_data = bind_cols(unmethy_loc, 
                           unmethy)
+
+
+
+
