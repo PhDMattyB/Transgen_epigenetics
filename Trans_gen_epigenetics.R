@@ -52,8 +52,23 @@ Loc_data = read_csv('Methylation_location_data.csv')
 methy_data = bind_cols(Loc_data, 
                        methy)
 
-methy_rotate = methy_data %>% 
-  rotate_df()
+methy_data %>% 
+  rotate_df() %>% 
+  rownames_to_column() %>% 
+  write_csv('Methylated_data_clean.csv')
+
+
+methy_clean = read_csv('Methylated_data_clean.csv')
+# methy_test = methy_data %>% 
+#   slice(1:10) %>% 
+#   select(1:15)
+
+# methy_test %>% 
+#   rotate_df() %>% 
+#   rownames_to_column() %>% 
+#   write_csv('test.csv', 
+#             col_names = F)
+
 
 unmethy = read_csv('Unmethylated_cov_nozero.csv')
 unmethy_loc = read_csv('UnMethylation_location_data.csv')
