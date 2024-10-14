@@ -64,7 +64,8 @@ methy_clean = read_csv('Methylated_data_clean.csv')
 
 methy_test = methy_clean %>% 
   slice(1:10) %>% 
-  select(1:15)
+  select(1:15) %>% 
+  select(-Location_data)
 # methy_test = methy_data %>% 
 #   slice(1:10) %>% 
 #   select(1:15)
@@ -92,6 +93,10 @@ unmethy_clean = read_csv('UnMethylated_data_clean.csv')
 
 unmethy_test = unmethy_clean %>% 
   slice(1:10) %>% 
-  select(1:15)
+  select(1:15) %>% 
+  select(-Location_data)
 
 
+map2_df(methy_test, 
+        unmethy_test, 
+        `-`)
