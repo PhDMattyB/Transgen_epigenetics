@@ -62,7 +62,7 @@ methy_data %>%
 methy_clean = read_csv('Methylated_data_clean.csv')
 
 
-methy_clean %>% 
+methy_test = methy_clean %>% 
   slice(1:10) %>% 
   select(1:15)
 # methy_test = methy_data %>% 
@@ -90,5 +90,8 @@ unmethy_data %>%
 
 unmethy_clean = read_csv('UnMethylated_data_clean.csv')
 
+unmethy_test = unmethy_clean %>% 
+  slice(1:10) %>% 
+  select(1:15)
 
 
