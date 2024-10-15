@@ -47,55 +47,48 @@ library(sjmisc)
 
 ## read new data format to make sure this actually worked
 
-methy = read_csv('Methylated_cov_nozero.csv')
-Loc_data = read_csv('Methylation_location_data.csv')
-methy_data = bind_cols(Loc_data, 
-                       methy)
+# methy = read_csv('Methylated_cov_nozero.csv')
+# Loc_data = read_csv('Methylation_location_data.csv')
+# methy_data = bind_cols(Loc_data, 
+#                        methy)
+# 
+# methy_data %>% 
+#   rotate_df() %>% 
+#   rownames_to_column() %>% 
+#   write_csv('Methylated_data_clean.csv', 
+#             col_names = F)
 
-methy_data %>% 
-  rotate_df() %>% 
-  rownames_to_column() %>% 
-  write_csv('Methylated_data_clean.csv', 
-            col_names = F)
+# unmethy = read_csv('Unmethylated_cov_nozero.csv')
+# unmethy_loc = read_csv('UnMethylation_location_data.csv')
+# 
+# unmethy_data = bind_cols(unmethy_loc, 
+#                           unmethy)
+# unmethy_data %>% 
+#   rotate_df() %>% 
+#   rownames_to_column() %>% 
+#   write_csv('UnMethylated_data_clean.csv', 
+#             col_names = F)
 
 
 methy_clean = read_csv('Methylated_data_clean.csv')
 
+unmethy_clean = read_csv('UnMethylated_data_clean.csv')
+
+methy_clean %>% 
+  select(-Location_data)
+
+unmethy_clean %>% 
+  select(-Location_data)
 
 methy_test = methy_clean %>% 
   slice(1:10) %>% 
   select(1:15) %>% 
   select(-Location_data)
-# methy_test = methy_data %>% 
-#   slice(1:10) %>% 
-#   select(1:15)
-
-# methy_test %>% 
-#   rotate_df() %>% 
-#   rownames_to_column() %>% 
-#   write_csv('test.csv', 
-#             col_names = F)
-
-
-unmethy = read_csv('Unmethylated_cov_nozero.csv')
-unmethy_loc = read_csv('UnMethylation_location_data.csv')
-
-unmethy_data = bind_cols(unmethy_loc, 
-                          unmethy)
-unmethy_data %>% 
-  rotate_df() %>% 
-  rownames_to_column() %>% 
-  write_csv('UnMethylated_data_clean.csv', 
-            col_names = F)
-
-
-unmethy_clean = read_csv('UnMethylated_data_clean.csv')
 
 unmethy_test = unmethy_clean %>% 
   slice(1:10) %>% 
   select(1:15) %>% 
   select(-Location_data)
-
 
 beta_denom = map2_df(methy_test, 
         unmethy_test, 
