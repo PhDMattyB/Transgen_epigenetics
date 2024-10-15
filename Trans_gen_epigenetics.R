@@ -107,3 +107,6 @@ beta_denom = map2_df(methy,
                        map2_df(.,
                                100,
                                `+`)
+beta_values = map2_df(methy,
+                    beta_denom,
+                    `/`)
