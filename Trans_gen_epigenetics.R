@@ -97,6 +97,13 @@ unmethy_test = unmethy_clean %>%
   select(-Location_data)
 
 
-sub_test = map2_df(methy_test, 
+beta_denom = map2_df(methy_test, 
         unmethy_test, 
-        `-`)
+        `+`) %>%  
+  map2_df(., 
+          100, 
+          `+`)
+
+beta_test = map2_df(methy_test, 
+                    beta_denom, 
+                    `/`)
