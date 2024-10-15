@@ -110,3 +110,10 @@ beta_denom = map2_df(methy,
 beta_values = map2_df(methy,
                     beta_denom,
                     `/`)
+
+meta = methy_clean %>% 
+  select(Location_data)
+
+
+full_data = bind_cols(meta, 
+                      beta_values)
