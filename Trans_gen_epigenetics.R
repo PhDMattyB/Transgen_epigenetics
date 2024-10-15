@@ -74,29 +74,36 @@ methy_clean = read_csv('Methylated_data_clean.csv')
 
 unmethy_clean = read_csv('UnMethylated_data_clean.csv')
 
-methy_clean %>% 
+methy = methy_clean %>% 
   select(-Location_data)
 
-unmethy_clean %>% 
+unmethy = unmethy_clean %>% 
   select(-Location_data)
 
-methy_test = methy_clean %>% 
-  slice(1:10) %>% 
-  select(1:15) %>% 
-  select(-Location_data)
+# methy_test = methy_clean %>% 
+#   slice(1:10) %>% 
+#   select(1:15) %>% 
+#   select(-Location_data)
+# 
+# unmethy_test = unmethy_clean %>% 
+#   slice(1:10) %>% 
+#   select(1:15) %>% 
+#   select(-Location_data)
+# 
+# beta_denom = map2_df(methy_test, 
+#         unmethy_test, 
+#         `+`) %>%  
+#   map2_df(., 
+#           100, 
+#           `+`)
+# 
+# beta_test = map2_df(methy_test, 
+#                     beta_denom, 
+#                     `/`)
 
-unmethy_test = unmethy_clean %>% 
-  slice(1:10) %>% 
-  select(1:15) %>% 
-  select(-Location_data)
-
-beta_denom = map2_df(methy_test, 
-        unmethy_test, 
-        `+`) %>%  
-  map2_df(., 
-          100, 
-          `+`)
-
-beta_test = map2_df(methy_test, 
-                    beta_denom, 
-                    `/`)
+beta_denom = map2_df(methy,
+                     unmethy,
+                             `+`) %>%
+                       map2_df(.,
+                               100,
+                               `+`)
