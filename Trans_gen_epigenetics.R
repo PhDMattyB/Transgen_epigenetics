@@ -97,6 +97,6 @@ unmethy_test = unmethy_clean %>%
   select(-Location_data)
 
 
-map2_df(methy_test, 
+sub_test = map2_df(methy_test, 
         unmethy_test, 
         `-`)
