@@ -117,3 +117,5 @@ meta = methy_clean %>%
 
 full_data = bind_cols(meta, 
                       beta_values)
+
+sum(is.na(full_data))
