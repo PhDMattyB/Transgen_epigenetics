@@ -101,6 +101,10 @@ unmethy = unmethy_clean %>%
 #                     beta_denom, 
 #                     `/`)
 
+
+# calculate beta values ---------------------------------------------------
+
+
 beta_denom = map2_df(methy,
                      unmethy,
                              `+`) %>%
@@ -119,6 +123,27 @@ full_data = bind_cols(meta,
                       beta_values)
 
 sum(is.na(full_data))
+
+
+
+
+# calculate m-values ------------------------------------------------------
+
+Methy_m = map2_df(methy,
+        100,
+        `+`) 
+Unmethy_m = map2_df(unmethy, 
+                    100, 
+                    `+`)
+
+divde = map2_df(Methy_m, 
+                Unmethy_m, 
+                `/`)
+
+mvalues = divide %>% 
+  mutate(across(~log2(.)))
+
+mvalues = log2(divide)
 
 
 # Phenotypic traits -------------------------------------------------------
