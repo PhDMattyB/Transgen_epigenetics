@@ -141,7 +141,8 @@ divde = map2_df(Methy_m,
                 `/`)
 
 mvalues = divde %>% 
-  mutate(across(~log2(.)))
+  mutate(across(everything(),
+                ~log2(.)))
 
 # mvalues = log2(divide)
 
