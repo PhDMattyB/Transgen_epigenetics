@@ -140,10 +140,10 @@ divde = map2_df(Methy_m,
                 Unmethy_m, 
                 `/`)
 
-mvalues = divide %>% 
+mvalues = divde %>% 
   mutate(across(~log2(.)))
 
-mvalues = log2(divide)
+# mvalues = log2(divide)
 
 
 # Phenotypic traits -------------------------------------------------------
