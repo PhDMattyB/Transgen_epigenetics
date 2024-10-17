@@ -110,10 +110,10 @@ beta_denom = map2_df(methy,
 beta_values = map2_df(methy,
                     beta_denom,
                     `/`)
-
-beta_values %>% 
-  slice(1:10) %>% 
-  select(1:10)
+# 
+# beta_values %>% 
+#   slice(1:10) %>% 
+#   select(1:10)
 
 meta = methy_clean %>% 
   select(Location_data)
@@ -140,13 +140,13 @@ divde = map2_df(Methy_m,
                 Unmethy_m, 
                 `/`)
 
-test_df = divde %>% 
-  slice(1:10) %>% 
-  select(1:10)
-
-test_df %>% 
-  mutate(across(everything(),
-                ~log2(.)))
+# test_df = divde %>% 
+#   slice(1:10) %>% 
+#   select(1:10)
+# 
+# test_df %>% 
+#   mutate(across(everything(),
+#                 ~log2(.)))
 
 mvalues = divde %>% 
   mutate(across(everything(),
