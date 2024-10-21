@@ -242,3 +242,7 @@ summary(eigenvals(test_rda,
                   model = 'constrained'))
 
 screeplot(test_rda)
+
+signif_full = anova.cca(test_rda, 
+                        parallel = )
+
