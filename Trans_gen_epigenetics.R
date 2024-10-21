@@ -157,26 +157,22 @@ sum(is.na(mvalues))
 mvalues %>% 
   purrr::keep(~any(. < 0))
 
+## combine with individual id data
 mvalues_final = bind_cols(meta, 
                           mvalues)  
 
+## write a copy so we don't have to do that again
 mvalues_final %>% 
   write_csv('MVALUES_methylation_cleaned_data.csv')
 # mvalues = log2(divide)
 
-
+## read in mvalue data
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
 
+## test set for down stream data wrangling
 mval_test = mvalues %>% 
   select(1:10) %>% 
   slice(1:10) 
-
-# mval_test %>% 
-#   summarise(across(everything(), 
-#                    list(min = min, 
-#                         max = max))) %>% 
-#   View()
-
 
 
 # Phenotypic traits -------------------------------------------------------
