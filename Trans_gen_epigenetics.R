@@ -236,3 +236,9 @@ library(vegan)
 test_rda = rda(mvalues ~ temps * Population, 
                data = test_pheno, 
                scale = T)
+
+RsquareAdj(test_rda)
+summary(eigenvals(test_rda, 
+                  model = 'constrained'))
+
+screeplot(test_rda)
