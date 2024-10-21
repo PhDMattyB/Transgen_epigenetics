@@ -174,7 +174,33 @@ mval_test = mvalues %>%
   select(1:10) %>% 
   slice(1:10) 
 
+meta = mvalues %>% 
+  select(1) 
 
+meta %>% 
+  separate(col = Location_data, 
+           into = c('SampleID', 
+                    'Other', 
+                    'individual'), 
+           sep = '-') %>% 
+  separate(col = Other, 
+           into = c('Pop_data', 
+                    'id'), 
+           sep = '_') %>% 
+  unite(col = 'SampleID', 
+        c('SampleID', 
+          'id', 
+          'individual'), 
+        sep = '_') %>% 
+  separate(col = Pop_data, 
+           into = c('Population', 
+                    'temps'), 
+           sep = '(?<=[A-Za-z])(?=[0-9])') %>% 
+  separate(col = temps, 
+           into = c('F1_temp', 
+                    'F2_temp'), 
+           sep = 2) %>%
+  
 # Phenotypic traits -------------------------------------------------------
 
 
