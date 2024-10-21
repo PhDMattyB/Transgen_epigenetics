@@ -228,7 +228,11 @@ methy_test = mval_test %>%
 test_pheno = meta_data %>% 
   select(temps, 
          Population)
+mvalues = mvalues %>% 
+  select(-1)
 
 library(vegan)
 
-
+test_rda = rda(methy_test ~ temps * Population, 
+               data = test_pheno, 
+               scale = T)
