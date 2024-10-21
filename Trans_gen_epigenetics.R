@@ -152,7 +152,10 @@ mvalues = divde %>%
   mutate(across(everything(),
                 ~log2(.)))
 
+## checks to see if the data is the way it should be
 sum(is.na(mvalues))
+mvalues %>% 
+  purrr::keep(~any(. < 0))
 
 mvalues_final = bind_cols(meta, 
                           mvalues)  
@@ -175,8 +178,6 @@ mval_test = mvalues %>%
 #   View()
 
 
-mvalues %>% 
-  filter(if_all(~ .x < 0))
 
 # Phenotypic traits -------------------------------------------------------
 
