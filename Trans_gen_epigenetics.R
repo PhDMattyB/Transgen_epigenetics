@@ -152,6 +152,8 @@ mvalues = divde %>%
   mutate(across(everything(),
                 ~log2(.)))
 
+sum(is.na(mvalues))
+
 mvalues_final = bind_cols(meta, 
                           mvalues)  
 
@@ -160,10 +162,12 @@ mvalues_final %>%
 # mvalues = log2(divide)
 
 
+mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
+
 mvalues %>% 
-  summarise_all(min = min(), 
-                max = max())
-sum(is.na(mvalues))
+  summarise_all(list(min, 
+                     max))
+
 # Phenotypic traits -------------------------------------------------------
 
 
