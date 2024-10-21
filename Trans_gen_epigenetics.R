@@ -13,6 +13,9 @@ setwd('~/Methylation_data/')
 
 library(tidyverse)
 library(sjmisc)
+library(vegan)
+
+
 # methy_rds = read_rds(file = "Methylated.cov.noZero.rds")
 # head(methy_rds)
 # 
@@ -170,46 +173,46 @@ mvalues_final %>%
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
 
 ## test set for down stream data wrangling
-mval_test = mvalues %>% 
-  select(1:10) 
+# mval_test = mvalues %>% 
+#   select(1:10) 
 
-meta = mvalues %>%
-  select(1)
-
-meta %>%
-  separate(col = Location_data,
-           into = c('SampleID',
-                    'Other',
-                    'individual'),
-           sep = '-') %>%
-  separate(col = Other,
-           into = c('Pop_data',
-                    'id'),
-           sep = '_') %>%
-  unite(col = 'SampleID',
-        c('SampleID',
-          'id',
-          'individual'),
-        sep = '_') %>%
-  separate(col = Pop_data,
-           into = c('Population',
-                    'temps'),
-           sep = '(?<=[A-Za-z])(?=[0-9])') %>%
-  separate(col = temps,
-           into = c('F1_temp',
-                    'F2_temp'),
-           sep = 2, 
-           remove = F) %>%
-  mutate(Ecotype = as.factor(case_when(
-    Population == 'GTS' ~ 'Geothermal',
-    Population == 'CSWY' ~ 'Ambient',
-    Population == 'ASHNW' ~ 'Geothermal',
-    Population == 'ASHNC' ~ 'Ambient',
-    Population == 'MYVW' ~ 'Geothermal',
-    Population == 'MYVC' ~ 'Ambient',
-    Population == 'SKRW' ~ 'Geothermal',
-    Population == 'SKRC' ~ 'Ambient'))) %>%
-  write_csv('Methylation_metadata.csv')
+# meta = mvalues %>%
+#   select(1)
+# 
+# meta %>%
+#   separate(col = Location_data,
+#            into = c('SampleID',
+#                     'Other',
+#                     'individual'),
+#            sep = '-') %>%
+#   separate(col = Other,
+#            into = c('Pop_data',
+#                     'id'),
+#            sep = '_') %>%
+#   unite(col = 'SampleID',
+#         c('SampleID',
+#           'id',
+#           'individual'),
+#         sep = '_') %>%
+#   separate(col = Pop_data,
+#            into = c('Population',
+#                     'temps'),
+#            sep = '(?<=[A-Za-z])(?=[0-9])') %>%
+#   separate(col = temps,
+#            into = c('F1_temp',
+#                     'F2_temp'),
+#            sep = 2, 
+#            remove = F) %>%
+#   mutate(Ecotype = as.factor(case_when(
+#     Population == 'GTS' ~ 'Geothermal',
+#     Population == 'CSWY' ~ 'Ambient',
+#     Population == 'ASHNW' ~ 'Geothermal',
+#     Population == 'ASHNC' ~ 'Ambient',
+#     Population == 'MYVW' ~ 'Geothermal',
+#     Population == 'MYVC' ~ 'Ambient',
+#     Population == 'SKRW' ~ 'Geothermal',
+#     Population == 'SKRC' ~ 'Ambient'))) %>%
+#   write_csv('Methylation_metadata.csv')
 
 meta_data = read_csv('Methylation_metadata.csv')
 
@@ -222,8 +225,8 @@ test_df = bind_cols(meta_data,
 
 
 # RDA ---------------------------------------------------------------------
-methy_test = mval_test %>% 
-  select(-1)
+# methy_test = mval_test %>% 
+#   select(-1)
 
 test_pheno = meta_data %>% 
   select(temps, 
@@ -231,18 +234,16 @@ test_pheno = meta_data %>%
 mvalues = mvalues %>% 
   select(-1)
 
-library(vegan)
-
-test_rda = rda(mvalues ~ temps * Population, 
+RDA_treatment = rda(mvalues ~ temps * Population, 
                data = test_pheno, 
                scale = T)
 
-RsquareAdj(test_rda)
-summary(eigenvals(test_rda, 
+RsquareAdj(RDA_treatment)
+summary(eigenvals(RDA_treatment, 
                   model = 'constrained'))
 
-screeplot(test_rda)
+screeplot(RDA_treatment)
 
-signif_full = anova.cca(test_rda, 
-                        parallel = )
+signif_full = anova.cca(RDA_treatment, 
+                        parallel = getOption('mc.cores'))
 
