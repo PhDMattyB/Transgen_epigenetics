@@ -164,9 +164,19 @@ mvalues_final %>%
 
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
 
+mval_test = mvalues %>% 
+  select(1:10) %>% 
+  slice(1:10) 
+
+# mval_test %>% 
+#   summarise(across(everything(), 
+#                    list(min = min, 
+#                         max = max))) %>% 
+#   View()
+
+
 mvalues %>% 
-  summarise_all(list(min, 
-                     max))
+  filter(if_all(~ .x < 0))
 
 # Phenotypic traits -------------------------------------------------------
 
