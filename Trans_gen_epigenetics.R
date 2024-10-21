@@ -151,10 +151,19 @@ divde = map2_df(Methy_m,
 mvalues = divde %>% 
   mutate(across(everything(),
                 ~log2(.)))
-  
+
+mvalues_final = bind_cols(meta, 
+                          mvalues)  
+
+mvalues_final %>% 
+  write_csv('MVALUES_methylation_cleaned_data.csv')
 # mvalues = log2(divide)
 
 
+mvalues %>% 
+  summarise_all(min = min(), 
+                max = max())
+sum(is.na(mvalues))
 # Phenotypic traits -------------------------------------------------------
 
 
