@@ -233,6 +233,6 @@ mvalues = mvalues %>%
 
 library(vegan)
 
-test_rda = rda(methy_test ~ temps * Population, 
+test_rda = rda(mvalues ~ temps * Population, 
                data = test_pheno, 
                scale = T)
