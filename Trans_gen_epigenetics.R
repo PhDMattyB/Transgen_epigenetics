@@ -247,3 +247,6 @@ screeplot(RDA_treatment)
 signif_full = anova.cca(RDA_treatment, 
                         parallel = getOption('mc.cores'))
 
+signif_axis = anova.cca(RDA_treatment, 
+                        by = 'axis',
+                        parallel = getOption('mc.cores'))
