@@ -426,30 +426,42 @@ vars_rda$temps = as.character(vars_rda$temps)
 theme_set(theme_bw())
 
 ggplot()+
-  # geom_point(data = loc_data, 
-  #            aes(x = RDA1, 
-  #                y = RDA2), 
-  #            col = '#ADA597', 
-  #            size = 2)+
-  # geom_point(data = candidates, 
-  #            aes(x = RDA1, 
-  #                y = RDA2), 
-  #            col = '#0AB33A', 
-  #            size = 2)+
-  geom_point(data = vars_rda, 
-             aes(x = RDA1, 
-                 y = RDA2, 
-                 col = temps), 
+  geom_point(data = loc_data,
+             aes(x = RDA1,
+                 y = RDA2),
+             col = '#ADA597',
              size = 2)+
-  geom_segment(aes(xend = RDA_treatment$CCA$biplot[,1], 
-                   yend = RDA_treatment$CCA$biplot[,2], 
-                   x = 0, 
-                   y = 0), 
-               colour = 'black', 
-               size = 1, 
-               linetype = 1, 
-               arrow = arrow(length = unit(0.1, 
-                                           'npc')))+
-  geom_text(aes(x = 1.5*RDA_treatment$CCA$biplot[,1], 
-                y = 1.2*RDA_treatment$CCA$biplot[,2], 
-                label = colnames(vars_rda[,1:2])))
+  geom_point(data = candidates,
+             aes(x = RDA1,
+                 y = RDA2),
+             col = '#0AB33A',
+             size = 2)+
+  labs(x = 'RDA 1 (0.65% variance explained)',
+       y = 'RDA 2 (0.13% variance explained)')+
+  theme(#legend.position = "none", 
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(), 
+    axis.title = element_text(size = 15), 
+    axis.text = element_text(size = 15), 
+    axis.ticks = element_line(size = 1), 
+    plot.title = element_text(size = 15, 
+                              hjust = 0), 
+    legend.title = element_text(size = 13),
+    legend.text = element_text(size = 12))
+  # geom_point(data = vars_rda, 
+  #            aes(x = RDA1, 
+  #                y = RDA2, 
+  #                col = temps), 
+  #            size = 2)+
+  # geom_segment(aes(xend = RDA_treatment$CCA$biplot[,1], 
+  #                  yend = RDA_treatment$CCA$biplot[,2], 
+  #                  x = 0, 
+  #                  y = 0), 
+  #              colour = 'black', 
+  #              size = 1, 
+  #              linetype = 1, 
+  #              arrow = arrow(length = unit(0.1, 
+  #                                          'npc')))+
+  # geom_text(aes(x = 1.5*RDA_treatment$CCA$biplot[,1], 
+  #               y = 1.2*RDA_treatment$CCA$biplot[,2], 
+  #               label = colnames(vars_rda[,1:2])))
