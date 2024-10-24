@@ -291,7 +291,7 @@ hist(rda_scores[,1])
 hist(rda_scores[,2])
 
 rda_outliers = outliers(rda_scores[,1], 3)
-# rda_outliers = outliers(rda_scores[,2], 3)
+# rda_outliers_axis2 = outliers(rda_scores[,2], 3)
 
 
 rda_out = cbind.data.frame(rep(1, 
@@ -405,7 +405,14 @@ normal_label = rep('Normal',
 normal_loc = bind_cols(normal_loc, 
                        normal_label)
 
-test_pheno
+
+vars_rda = bind_cols(test_pheno, 
+          individuals)
+
+candidates = candidates %>%
+  rename(RDA1 = scores) %>% 
+  mutate(RDA2 = 0.000)
+  
 
 theme_set(theme_bw())
 
@@ -414,4 +421,9 @@ ggplot()+
              aes(x = RDA1, 
                  y = RDA2), 
              col = '#ADA597', 
+             size = 2)+
+  geom_point(data = candidates, 
+             aes(x = RDA1, 
+                 y = RDA2), 
+             col = '#0AB33A', 
              size = 2)
