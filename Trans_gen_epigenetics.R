@@ -407,7 +407,9 @@ normal_loc = bind_cols(normal_loc,
 
 
 vars_rda = bind_cols(test_pheno, 
-          individuals)
+          individuals) 
+
+vars_rda$temps = as.character(vars_rda$temps)
 
 # all_scores = rda_scores %>%
 #   as.data.frame() %>%
@@ -438,4 +440,16 @@ ggplot()+
              aes(x = RDA1, 
                  y = RDA2, 
                  col = temps), 
-             size = 2)
+             size = 2)+
+  geom_segment(aes(xend = RDA_treatment$CCA$biplot[,1], 
+                   yend = RDA_treatment$CCA$biplot[,2], 
+                   x = 0, 
+                   y = 0), 
+               colour = 'black', 
+               size = 1, 
+               linetype = 1, 
+               arrow = arrow(length = unit(0.02, 
+                                           'npc')))+
+  geom_text(aes(x = 1.5*RDA_treatment$CCA$biplot[,1], 
+                y = 1.2*RDA_treatment$CCA$biplot[,2], 
+                label = colnames(vars_rda[,1:2])))
