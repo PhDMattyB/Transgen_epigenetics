@@ -280,11 +280,19 @@ sum_rda$biplot %>%
   as_tibble() %>% 
   write_csv('RDA_treatment_pops_biplot.csv')
 
+
+
+
 rda_scores = scores(RDA_treatment, 
                     choices = c(1:2), 
                     display = 'species')
 
+hist(rda_scores[,1])
+hist(rda_scores[,2])
+
 rda_outliers = outliers(rda_scores[,1], 3)
+# rda_outliers = outliers(rda_scores[,2], 3)
+
 
 rda_out = cbind.data.frame(rep(1, 
                                times = length(rda_outliers)), 
@@ -296,6 +304,7 @@ rda_out = rda_out %>%
 dplyr::rename(axis = 1, 
               loc = 2, 
               scores = 3)
+
 
 all_loc = rda_scores[,1]
 
@@ -335,8 +344,28 @@ mutate(pop_num = as.numeric(case_when(
   dplyr::select(-Population) %>% 
   as.data.frame()
 
-nam = rda_out[1:45, 2]
-out_loc = all_loc[nam,]
-out_cor = apply(test_pheno,
-                2, 
-                function(x)cor(x, out_loc))
+# nam = rda_out[1:45, 2]
+# out_loc = all_loc[nam,]
+# out_cor = apply(test_pheno,
+#                 2, 
+#                 function(x)cor(x, out_loc))
+
+foo = matrix(nrow=(45), 
+             ncol = 2)
+colnames(foo) = c('temps', 
+                  'pop_num')
+
+for (i in 1:length(rda_out$loc)){
+  nam = rda_out[i,2]
+  loc.gen = mvalues[,nam]
+  foo[i,] = apply(test_pheno,2,function(x)cor(x,loc.gen))
+}
+
+candidates = cbind.data.frame(rda_out, 
+                              foo)
+
+# candidates %>% 
+#   as_tibble() %>% 
+#   write_csv('RDA_outliers_methylation_correlations.csv')
+            
+
