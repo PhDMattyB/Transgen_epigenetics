@@ -311,8 +311,8 @@ rda_normal = rda_normal %>%
 
 rda_normal = rda_normal[!rda_normal$loc %in% rda_out$loc,]
 
-write_csv(rda_normal, 
-          'RDA_nonoutliers_methylation.csv')
-
-write_csv(rda_out, 
-          'RDA_outliers_methylation.csv')
+# write_csv(rda_normal, 
+#           'RDA_nonoutliers_methylation.csv')
+# 
+# write_csv(rda_out, 
+#           'RDA_outliers_methylation.csv')
