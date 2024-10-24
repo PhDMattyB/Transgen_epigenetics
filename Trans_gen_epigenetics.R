@@ -330,7 +330,7 @@ rda_out = as.data.frame(rda_out)
 all_loc = as.data.frame(all_loc)
 # test_pheno = as.data.frame(test_pheno)
 
-test_pheno = test_pheno %>% 
+test_pheno2 = test_pheno %>% 
   as_tibble() %>% 
 mutate(pop_num = as.numeric(case_when(
       Population == 'GTS' ~ '1',
@@ -341,7 +341,7 @@ mutate(pop_num = as.numeric(case_when(
       Population == 'MYVC' ~ '6',
       Population == 'SKRW' ~ '7',
       Population == 'SKRC' ~ '8'))) %>% 
-  dplyr::select(-Population) %>% 
+  # dplyr::select(-Population) %>% 
   as.data.frame()
 
 # nam = rda_out[1:45, 2]
@@ -378,3 +378,40 @@ for(i in 1:length(candidates$loc)){
   }
 
 candidates
+
+
+# GRAPHS! -----------------------------------------------------------------
+
+
+candidates = read_csv('RDA_outliers_methylation_correlations.csv')
+normal_loc = read_csv('RDA_nonoutliers_methylation.csv')
+loc_data = read_csv('RDA_treatment_pops_methy_locations.csv')
+individuals = read_csv('RDA_treatment_pops_individuals.csv')
+biplot = read_csv('RDA_treatment_pops_biplot.csv')
+
+outlier_label = rep('Outlier', 
+                    length(candidates$loc)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+
+candidates = bind_cols(candidates, 
+                       outlier_label)
+
+normal_label = rep('Normal', 
+                   length(normal_loc$loc)) %>% 
+  as_tibble() %>% 
+  rename(label = value)
+
+normal_loc = bind_cols(normal_loc, 
+                       normal_label)
+
+test_pheno
+
+theme_set(theme_bw())
+
+ggplot()+
+  geom_point(data = loc_data, 
+             aes(x = RDA1, 
+                 y = RDA2), 
+             col = '#ADA597', 
+             size = 2)
