@@ -426,16 +426,16 @@ vars_rda$temps = as.character(vars_rda$temps)
 theme_set(theme_bw())
 
 ggplot()+
-  geom_point(data = loc_data, 
-             aes(x = RDA1, 
-                 y = RDA2), 
-             col = '#ADA597', 
-             size = 2)+
-  geom_point(data = candidates, 
-             aes(x = RDA1, 
-                 y = RDA2), 
-             col = '#0AB33A', 
-             size = 2)+
+  # geom_point(data = loc_data, 
+  #            aes(x = RDA1, 
+  #                y = RDA2), 
+  #            col = '#ADA597', 
+  #            size = 2)+
+  # geom_point(data = candidates, 
+  #            aes(x = RDA1, 
+  #                y = RDA2), 
+  #            col = '#0AB33A', 
+  #            size = 2)+
   geom_point(data = vars_rda, 
              aes(x = RDA1, 
                  y = RDA2, 
@@ -448,7 +448,7 @@ ggplot()+
                colour = 'black', 
                size = 1, 
                linetype = 1, 
-               arrow = arrow(length = unit(0.02, 
+               arrow = arrow(length = unit(0.1, 
                                            'npc')))+
   geom_text(aes(x = 1.5*RDA_treatment$CCA$biplot[,1], 
                 y = 1.2*RDA_treatment$CCA$biplot[,2], 
