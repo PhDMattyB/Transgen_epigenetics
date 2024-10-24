@@ -8,6 +8,18 @@
 ##############################
 
 
+# Functions ---------------------------------------------------------------
+
+outliers = function(x,z){
+  lims = mean(x) + c(-1,1)*z*sd(x)
+  
+  x[x<lims[1] | x>lims[2]]
+}
+
+
+# start -------------------------------------------------------------------
+
+
 # setwd('C:/Users/phdma/OneDrive/OneDrive - University of Glasgow/Documents/Parsons_Postdoc/Stickleback_Genomic/Transgen_epigenetics/')
 setwd('~/Methylation_data/')
 
@@ -255,3 +267,52 @@ signif_full = anova.cca(RDA_treatment,
 vif.cca(RDA_treatment)
 
 sum_rda = summary(RDA_treatment)
+
+sum_rda$species %>% 
+  as_tibble() %>% 
+  write_csv('RDA_treatment_pops_methy_locations.csv')
+
+sum_rda$sites %>% 
+  as_tibble() %>% 
+  write_csv('RDA_treatment_pops_individuals.csv')
+
+sum_rda$biplot %>% 
+  as_tibble() %>% 
+  write_csv('RDA_treatment_pops_biplot.csv')
+
+rda_scores = scores(RDA_treatment, 
+                    choices = c(1:2), 
+                    display = 'species')
+
+rda_outliers = outliers(rda_scores[,1], 3)
+
+rda_out = cbind.data.frame(rep(1, 
+                               times = length(rda_outliers)), 
+                           names(rda_outliers), 
+                           unname(rda_outliers))
+
+rda_out = rda_out %>% 
+  as_tibble() %>%  
+dplyr::rename(axis = 1, 
+              loc = 2, 
+              scores = 3)
+
+all_loc = rda_scores[,1]
+
+rda_normal = cbind.data.frame(rep(1, 
+                                  times = length(all_loc)), 
+                              names(all_loc),
+                              unname(all_loc))
+rda_normal = rda_normal %>% 
+  as_tibble() %>% 
+  dplyr::rename(axis = 1, 
+                loc = 2, 
+                scores = 3)
+
+rda_normal = rda_normal[!rda_normal$loc %in% rda_out$loc,]
+
+write_csv(rda_normal, 
+          'RDA_nonoutliers_methylation.csv')
+
+write_csv(rda_out, 
+          'RDA_outliers_methylation.csv')
