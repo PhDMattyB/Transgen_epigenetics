@@ -409,10 +409,17 @@ normal_loc = bind_cols(normal_loc,
 vars_rda = bind_cols(test_pheno, 
           individuals)
 
-candidates = candidates %>%
-  rename(RDA1 = scores) %>% 
-  mutate(RDA2 = 0.000)
-  
+# all_scores = rda_scores %>%
+#   as.data.frame() %>%
+#   rownames_to_column() %>%
+#   as_tibble() %>%
+#   rename(loc = rowname)
+# 
+# inner_join(candidates,
+#            all_scores,
+#            by = 'loc') %>%
+#   write_csv('RDA_outliers_methylation_correlations.csv')
+
 
 theme_set(theme_bw())
 
@@ -426,4 +433,9 @@ ggplot()+
              aes(x = RDA1, 
                  y = RDA2), 
              col = '#0AB33A', 
+             size = 2)+
+  geom_point(data = vars_rda, 
+             aes(x = RDA1, 
+                 y = RDA2, 
+                 col = temps), 
              size = 2)
