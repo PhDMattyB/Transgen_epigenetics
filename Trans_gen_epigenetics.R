@@ -368,4 +368,13 @@ candidates = cbind.data.frame(rda_out,
 #   as_tibble() %>% 
 #   write_csv('RDA_outliers_methylation_correlations.csv')
             
+##check for duplicates
+length(candidates$loc[duplicated(candidates$loc)])
 
+for(i in 1:length(candidates$loc)){
+  bar = candidates[i,]
+  candidates[i,6] = names(which.max(abs(bar[4:5])))
+  candidates[i,7] = max(abs(bar[4:5]))
+  }
+
+candidates
