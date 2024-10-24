@@ -316,3 +316,27 @@ rda_normal = rda_normal[!rda_normal$loc %in% rda_out$loc,]
 # 
 # write_csv(rda_out, 
 #           'RDA_outliers_methylation.csv')
+
+rda_out = as.data.frame(rda_out)
+all_loc = as.data.frame(all_loc)
+# test_pheno = as.data.frame(test_pheno)
+
+test_pheno = test_pheno %>% 
+  as_tibble() %>% 
+mutate(pop_num = as.numeric(case_when(
+      Population == 'GTS' ~ '1',
+      Population == 'CSWY' ~ '2',
+      Population == 'ASHNW' ~ '3',
+      Population == 'ASHNC' ~ '4',
+      Population == 'MYVW' ~ '5',
+      Population == 'MYVC' ~ '6',
+      Population == 'SKRW' ~ '7',
+      Population == 'SKRC' ~ '8'))) %>% 
+  dplyr::select(-Population) %>% 
+  as.data.frame()
+
+nam = rda_out[1:45, 2]
+out_loc = all_loc[nam,]
+out_cor = apply(test_pheno,
+                2, 
+                function(x)cor(x, out_loc))
