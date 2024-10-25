@@ -406,9 +406,11 @@ cand_methy_pivot = cand_methy %>%
                names_to = 'methy_loc', 
                values_to = 'Methylation') %>% 
   separate(col = methy_loc, 
-           into = c('Chromsome', 
+           into = c('Chromosome', 
                     'BP'), 
-           sep = '-')
+           sep = '-') %>% 
+  arrange(Chromosome, 
+          BP)
 
 
 # GRAPHS! -----------------------------------------------------------------
