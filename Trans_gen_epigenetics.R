@@ -395,7 +395,7 @@ cand_methy %>%
           temps) %>% 
   View()
 
-cand_methy %>% 
+cand_methy_pivot = cand_methy %>% 
   group_by(SampleID, 
            Population, 
            temps, 
@@ -404,7 +404,11 @@ cand_methy %>%
            Ecotype) %>% 
   pivot_longer(cols = starts_with('chr'),
                names_to = 'methy_loc', 
-               values_to = 'Methylation') 
+               values_to = 'Methylation') %>% 
+  separate(col = methy_loc, 
+           into = c('Chromsome', 
+                    'BP'), 
+           sep = '-')
 
 
 # GRAPHS! -----------------------------------------------------------------
