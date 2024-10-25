@@ -390,7 +390,12 @@ cand_methy = mvalues %>%
 cand_methy = bind_cols(meta_data, 
                        cand_methy)
 
+cand_methy %>% 
+  arrange(Population,
+          temps) %>% 
+  View()
 
+View(cand_methy)
 
 
 # GRAPHS! -----------------------------------------------------------------
