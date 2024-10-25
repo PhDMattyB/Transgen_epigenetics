@@ -281,8 +281,6 @@ sum_rda$biplot %>%
   write_csv('RDA_treatment_pops_biplot.csv')
 
 
-
-
 rda_scores = scores(RDA_treatment, 
                     choices = c(1:2), 
                     display = 'species')
@@ -380,6 +378,12 @@ for(i in 1:length(candidates$loc)){
 candidates
 
 
+cand_loc = candidates$loc
+
+mvalues %>% 
+  select(any_of(cand_loc))
+
+
 # GRAPHS! -----------------------------------------------------------------
 
 
@@ -443,7 +447,7 @@ ggplot()+
     panel.grid.minor = element_blank(), 
     axis.title = element_text(size = 15), 
     axis.text = element_text(size = 15), 
-    axis.ticks = element_line(size = 1), 
+    # axis.ticks = element_line(size = 1), 
     plot.title = element_text(size = 15, 
                               hjust = 0), 
     legend.title = element_text(size = 13),
