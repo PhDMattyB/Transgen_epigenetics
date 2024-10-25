@@ -412,6 +412,46 @@ cand_methy_pivot = cand_methy %>%
   arrange(Chromosome, 
           BP)
 
+cand_methy_pivot$temps = as.character(cand_methy_pivot$temps)
+
+
+cand_methy_pivot %>% 
+  filter(Population %in% c('ASHNC', 
+                           'ASHNW')) %>% 
+  ggplot()+
+  geom_point(aes(x = BP, 
+                 y = Methylation, 
+                 col = temps))+
+  facet_grid(~Chromosome)
+
+cand_methy_pivot %>% 
+  filter(Population %in% c('MYVC', 
+                           'MYVW')) %>% 
+  ggplot()+
+  geom_point(aes(x = BP, 
+                 y = Methylation, 
+                 col = temps))+
+  facet_grid(~Chromosome)
+
+cand_methy_pivot %>% 
+  filter(Population %in% c('SKRC', 
+                           'SKRW')) %>% 
+  ggplot()+
+  geom_point(aes(x = BP, 
+                 y = Methylation, 
+                 col = temps))+
+  facet_grid(~Chromosome)
+
+
+cand_methy_pivot %>% 
+  filter(Population %in% c('CSWY', 
+                           'GTS')) %>% 
+  ggplot()+
+  geom_point(aes(x = BP, 
+                 y = Methylation, 
+                 col = temps))+
+  facet_grid(~Chromosome)
+
 
 # GRAPHS! -----------------------------------------------------------------
 
