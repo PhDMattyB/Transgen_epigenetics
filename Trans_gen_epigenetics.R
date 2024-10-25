@@ -378,10 +378,19 @@ for(i in 1:length(candidates$loc)){
 candidates
 
 
+
+# Hyper and hypo methylation candidate loci -------------------------------
+
+
 cand_loc = candidates$loc
 
-mvalues %>% 
+cand_methy = mvalues %>% 
   select(any_of(cand_loc))
+
+cand_methy = bind_cols(meta_data, 
+                       cand_methy)
+
+
 
 
 # GRAPHS! -----------------------------------------------------------------
