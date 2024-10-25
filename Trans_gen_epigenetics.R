@@ -425,6 +425,23 @@ cand_methy_pivot %>%
   facet_grid(~Chromosome)
 
 cand_methy_pivot %>% 
+  filter(Population == 'ASHNC') %>% 
+  ggplot()+
+  geom_point(aes(x = BP, 
+                 y = Methylation, 
+                 col = temps))+
+  facet_grid(~Chromosome)
+
+cand_methy_pivot %>% 
+  filter(Population == 'ASHNW') %>% 
+  ggplot()+
+  geom_point(aes(x = BP, 
+                 y = Methylation, 
+                 col = temps))+
+  facet_grid(~Chromosome)
+
+
+cand_methy_pivot %>% 
   filter(Population %in% c('MYVC', 
                            'MYVW')) %>% 
   ggplot()+
