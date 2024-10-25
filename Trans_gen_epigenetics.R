@@ -395,7 +395,16 @@ cand_methy %>%
           temps) %>% 
   View()
 
-View(cand_methy)
+cand_methy %>% 
+  group_by(SampleID, 
+           Population, 
+           temps, 
+           F1_temp, 
+           F2_temp, 
+           Ecotype) %>% 
+  pivot_longer(cols = starts_with('chr'),
+               names_to = 'methy_loc', 
+               values_to = 'Methylation') 
 
 
 # GRAPHS! -----------------------------------------------------------------
