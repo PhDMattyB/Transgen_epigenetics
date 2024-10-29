@@ -475,16 +475,18 @@ ASHNC_outlier_plot = cand_methy_pivot %>%
   scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
   theme(axis.title.x = element_blank(), 
-        axis.text.x = element_blank(), 
+        axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.title.y = element_text(size = 14), 
+        # axis.title.y = element_text(size = 14),
+        axis.title.y = element_blank(),
         axis.text.y = element_text(size = 12), 
         strip.background = element_rect(fill = 'white'), 
         strip.text = element_text(size = 12, 
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'none')
 
 
 ASHNW_outlier_plot = cand_methy_pivot %>% 
@@ -518,8 +520,10 @@ ASHNW_outlier_plot = cand_methy_pivot %>%
        x = 'Base pair position')+
   scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
-  theme(axis.title = element_text(size = 14), 
+  theme(axis.title.y = element_blank(), 
+        # axis.title.y = element_text(size = 14), 
         axis.text.y = element_text(size = 12),
+        axis.title.x = element_blank(),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         strip.background = element_rect(fill = 'white'), 
@@ -527,7 +531,8 @@ ASHNW_outlier_plot = cand_methy_pivot %>%
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'none')
 
 
 ASHN_meth_outliers = ASHNC_outlier_plot/ASHNW_outlier_plot
@@ -567,14 +572,16 @@ MYVC_outlier_plot = cand_methy_pivot %>%
   theme(axis.title.x = element_blank(), 
         axis.text.x = element_blank(), 
         axis.ticks.x = element_blank(),
-        axis.title.y = element_text(size = 14), 
+        # axis.title.y = element_text(size = 14), 
+        axis.title.y = element_blank(),
         axis.text.y = element_text(size = 12), 
         strip.background = element_rect(fill = 'white'), 
         strip.text = element_text(size = 12, 
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'none')
 
 MYVW_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'MYVW') %>% 
@@ -607,7 +614,7 @@ MYVW_outlier_plot = cand_methy_pivot %>%
        x = 'Base pair position')+
   scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
-  theme(axis.title = element_text(size = 14), 
+  theme(axis.title = element_blank(), 
         axis.text.y = element_text(size = 12),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -616,7 +623,8 @@ MYVW_outlier_plot = cand_methy_pivot %>%
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'none')
 
 MYV_meth_outliers = MYVC_outlier_plot/MYVW_outlier_plot
 
@@ -654,14 +662,16 @@ SKRC_outlier_plot = cand_methy_pivot %>%
   theme(axis.title.x = element_blank(), 
         axis.text.x = element_blank(), 
         axis.ticks.x = element_blank(),
-        axis.title.y = element_text(size = 14), 
+        # axis.title.y = element_text(size = 14),
+        axis.title.y = element_blank(),
         axis.text.y = element_text(size = 12), 
         strip.background = element_rect(fill = 'white'), 
         strip.text = element_text(size = 12, 
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'none')
   
 
 SKRW_outlier_plot = cand_methy_pivot %>% 
@@ -695,7 +705,8 @@ SKRW_outlier_plot = cand_methy_pivot %>%
        x = 'Base pair position')+
   scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
-  theme(axis.title = element_text(size = 14), 
+  theme(axis.title.x = element_text(size = 14),
+        axis.title.y = element_blank(),
         axis.text.y = element_text(size = 12),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -704,7 +715,8 @@ SKRW_outlier_plot = cand_methy_pivot %>%
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'none')
 
 SKR_meth_outlier = SKRC_outlier_plot/SKRW_outlier_plot
 
@@ -743,14 +755,16 @@ CSWY_outlier_plot = cand_methy_pivot %>%
   theme(axis.title.x = element_blank(), 
         axis.text.x = element_blank(), 
         axis.ticks.x = element_blank(),
-        axis.title.y = element_text(size = 14), 
+        # axis.title.y = element_text(size = 14),
+        axis.title.y = element_blank(),
         axis.text.y = element_text(size = 12), 
         strip.background = element_rect(fill = 'white'), 
         strip.text = element_text(size = 12, 
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'bottom')
 
 GTS_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'GTS') %>% 
@@ -783,7 +797,8 @@ GTS_outlier_plot = cand_methy_pivot %>%
        x = 'Base pair position')+
   scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
-  theme(axis.title = element_text(size = 14), 
+  theme(axis.title.x = element_text(size = 14),
+        axis.title.y = element_blank(),
         axis.text.y = element_text(size = 12),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -792,11 +807,14 @@ GTS_outlier_plot = cand_methy_pivot %>%
                                   face = 'bold'),
         plot.title = element_text(hjust = 0.5),
         panel.grid = element_blank(), 
-        legend.title = element_blank())
+        legend.title = element_blank(), 
+        legend.position = 'bottom')
 
 CSWY_GTS_meth_outlier = CSWY_outlier_plot/GTS_outlier_plot
 
 (ASHN_meth_outliers|MYV_meth_outliers)/(SKR_meth_outlier|CSWY_GTS_meth_outlier)
+
+(ASHNC_outlier_plot|ASHNW_outlier_plot)/(MYVC_outlier_plot|MYVW_outlier_plot)/(SKRC_outlier_plot|SKRW_outlier_plot)/(CSWY_outlier_plot|GTS_outlier_plot)
 
 
 # GRAPHS! -----------------------------------------------------------------
