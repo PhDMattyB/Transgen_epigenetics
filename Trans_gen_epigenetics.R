@@ -237,6 +237,28 @@ test_df = bind_cols(meta_data,
 # Phenotypic traits -------------------------------------------------------
 
 
+# percent methylation -----------------------------------------------------
+
+percent_df = bind_cols(meta_data, 
+                       mvalues)
+
+df = percent_df %>% 
+  select(-SampleID,
+         -F1_temp, 
+         -F2_temp, 
+         -Ecotype) %>% 
+  group_by(Population, 
+           temps) %>% 
+  pivot_longer(cols = starts_with('chr'),
+               names_to = 'methy_loc', 
+               values_to = 'Methylation') %>% 
+  separate(col = methy_loc, 
+           into = c('Chromosome', 
+                    'BP'), 
+           sep = '-') %>% 
+  arrange(Chromosome, 
+          BP)
+
 
 # RDA ---------------------------------------------------------------------
 # methy_test = mval_test %>% 
