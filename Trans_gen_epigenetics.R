@@ -823,10 +823,15 @@ GTS_outlier_plot = cand_methy_pivot %>%
 
 CSWY_GTS_meth_outlier = CSWY_outlier_plot/GTS_outlier_plot
 
-(ASHN_meth_outliers|MYV_meth_outliers)/(SKR_meth_outlier|CSWY_GTS_meth_outlier)
 
-(ASHNC_outlier_plot|ASHNW_outlier_plot)/(MYVC_outlier_plot|MYVW_outlier_plot)/(SKRC_outlier_plot|SKRW_outlier_plot)/(CSWY_outlier_plot|GTS_outlier_plot)
+BIG_METHY = (ASHNC_outlier_plot|ASHNW_outlier_plot)/(MYVC_outlier_plot|MYVW_outlier_plot)/(SKRC_outlier_plot|SKRW_outlier_plot)/(CSWY_outlier_plot|GTS_outlier_plot)
 
+ggsave('Big_methylaton_treatment_plot.tiff', 
+       plot = BIG_METHY, 
+       dpi = 'retina', 
+       units = 'cm', 
+       height = 20, 
+       width = 30)
 
 # GRAPHS! -----------------------------------------------------------------
 
