@@ -443,6 +443,17 @@ F1_temps_pal = c('#0077b6',
               '#ef959c',
               '#ef233c')
 
+cand_methy_pivot$Chromosome = factor(cand_methy_pivot$Chromosome, 
+                                     levels = c('chrIII', 
+                                                'chrIV', 
+                                                'chrVI', 
+                                                'chrXI', 
+                                                'chrXII', 
+                                                'chrXIII', 
+                                                'chrXVI', 
+                                                'chrXX', 
+                                                'chrUn'))
+
 
 ASHNC_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'ASHNC') %>% 
@@ -705,7 +716,7 @@ SKRW_outlier_plot = cand_methy_pivot %>%
        x = 'Base pair position')+
   scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
-  theme(axis.title.x = element_text(size = 14),
+  theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         axis.text.y = element_text(size = 12),
         axis.text.x = element_blank(),
@@ -752,7 +763,7 @@ CSWY_outlier_plot = cand_methy_pivot %>%
        x = 'Base pair position')+
   scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
-  theme(axis.title.x = element_blank(), 
+  theme(axis.title.x = element_text(size = 14), 
         axis.text.x = element_blank(), 
         axis.ticks.x = element_blank(),
         # axis.title.y = element_text(size = 14),
