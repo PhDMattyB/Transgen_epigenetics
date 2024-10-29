@@ -426,17 +426,17 @@ cand_methy_pivot$temps = as.character(cand_methy_pivot$temps)
 #                  col = temps))+
 #   facet_grid(~Chromosome)
 
-cand_methy_pivot %>%
-  filter(Population == 'ASHNC') %>%
-  group_by(Population,
-           temps) %>%
-  distinct(Chromosome,
-           BP,
-           .keep_all = T) %>%
-  arrange(Chromosome,
-          BP,
-          temps) %>%
-  View()
+# cand_methy_pivot %>%
+#   filter(Population == 'ASHNC') %>%
+#   group_by(Population,
+#            temps) %>%
+#   distinct(Chromosome,
+#            BP,
+#            .keep_all = T) %>%
+#   arrange(Chromosome,
+#           BP,
+#           temps) %>%
+#   View()
 
 F1_temps_pal = c('#0077b6', 
               '#a2d2ff', 
