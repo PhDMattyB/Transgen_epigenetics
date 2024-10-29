@@ -26,6 +26,7 @@ setwd('~/Methylation_data/')
 library(tidyverse)
 library(sjmisc)
 library(vegan)
+library(patchwork)
 
 
 # methy_rds = read_rds(file = "Methylated.cov.noZero.rds")
@@ -415,59 +416,208 @@ cand_methy_pivot = cand_methy %>%
 cand_methy_pivot$temps = as.character(cand_methy_pivot$temps)
 
 
-cand_methy_pivot %>% 
-  filter(Population %in% c('ASHNC', 
-                           'ASHNW')) %>% 
-  ggplot()+
-  geom_point(aes(x = BP, 
-                 y = Methylation, 
-                 col = temps))+
-  facet_grid(~Chromosome)
+# cand_methy_pivot %>% 
+#   filter(Population %in% c('ASHNC', 
+#                            'ASHNW')) %>% 
+#   ggplot()+
+#   geom_point(aes(x = BP, 
+#                  y = Methylation, 
+#                  col = temps))+
+#   facet_grid(~Chromosome)
 
-cand_methy_pivot %>% 
+# cand_methy_pivot %>% 
+#   filter(Population == 'ASHNC') %>% 
+#   group_by(Population, 
+#            temps) %>% 
+#   distinct(Chromosome, 
+#            BP, 
+#            .keep_all = T) %>%
+#   arrange(Chromosome, 
+#           BP, 
+#           temps) %>% 
+#   View()
+
+ASHNC_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'ASHNC') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
   ggplot()+
-  geom_point(aes(x = BP, 
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
                  y = Methylation, 
-                 col = temps))+
+                 col = temps), 
+              width = 0, 
+              height = 0.05)+
   facet_grid(~Chromosome)
 
-cand_methy_pivot %>% 
+
+ASHNW_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'ASHNW') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
   ggplot()+
-  geom_point(aes(x = BP, 
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
                  y = Methylation, 
-                 col = temps))+
+                 col = temps), 
+              width = 0, 
+              height = 0.05)+
   facet_grid(~Chromosome)
 
+ASHNC_outlier_plot/ASHNW_outlier_plot
 
-cand_methy_pivot %>% 
-  filter(Population %in% c('MYVC', 
-                           'MYVW')) %>% 
+
+MYVC_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'MYVC') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
   ggplot()+
-  geom_point(aes(x = BP, 
-                 y = Methylation, 
-                 col = temps))+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  col = temps), 
+              width = 0, 
+              height = 0.05)+
   facet_grid(~Chromosome)
 
-cand_methy_pivot %>% 
-  filter(Population %in% c('SKRC', 
-                           'SKRW')) %>% 
+MYVW_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'MYVW') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
   ggplot()+
-  geom_point(aes(x = BP, 
-                 y = Methylation, 
-                 col = temps))+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  col = temps), 
+              width = 0, 
+              height = 0.05)+
   facet_grid(~Chromosome)
 
+MYVC_outlier_plot/MYVW_outlier_plot
 
-cand_methy_pivot %>% 
-  filter(Population %in% c('CSWY', 
-                           'GTS')) %>% 
+SKRC_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'SKRC') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
   ggplot()+
-  geom_point(aes(x = BP, 
-                 y = Methylation, 
-                 col = temps))+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  col = temps), 
+              width = 0, 
+              height = 0.05)+
   facet_grid(~Chromosome)
+
+SKRW_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'SKRW') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  col = temps), 
+              width = 0, 
+              height = 0.05)+
+  facet_grid(~Chromosome)
+
+SKRC_outlier_plot/SKRW_outlier_plot
+
+
+CSWY_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'CSWY') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  col = temps), 
+              width = 0, 
+              height = 0.05)+
+  facet_grid(~Chromosome)
+
+GTS_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'GTS') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  col = temps), 
+              width = 0, 
+              height = 0.05)+
+  facet_grid(~Chromosome)
+
+CSWY_outlier_plot/GTS_outlier_plot
+# cand_methy_pivot %>% 
+#   filter(Population %in% c('MYVC', 
+#                            'MYVW')) %>% 
+#   ggplot()+
+#   geom_point(aes(x = BP, 
+#                  y = Methylation, 
+#                  col = temps))+
+#   facet_grid(~Chromosome)
+# 
+# cand_methy_pivot %>% 
+#   filter(Population %in% c('SKRC', 
+#                            'SKRW')) %>% 
+#   ggplot()+
+#   geom_point(aes(x = BP, 
+#                  y = Methylation, 
+#                  col = temps))+
+#   facet_grid(~Chromosome)
+# 
+# 
+# cand_methy_pivot %>% 
+#   filter(Population %in% c('CSWY', 
+#                            'GTS')) %>% 
+#   ggplot()+
+#   geom_point(aes(x = BP, 
+#                  y = Methylation, 
+#                  col = temps))+
+#   facet_grid(~Chromosome)
 
 
 # GRAPHS! -----------------------------------------------------------------
