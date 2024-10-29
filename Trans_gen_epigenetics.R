@@ -438,6 +438,17 @@ cand_methy_pivot$temps = as.character(cand_methy_pivot$temps)
 #           temps) %>% 
 #   View()
 
+F1_temps_pal = c('#0077b6', 
+              '#a2d2ff', 
+              '#ef959c',
+              '#ef233c')
+
+F2_temps_pal = c('#0077b6', 
+                 '#ef959c',
+                 '#a2d2ff',
+                 '#ef233c')
+
+
 ASHNC_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'ASHNC') %>% 
   group_by(Population, 
@@ -455,8 +466,18 @@ ASHNC_outlier_plot = cand_methy_pivot %>%
               width = 0, 
               height = 0.05)+
   scale_y_continuous(expand = c(0,0), 
-                     limits = c(-6.0, 0.1))+
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
   labs(title = 'ASHN Cold')+
+  scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
   theme(axis.title.x = element_blank(), 
         axis.text.x = element_blank(), 
@@ -488,9 +509,19 @@ ASHNW_outlier_plot = cand_methy_pivot %>%
               width = 0, 
               height = 0.05)+
   scale_y_continuous(expand = c(0,0), 
-                     limits = c(-6.0, 0.1))+
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
   labs(title = 'ASHN Warm', 
        x = 'Base pair position')+
+  scale_color_manual(values = F1_temps_pal)+
   facet_grid(~Chromosome)+
   theme(axis.title = element_text(size = 14), 
         axis.text.y = element_text(size = 12),
