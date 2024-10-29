@@ -28,6 +28,7 @@ library(sjmisc)
 library(vegan)
 library(patchwork)
 
+theme_set(theme_bw())
 
 # methy_rds = read_rds(file = "Methylated.cov.noZero.rds")
 # head(methy_rds)
@@ -453,7 +454,21 @@ ASHNC_outlier_plot = cand_methy_pivot %>%
                  col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 0.1))+
+  labs(title = 'ASHN Cold')+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(size = 14), 
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
 
 
 ASHNW_outlier_plot = cand_methy_pivot %>% 
@@ -472,7 +487,22 @@ ASHNW_outlier_plot = cand_methy_pivot %>%
                  col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 0.1))+
+  labs(title = 'ASHN Warm', 
+       x = 'Base pair position')+
+  facet_grid(~Chromosome)+
+  theme(axis.title = element_text(size = 14), 
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
+
 
 ASHNC_outlier_plot/ASHNW_outlier_plot
 
