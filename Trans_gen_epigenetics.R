@@ -443,11 +443,6 @@ F1_temps_pal = c('#0077b6',
               '#ef959c',
               '#ef233c')
 
-F2_temps_pal = c('#0077b6', 
-                 '#ef959c',
-                 '#a2d2ff',
-                 '#ef233c')
-
 
 ASHNC_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'ASHNC') %>% 
@@ -535,7 +530,7 @@ ASHNW_outlier_plot = cand_methy_pivot %>%
         legend.title = element_blank())
 
 
-ASHNC_outlier_plot/ASHNW_outlier_plot
+ASHN_meth_outliers = ASHNC_outlier_plot/ASHNW_outlier_plot
 
 
 MYVC_outlier_plot = cand_methy_pivot %>% 
@@ -554,7 +549,32 @@ MYVC_outlier_plot = cand_methy_pivot %>%
                   col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'MYV Cold', 
+       x = 'Base pair position')+
+  scale_color_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(size = 14), 
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
 
 MYVW_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'MYVW') %>% 
@@ -572,9 +592,33 @@ MYVW_outlier_plot = cand_methy_pivot %>%
                   col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'MYV Warm', 
+       x = 'Base pair position')+
+  scale_color_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title = element_text(size = 14), 
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
 
-MYVC_outlier_plot/MYVW_outlier_plot
+MYV_meth_outliers = MYVC_outlier_plot/MYVW_outlier_plot
 
 SKRC_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'SKRC') %>% 
@@ -592,7 +636,33 @@ SKRC_outlier_plot = cand_methy_pivot %>%
                   col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'SKR Cold', 
+       x = 'Base pair position')+
+  scale_color_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(size = 14), 
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
+  
 
 SKRW_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'SKRW') %>% 
@@ -610,9 +680,33 @@ SKRW_outlier_plot = cand_methy_pivot %>%
                   col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'SKR Warm', 
+       x = 'Base pair position')+
+  scale_color_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title = element_text(size = 14), 
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
 
-SKRC_outlier_plot/SKRW_outlier_plot
+SKR_meth_outlier = SKRC_outlier_plot/SKRW_outlier_plot
 
 
 CSWY_outlier_plot = cand_methy_pivot %>% 
@@ -631,7 +725,32 @@ CSWY_outlier_plot = cand_methy_pivot %>%
                   col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'CSWY Cold', 
+       x = 'Base pair position')+
+  scale_color_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(size = 14), 
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
 
 GTS_outlier_plot = cand_methy_pivot %>% 
   filter(Population == 'GTS') %>% 
@@ -649,10 +768,35 @@ GTS_outlier_plot = cand_methy_pivot %>%
                   col = temps), 
               width = 0, 
               height = 0.05)+
-  facet_grid(~Chromosome)
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'GTS Warm', 
+       x = 'Base pair position')+
+  scale_color_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title = element_text(size = 14), 
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank())
 
-CSWY_outlier_plot/GTS_outlier_plot
+CSWY_GTS_meth_outlier = CSWY_outlier_plot/GTS_outlier_plot
 
+(ASHN_meth_outliers|MYV_meth_outliers)/(SKR_meth_outlier|CSWY_GTS_meth_outlier)
 
 
 # GRAPHS! -----------------------------------------------------------------
