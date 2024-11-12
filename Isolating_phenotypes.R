@@ -92,6 +92,24 @@ F1_12deg_range = c(1:104, 206:370, 411:511, 612:700, 789:897, 999:1097, 1198:129
 
 F1_18deg_range = c(105:205, 371:410, 512:611, 701:788, 898:998, 1098:1197, 1298:1297, 1475:1575)
 
+F1_array = array(0, dim = c(37, 2, 1575))
+
+for(i in F1_12deg_range){
+  F1_array[,,i] = gpa$coords[,,i] - F1_12deg_array[,,1]
+}
+
+for(i in F1_18deg_range){
+  F1_array[,,i] = gpa$coords[,,i] - F1_18deg_array[,,1]
+}
 
 
+F1_array_consensus = array(0, dim = c(37, 2, 1575))
 
+for(i in 1:1575){
+  F1_array_consensus[,,i] = F1_array[,,i] + mean_shape_array[,,1]
+}
+
+# writeland.tps(F1_array_consensus, 
+#               file = 'F1_effect_landmarks_all_individuals.tps',
+#               scale = NULL, 
+#               specID = T)
