@@ -157,8 +157,30 @@ for(i in 1:1575){
   F2_array_consensus[,,i] = F2_array[,,i] + mean_shape_array[,,1]
 }
 
-writeland.tps(F2_array_consensus,
-              file = 'F2_effect_landmarks_all_individuals.tps',
+# writeland.tps(F2_array_consensus,
+#               file = 'F2_effect_landmarks_all_individuals.tps',
+#               scale = NULL,
+#               specID = T)
+
+
+# isolate ecotype effects -------------------------------------------------
+
+## isolate effects due to warm cold divergence axis regardless of population
+ecotype_mod1 = procD.lm(gpa$coords ~ meta_data$ecotype...12, 
+                       iter = 999, 
+                       RRPP = T)
+
+ecotype_lm = ecotype_mod1$GM$fitted
+
+ecotype_consensus = array(0, dim = c(37, 2, 1575))
+
+for(i in 1:1575){
+  ecotype_consensus[,,i] = ecotype_lm[,,i] + mean_shape_array[,,1]
+}
+
+writeland.tps(ecotype_consensus,
+              file = 'ecotype_effect_landmarks_all_individuals.tps',
               scale = NULL,
               specID = T)
+
 
