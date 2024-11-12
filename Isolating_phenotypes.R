@@ -34,6 +34,16 @@ bs_data = readland.tps('F2_All_aligned_withsliders.tps',
                        specID = 'imageID', 
                        readcurves = T)
 
+bs_data = read_csv("epigenetic_landmark_data.csv") %>% 
+  select(-na)
+
+bs_data = as.matrix(bs_data)
+
+arrayspecs(A = bs_data, 
+           p = 37, 
+           k = 2)
+
+
 sliders = define.sliders(c(28:37,1))
 
 gpa = gpagen(bs_data, 
@@ -68,8 +78,8 @@ F1_temp_mod = procD.lm(gpa$coords ~ meta_data$F1,
                        iter = 999, 
                        RRPP = T)
 
-F1_fitted = F1_temp_mod$GM$fitted[,,1]
-F1_fitted_mat_12deg = as.matrix(F1_fitted)
+F1_fitted_12deg = F1_temp_mod$GM$fitted[,,1]
+F1_fitted_mat_12deg = as.matrix(F1_fitted_12deg)
 F1_12deg_array = array(F1_fitted_mat_12deg, 
                        dim = c(37, 2, 1))
 
@@ -77,3 +87,6 @@ F1_fitted_18deg = F1_temp_mod$GM$fitted[,,64]
 F1_fitteed_18deg_mat = as.matrix(F1_fitted_18deg)
 F1_18deg_array = array(F1_fitteed_18deg_mat, 
                        dim = c(37, 2, 1))
+
+
+
