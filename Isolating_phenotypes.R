@@ -61,3 +61,19 @@ mean_shape_array = array(matrix_mean_shape,
                          dim = c(37, 2, 1))
 
 
+
+# Isolate F1 effects ------------------------------------------------------
+
+F1_temp_mod = procD.lm(gpa$coords ~ meta_data$F1, 
+                       iter = 999, 
+                       RRPP = T)
+
+F1_fitted = F1_temp_mod$GM$fitted[,,1]
+F1_fitted_mat_12deg = as.matrix(F1_fitted)
+F1_12deg_array = array(F1_fitted_mat_12deg, 
+                       dim = c(37, 2, 1))
+
+F1_fitted_18deg = F1_temp_mod$GM$fitted[,,64]
+F1_fitteed_18deg_mat = as.matrix(F1_fitted_18deg)
+F1_18deg_array = array(F1_fitteed_18deg_mat, 
+                       dim = c(37, 2, 1))
