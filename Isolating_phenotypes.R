@@ -183,4 +183,20 @@ writeland.tps(ecotype_consensus,
               scale = NULL,
               specID = T)
 
+ecotype_mod2 = procD.lm(gpa$coords ~ meta_data$poppair*meta_data$ecotype...12, 
+                        iter = 999, 
+                        RRPP = T)
+
+ecotype2_fitted = ecotype_mod2$GM$fitted
+
+ecotype2_consensus = array(0, dim = c(37, 2, 1575))
+
+for(i in 1:1575){
+  ecotype2_consensus[,,i] = ecotype2_fitted[,,i] + mean_shape_array[,,1]
+}
+
+writeland.tps(ecotype2_consensus,
+              file = 'ecotype_effect_per_population_landmarks_all_individuals.tps',
+              scale = NULL,
+              specID = T)
 
