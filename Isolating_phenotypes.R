@@ -25,7 +25,10 @@ meta_data = read_csv('formattedDataEU.csv') %>%
              F2, 
              poppair, 
              ecotype...12, 
-         csize_real)
+         csize_real) %>% 
+  unite(Ecotype, 
+        c(poppair, 
+          ecotype...12))
 
 
 # Body shape data ---------------------------------------------------------
