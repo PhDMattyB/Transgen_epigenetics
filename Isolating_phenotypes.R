@@ -200,3 +200,130 @@ writeland.tps(ecotype2_consensus,
               scale = NULL,
               specID = T)
 
+
+
+
+# Phenotype PCA -----------------------------------------------------------
+
+
+
+## pca of the raw landmark data
+raw = readland.tps('F2_All_aligned_withsliders.tps', 
+                   specID = 'imageID', 
+                   readcurves = T)
+
+sliders = define.sliders(c(28:37,1))
+
+raw_gpa = gpagen(raw, 
+             print.progress = T, 
+             curves = sliders)
+
+raw_pca = gm.prcomp(A = raw_gpa$coords)
+
+summary(raw_pca)
+
+raw_pca_vals = raw_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+raw_pca_data = bind_cols(meta_data, 
+      raw_pca_vals) 
+
+raw_pca_data$F1 = as.character(raw_pca_data$F1)
+raw_pca_data$F2 = as.character(raw_pca_data$F2)
+
+ggplot(data = raw_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = F2))
+
+
+## pca of the f1 effects
+F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps', 
+                          specID = 'imageID', 
+                          readcurves = T)
+
+f1_gpa = gpagen(F1_effects, 
+                curves = sliders)
+f1_pca = gm.prcomp(f1_gpa$coords)
+
+summary(f1_pca)
+
+f1_pca_vals = f1_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+f1_pca_data = bind_cols(meta_data, 
+                        f1_pca_vals)
+
+f1_pca_data$F1 = as.character(f1_pca_data$F1)
+f1_pca_data$F2 = as.character(f1_pca_data$F2)
+
+ggplot(data = f1_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = F2))
+
+
+## pca of the f2 effects
+f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
+                          specID = 'imageID', 
+                          readcurves = T)
+
+f2_gpa = gpagen(f2_effects, 
+                curves = sliders)
+f2_pca = gm.prcomp(f2_gpa$coords)
+
+summary(f2_pca)
+
+f2_pca_vals = f2_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+f2_pca_data = bind_cols(meta_data, 
+                        f2_pca_vals)
+
+f2_pca_data$F1 = as.character(f2_pca_data$F1)
+f2_pca_data$F2 = as.character(f2_pca_data$F2)
+
+ggplot(data = f2_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = F2))
+
+
+## pca of the cold vs warm ecotype effects
+eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
+                          specID = 'imageID', 
+                          readcurves = T)
+
+eco1_gpa = gpagen(eco1_effects, 
+                curves = sliders)
+eco1_pca = gm.prcomp(eco1_gpa$coords)
+
+summary(eco1_pca)
+
+eco1_pca_vals = eco1_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+eco1_pca_data = bind_cols(meta_data, 
+                        eco1_pca_vals)
+
+eco1_pca_data$F1 = as.character(eco1_pca_data$F1)
+eco1_pca_data$F2 = as.character(eco1_pca_data$F2)
+
+ggplot(data = eco1_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = F2))
+
+ggplot(data = eco1_pca_data)+
+  geom_jitter(aes(x = Comp1, 
+                  y = Comp2, 
+                  col = F1, 
+                  shape = F2))
