@@ -25,10 +25,11 @@ meta_data = read_csv('formattedDataEU.csv') %>%
              F2, 
              poppair, 
              ecotype...12, 
-         csize_real) %>% 
-  unite(Ecotype, 
-        c(poppair, 
-          ecotype...12))
+         csize_real) 
+# %>% 
+#   unite(Ecotype, 
+#         c(poppair, 
+#           ecotype...12))
 
 
 # Body shape data ---------------------------------------------------------
@@ -173,16 +174,39 @@ ecotype_mod1 = procD.lm(gpa$coords ~ meta_data$ecotype...12,
                        iter = 999, 
                        RRPP = T)
 
-ecotype_lm = ecotype_mod1$GM$fitted
+eco1_fitted_cold = ecotype_mod1$GM$fitted[,,1]
+eco1_fitted_mat_cold = as.matrix(eco1_fitted_cold)
+eco1_cold_array = array(eco1_fitted_mat_cold, 
+                       dim = c(37, 2, 1))
 
-ecotype_consensus = array(0, dim = c(37, 2, 1575))
+eco1_fitted_warm = ecotype_mod1$GM$fitted[,,292]
+eco1_fitteed_warm_mat = as.matrix(eco1_fitted_warm)
+eco1_warm_array = array(eco1_fitteed_warm_mat, 
+                       dim = c(37, 2, 1))
 
-for(i in 1:1575){
-  ecotype_consensus[,,i] = ecotype_lm[,,i] + mean_shape_array[,,1]
+eco1_cold_range = c(1:204, 412:611, 798:997, 1198:1397)
+
+eco1_warm_range = c(205:411, 612:797, 998:1197, 1397:1575)
+
+eco1_array = array(0, dim = c(37, 2, 1575))
+
+for(i in eco1_cold_range){
+  eco1_array[,,i] = gpa$coords[,,i] - eco1_cold_array[,,1]
 }
 
-writeland.tps(ecotype_consensus,
-              file = 'ecotype_effect_landmarks_all_individuals.tps',
+for(i in eco1_warm_range){
+  eco1_array[,,i] = gpa$coords[,,i] - eco1_warm_array[,,1]
+}
+
+
+eco1_array_consensus = array(0, dim = c(37, 2, 1575))
+
+for(i in 1:1575){
+  eco1_array_consensus[,,i] = eco1_array[,,i] + mean_shape_array[,,1]
+}
+
+writeland.tps(eco1_array_consensus,
+              file = 'Ecotype_effect_landmarks_all_individuals.tps',
               scale = NULL,
               specID = T)
 
@@ -299,6 +323,11 @@ ggplot(data = f2_pca_data)+
 
 
 ## pca of the cold vs warm ecotype effects
+# eco1_effects = readland.tps('ecotype_effect_landmarks_all_individuals.tps', 
+#                             specID = 'imageID', 
+#                             readcurves = T)
+
+
 eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
                           specID = 'imageID', 
                           readcurves = T)
