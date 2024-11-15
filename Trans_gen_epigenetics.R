@@ -964,3 +964,11 @@ ggplot()+
   # geom_text(aes(x = 1.5*RDA_treatment$CCA$biplot[,1], 
   #               y = 1.2*RDA_treatment$CCA$biplot[,2], 
   #               label = colnames(vars_rda[,1:2])))
+
+
+
+# RAW whole body RDA ------------------------------------------------------
+
+mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
+raw_data = read_csv('Raw_RDA_phenotypes.csv')
+

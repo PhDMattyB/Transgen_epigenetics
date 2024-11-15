@@ -397,7 +397,81 @@ raw_lmk_dist %>%
 
 ## F1 effects
 
+F1_data = readland.tps('F1_effect_landmarks_all_individuals.tps', 
+                       specID = 'imageID', 
+                       readcurves = T)
+F1_pca = read_csv('F1_effect_PCA_data.csv')
+
+sliders = define.sliders(c(28:37,1))
+f1_gpa = gpagen(F1_data, 
+             print.progress = T, 
+             curves = sliders)
+
+lmks = data.frame(body_width = c(12, 21), 
+                      body_length = c(1, 16), 
+                      row.names = c('start', 
+                                    'end'))
+
+F1_lmk_dist = interlmkdist(f1_gpa$coords, 
+                            lmks)
+
+F1_lmk_dist %>% 
+  as_tibble() %>% 
+  mutate(fineness_ratio = body_length/body_width) %>% 
+  bind_cols(F1_pca, 
+            .) %>% 
+  write_csv('F1_RDA_phenotypes.csv')
+
+
 ## F2 effects
+F2_data = readland.tps('F2_effect_landmarks_all_individuals.tps', 
+                       specID = 'imageID', 
+                       readcurves = T)
+F2_pca = read_csv('F2_effect_PCA_data.csv')
+
+sliders = define.sliders(c(28:37,1))
+F2_gpa = gpagen(F2_data, 
+                print.progress = T, 
+                curves = sliders)
+
+lmks = data.frame(body_width = c(12, 21), 
+                  body_length = c(1, 16), 
+                  row.names = c('start', 
+                                'end'))
+
+F2_lmk_dist = interlmkdist(F2_gpa$coords, 
+                           lmks)
+
+F2_lmk_dist %>% 
+  as_tibble() %>% 
+  mutate(fineness_ratio = body_length/body_width) %>% 
+  bind_cols(F2_pca, 
+            .) %>% 
+  write_csv('F2_RDA_phenotypes.csv')
 
 ## ecotype effects
 
+Ecotype_data = readland.tps('Ecotype_effect_landmarks_all_individuals.tps', 
+                       specID = 'imageID', 
+                       readcurves = T)
+Ecotype_pca = read_csv('Ecotype_effect_PCA_data.csv')
+
+sliders = define.sliders(c(28:37,1))
+Ecotype_gpa = gpagen(Ecotype_data, 
+                print.progress = T, 
+                curves = sliders)
+
+lmks = data.frame(body_width = c(12, 21), 
+                  body_length = c(1, 16), 
+                  row.names = c('start', 
+                                'end'))
+
+Ecotype_lmk_dist = interlmkdist(Ecotype_gpa$coords, 
+                           lmks)
+
+Ecotype_lmk_dist %>% 
+  as_tibble() %>% 
+  mutate(fineness_ratio = body_length/body_width) %>% 
+  bind_cols(Ecotype_pca, 
+            .) %>% 
+  write_csv('Ecotype_RDA_phenotypes.csv')
