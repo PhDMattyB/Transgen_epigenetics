@@ -210,24 +210,24 @@ writeland.tps(eco1_array_consensus,
               scale = NULL,
               specID = T)
 
-ecotype_mod2 = procD.lm(gpa$coords ~ meta_data$poppair*meta_data$ecotype...12, 
-                        iter = 999, 
-                        RRPP = T)
-
-ecotype2_fitted = ecotype_mod2$GM$fitted
-
-ecotype2_consensus = array(0, dim = c(37, 2, 1575))
-
-for(i in 1:1575){
-  ecotype2_consensus[,,i] = ecotype2_fitted[,,i] + mean_shape_array[,,1]
-}
-
-writeland.tps(ecotype2_consensus,
-              file = 'ecotype_effect_per_population_landmarks_all_individuals.tps',
-              scale = NULL,
-              specID = T)
-
-
+# ecotype_mod2 = procD.lm(gpa$coords ~ meta_data$poppair*meta_data$ecotype...12, 
+#                         iter = 999, 
+#                         RRPP = T)
+# 
+# ecotype2_fitted = ecotype_mod2$GM$fitted
+# 
+# ecotype2_consensus = array(0, dim = c(37, 2, 1575))
+# 
+# for(i in 1:1575){
+#   ecotype2_consensus[,,i] = ecotype2_fitted[,,i] + mean_shape_array[,,1]
+# }
+# 
+# writeland.tps(ecotype2_consensus,
+#               file = 'ecotype_effect_per_population_landmarks_all_individuals.tps',
+#               scale = NULL,
+#               specID = T)
+# 
+# 
 
 
 # Phenotype PCA -----------------------------------------------------------
@@ -265,6 +265,10 @@ ggplot(data = raw_pca_data)+
                  col = F1, 
                  shape = F2))
 
+# raw_pca_data %>% 
+#   write_csv('Unfilered_PCA_data.csv')
+
+
 
 ## pca of the f1 effects
 F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps', 
@@ -293,6 +297,8 @@ ggplot(data = f1_pca_data)+
                  col = F1, 
                  shape = F2))
 
+# f1_pca_data %>% 
+#   write_csv('F1_effect_PCA_data.csv')
 
 ## pca of the f2 effects
 f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
@@ -321,16 +327,18 @@ ggplot(data = f2_pca_data)+
                  col = F1, 
                  shape = F2))
 
+# f2_pca_data %>% 
+#   write_csv('F2_effect_pca_data.csv')
 
 ## pca of the cold vs warm ecotype effects
-# eco1_effects = readland.tps('ecotype_effect_landmarks_all_individuals.tps', 
-#                             specID = 'imageID', 
-#                             readcurves = T)
+eco1_effects = readland.tps('Ecotype_effect_landmarks_all_individuals.tps',
+                            specID = 'imageID',
+                            readcurves = T)
 
 
-eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
-                          specID = 'imageID', 
-                          readcurves = T)
+# eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
 
 eco1_gpa = gpagen(eco1_effects, 
                 curves = sliders)
@@ -345,17 +353,51 @@ eco1_pca_vals = eco1_pca$x %>%
 eco1_pca_data = bind_cols(meta_data, 
                         eco1_pca_vals)
 
-eco1_pca_data$F1 = as.character(eco1_pca_data$F1)
-eco1_pca_data$F2 = as.character(eco1_pca_data$F2)
+# eco1_pca_data$F1 = as.character(eco1_pca_data$F1)
+# eco1_pca_data$F2 = as.character(eco1_pca_data$F2)
 
 ggplot(data = eco1_pca_data)+
   geom_point(aes(x = Comp1, 
                  y = Comp2, 
-                 col = F1, 
-                 shape = F2))
+                 col = ecotype))
 
-ggplot(data = eco1_pca_data)+
-  geom_jitter(aes(x = Comp1, 
-                  y = Comp2, 
-                  col = F1, 
-                  shape = F2))
+# eco1_pca_data %>% 
+#   write_csv('Ecotype_effect_pca_data.csv')
+
+
+# interlandmark distances -------------------------------------------------
+
+## raw body shape data
+
+
+bs_data = readland.tps('F2_All_aligned_withsliders.tps', 
+                       specID = 'imageID', 
+                       readcurves = T)
+raw_pca = read_csv('Unfilered_PCA_data.csv')
+
+sliders = define.sliders(c(28:37,1))
+gpa = gpagen(bs_data, 
+             print.progress = T, 
+             curves = sliders)
+
+raw_lmks = data.frame(body_width = c(12, 21), 
+                      body_length = c(1, 16), 
+                      row.names = c('start', 
+                                    'end'))
+
+raw_lmk_dist = interlmkdist(gpa$coords, 
+             raw_lmks)
+
+raw_lmk_dist %>% 
+  as_tibble() %>% 
+  mutate(fineness_ratio = body_length/body_width) %>% 
+  bind_cols(raw_pca, 
+            .) %>% 
+  write_csv('Raw_RDA_phenotypes.csv')
+
+## F1 effects
+
+## F2 effects
+
+## ecotype effects
+
