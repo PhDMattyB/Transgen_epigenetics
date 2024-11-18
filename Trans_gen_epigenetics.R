@@ -1038,3 +1038,17 @@ pheno_fish = raw_data %>%
   # select(Full_ID) %>% 
   bind_cols(pheno_fish_ID, 
                        .)
+
+inner_join(pheno_fish_ID, 
+           meth_fish_ID)
+
+inner_join(pheno_fish, 
+           meth_fish_ID, 
+           by = 'Fish_ID')
+
+intersect(pheno_fish_ID, 
+          meth_fish_ID)
+
+setdiff(meth_fish_ID, 
+        pheno_fish_ID) %>% 
+  View()
