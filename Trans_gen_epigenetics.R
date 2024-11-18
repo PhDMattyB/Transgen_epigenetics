@@ -1042,10 +1042,23 @@ pheno_fish = raw_data %>%
   # select(Full_ID) %>% 
   bind_cols(pheno_fish_ID, 
                        .)
-
-inner_join(meth_fish_ID, 
-          pheno_fish_ID) 
-
-anti_join(meth_fish_ID, 
+## identifying potential issues with phenotypic data
+## 5 individuals that were sequenced did not have the #G identifier
+## Four from GTS18@12 and one from MYVC12@12
+anti_join(meth_fish_ID,
           pheno_fish_ID)
+
+
+pheno_fish_final = inner_join(meth_fish_ID, 
+          pheno_fish) 
+
+## now we need to order the phenotypic data and methylation data
+## they have to be in the same order otherwise this will all
+## be fucked. Right now they aren't. 
+## order the data by the Fish_ID column
+
+## Add the new id column to the methylation data
+
+mvalues_final = bind_cols(meth_fish_ID, 
+          mvalues)
 
