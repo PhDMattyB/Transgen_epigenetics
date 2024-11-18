@@ -1044,11 +1044,9 @@ pheno_fish = raw_data %>%
                        .)
 
 inner_join(pheno_fish_ID, 
-          meth_fish_ID) %>% 
-  View()
-
-anti_join(pheno_fish_ID, 
-          meth_fish_ID)
+          meth_fish_ID) 
 
 anti_join(meth_fish_ID, 
           pheno_fish_ID)
+
+
