@@ -1068,4 +1068,7 @@ mvalues_final = bind_cols(meth_fish_ID,
           mvalues) %>% 
 arrange(Fish_ID)  
 
+## need to check that everythings in order for the analyses
+## If there are any FALSE we're fucked. 
+## Shooting for all TRUES
 mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
