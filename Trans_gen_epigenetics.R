@@ -977,7 +977,7 @@ raw_data = read_csv('Raw_RDA_phenotypes.csv')
 meth_fish = mvalues %>% 
   select(1)
 
-meth_fish %>% 
+meth_fish_ID = meth_fish %>% 
   # separate(Location_data, 
   #         into = c('garbage', 
   #            'ID'), 
@@ -1007,7 +1007,7 @@ pheno_fish = raw_data %>%
            .keep_all = T) %>% 
   select(Full_ID)
 
-pheno_fish %>% 
+pheno_fish_ID = pheno_fish %>% 
   separate_wider_regex(Full_ID, 
                        c(var1 = ".*?", 
                          "_", 
@@ -1019,4 +1019,22 @@ pheno_fish %>%
   separate(f2_temp, 
            into = c('f2_temp', 
                     'trash'), 
-           sep = '.')
+           sep = '[.]') %>% 
+  select(var1, 
+         f1_temp, 
+         f2_temp) 
+
+pheno_fish_ID$var1 = gsub("'", '', pheno_fish_ID$var1)
+
+pheno_fish_ID = pheno_fish_ID %>% 
+  unite(col = 'Fish_ID', 
+        sep = '')
+
+pheno_fish = raw_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>% 
+  # select(Full_ID) %>% 
+  bind_cols(pheno_fish_ID, 
+                       .)
