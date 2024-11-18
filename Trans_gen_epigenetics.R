@@ -1005,10 +1005,10 @@ pheno_fish = raw_data %>%
                     '_#G')) %>% 
   distinct(fish, 
            .keep_all = T) %>% 
-  select(Full_ID)
+  select(fish)
 
 pheno_fish_ID = pheno_fish %>% 
-  separate_wider_regex(Full_ID, 
+  separate_wider_regex(fish, 
                        c(var1 = ".*?", 
                          "_", 
                          var2 = ".*")) %>% 
@@ -1049,6 +1049,3 @@ inner_join(meth_fish_ID,
 anti_join(meth_fish_ID, 
           pheno_fish_ID)
 
-left_join(meth_fish_ID, 
-          pheno_fish_ID, 
-          by = 'Fish_ID') %>% View()
