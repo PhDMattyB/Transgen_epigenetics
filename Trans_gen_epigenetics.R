@@ -1043,10 +1043,12 @@ pheno_fish = raw_data %>%
   bind_cols(pheno_fish_ID, 
                        .)
 
-inner_join(pheno_fish_ID, 
-          meth_fish_ID) 
+inner_join(meth_fish_ID, 
+          pheno_fish_ID) 
 
 anti_join(meth_fish_ID, 
           pheno_fish_ID)
 
-
+left_join(meth_fish_ID, 
+          pheno_fish_ID, 
+          by = 'Fish_ID') %>% View()
