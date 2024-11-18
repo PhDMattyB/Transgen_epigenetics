@@ -1060,5 +1060,6 @@ pheno_fish_final = inner_join(meth_fish_ID,
 ## Add the new id column to the methylation data
 
 mvalues_final = bind_cols(meth_fish_ID, 
-          mvalues)
+          mvalues) %>% 
+arrange(Fish_ID)  
 
