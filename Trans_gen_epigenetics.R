@@ -1028,7 +1028,11 @@ pheno_fish_ID$var1 = gsub("'", '', pheno_fish_ID$var1)
 
 pheno_fish_ID = pheno_fish_ID %>% 
   unite(col = 'Fish_ID', 
-        sep = '')
+        sep = '')%>% 
+  mutate(Fish_ID = gsub("Myvat", 
+                        "MYV", 
+                        Fish_ID)) 
+
 
 pheno_fish = raw_data %>% 
   filter(str_detect(fish,
@@ -1040,15 +1044,11 @@ pheno_fish = raw_data %>%
                        .)
 
 inner_join(pheno_fish_ID, 
-           meth_fish_ID)
+          meth_fish_ID) %>% 
+  View()
 
-inner_join(pheno_fish, 
-           meth_fish_ID, 
-           by = 'Fish_ID')
-
-intersect(pheno_fish_ID, 
+anti_join(pheno_fish_ID, 
           meth_fish_ID)
 
-setdiff(meth_fish_ID, 
-        pheno_fish_ID) %>% 
-  View()
+anti_join(meth_fish_ID, 
+          pheno_fish_ID)
