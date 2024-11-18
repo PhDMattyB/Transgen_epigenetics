@@ -1050,7 +1050,8 @@ anti_join(meth_fish_ID,
 
 
 pheno_fish_final = inner_join(meth_fish_ID, 
-          pheno_fish) 
+          pheno_fish) %>% 
+  arrange(Fish_ID)
 
 ## now we need to order the phenotypic data and methylation data
 ## they have to be in the same order otherwise this will all
@@ -1063,3 +1064,4 @@ mvalues_final = bind_cols(meth_fish_ID,
           mvalues) %>% 
 arrange(Fish_ID)  
 
+mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
