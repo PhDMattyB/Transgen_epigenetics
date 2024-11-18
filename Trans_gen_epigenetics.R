@@ -974,8 +974,49 @@ meta_data = read_csv('Methylation_metadata.csv')
 raw_data = read_csv('Raw_RDA_phenotypes.csv')
 
 
-raw_data %>% 
+meth_fish = mvalues %>% 
+  select(1)
+
+meth_fish %>% 
+  # separate(Location_data, 
+  #         into = c('garbage', 
+  #            'ID'), 
+  #          sep = '-') %>% 
+  separate_wider_regex(Location_data, 
+                       c(var1 = ".*?", 
+                         "-", 
+                         var2 = ".*")) %>% 
+  select(var2) %>% 
+  separate(var2, 
+           into = c('ID', 
+                    'ID2'), 
+           sep = '-') %>% 
+  mutate(new_vals = paste0('#G', 
+                           str_pad(ID2, 
+                                   0, 
+                                   side = 'left'))) %>% 
+  select(ID, 
+         new_vals) %>% 
+  unite(col = Fish_ID, 
+        sep = '_')
+
+pheno_fish = raw_data %>% 
   filter(str_detect(fish,
                     '_#G')) %>% 
   distinct(fish, 
-           .keep_all = T)
+           .keep_all = T) %>% 
+  select(Full_ID)
+
+pheno_fish %>% 
+  separate_wider_regex(Full_ID, 
+                       c(var1 = ".*?", 
+                         "_", 
+                         var2 = ".*")) %>% 
+  separate_wider_regex(var2, 
+                       c(f1_temp = ".*?", 
+                         "@", 
+                         f2_temp = ".*")) %>% 
+  separate(f2_temp, 
+           into = c('f2_temp', 
+                    'trash'), 
+           sep = '.')
