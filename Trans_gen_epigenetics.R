@@ -970,5 +970,12 @@ ggplot()+
 # RAW whole body RDA ------------------------------------------------------
 
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
+meta_data = read_csv('Methylation_metadata.csv')
 raw_data = read_csv('Raw_RDA_phenotypes.csv')
 
+
+raw_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T)
