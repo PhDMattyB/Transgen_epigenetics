@@ -17,7 +17,9 @@ outliers = function(x,z){
 }
 
 
-# start -------------------------------------------------------------------
+
+
+# Start up ----------------------------------------------------------------
 
 
 # setwd('C:/Users/phdma/OneDrive/OneDrive - University of Glasgow/Documents/Parsons_Postdoc/Stickleback_Genomic/Transgen_epigenetics/')
@@ -29,6 +31,8 @@ library(vegan)
 library(patchwork)
 
 theme_set(theme_bw())
+
+# Analysis start -------------------------------------------------------------------
 
 # methy_rds = read_rds(file = "Methylated.cov.noZero.rds")
 # head(methy_rds)
