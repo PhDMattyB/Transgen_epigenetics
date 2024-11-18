@@ -1076,8 +1076,8 @@ mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
 mvalues = mvalues %>% 
   select(-1)
 
-RDA_treatment = rda(mvalues ~ temps * Population, 
-                    data = test_pheno, 
+RDA_treatment = rda(mvalues ~ Comp1 + Comp2 + Comp3 + Comp4 + Comp5, 
+                    data = pheno_fish_final, 
                     scale = T)
 
 RsquareAdj(RDA_treatment)
