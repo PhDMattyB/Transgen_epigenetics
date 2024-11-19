@@ -1100,25 +1100,28 @@ sum_rda = summary(RDA_treatment)
 
 sum_rda$species %>% 
   as_tibble() %>% 
-  write_csv('RDA_treatment_pops_methy_locations.csv')
+  write_csv('RAW_Uncorrected_PCA_locations.csv')
 
 sum_rda$sites %>% 
   as_tibble() %>% 
-  write_csv('RDA_treatment_pops_individuals.csv')
+  write_csv('RDA_Uncorrected_PCA_individuals.csv')
 
 sum_rda$biplot %>% 
   as_tibble() %>% 
-  write_csv('RDA_treatment_pops_biplot.csv')
+  write_csv('RDA_Uncorrected_PCA_biplot.csv')
 
 
 rda_scores = scores(RDA_treatment, 
-                    choices = c(1:2), 
+                    choices = c(1:5), 
                     display = 'species')
 
 hist(rda_scores[,1])
 hist(rda_scores[,2])
+hist(rda_scores[,3])
+hist(rda_scores[,4])
+hist(rda_scores[,5])
 
-rda_outliers = outliers(rda_scores[,1], 3)
+rda_outliers_axis1 = outliers(rda_scores[,1], 3)
 # rda_outliers_axis2 = outliers(rda_scores[,2], 3)
 
 
