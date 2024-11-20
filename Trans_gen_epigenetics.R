@@ -1076,7 +1076,7 @@ mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
 mvalues = mvalues %>% 
   select(-1)
 
-RDA_treatment = rda(mvalues ~ Comp1 + Comp2 + Comp3 + Comp4 + Comp5, 
+RDA_treatment_eco = rda(mvalues ~ Comp1 + Comp2 + Comp3 + Comp4 + Comp5 * ecotype, 
                     data = pheno_fish_final, 
                     scale = T)
 
@@ -1125,12 +1125,12 @@ rda_outliers_axis1 = outliers(rda_scores[,1], 3)
 # rda_outliers_axis2 = outliers(rda_scores[,2], 3)
 
 
-rda_out = cbind.data.frame(rep(1, 
-                               times = length(rda_outliers)), 
-                           names(rda_outliers), 
-                           unname(rda_outliers))
+rda_out_axis1 = cbind.data.frame(rep(1, 
+                               times = length(rda_outliers_axis1)), 
+                           names(rda_outliers_axis1), 
+                           unname(rda_outliers_axis1))
 
-rda_out = rda_out %>% 
+rda_out_axis1 = rda_out_axis1 %>% 
   as_tibble() %>%  
   dplyr::rename(axis = 1, 
                 loc = 2, 
@@ -1149,13 +1149,13 @@ rda_normal = rda_normal %>%
                 loc = 2, 
                 scores = 3)
 
-rda_normal = rda_normal[!rda_normal$loc %in% rda_out$loc,]
+rda_normal = rda_normal[!rda_normal$loc %in% rda_out_axis1$loc,]
 
-# write_csv(rda_normal, 
-#           'RDA_nonoutliers_methylation.csv')
+# write_csv(rda_normal,
+#           'RDA_RAW_PCaxes_nonoutliers_methylation.csv')
 # 
-# write_csv(rda_out, 
-#           'RDA_outliers_methylation.csv')
+# write_csv(rda_out_axis1,
+#           'RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
 
 rda_out = as.data.frame(rda_out)
 all_loc = as.data.frame(all_loc)
