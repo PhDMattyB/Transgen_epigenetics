@@ -1076,17 +1076,17 @@ mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
 mvalues = mvalues %>% 
   select(-1)
 
-RDA_treatment_eco = rda(mvalues ~ Comp1 + Comp2 + Comp3 + Comp4 + Comp5 * ecotype, 
+RDA_treatment = rda(mvalues ~ Comp1 + Comp2 + Comp3, 
                     data = pheno_fish_final, 
                     scale = T)
 
-RsquareAdj(RDA_treatment)
-summary(eigenvals(RDA_treatment, 
+RsquareAdj(RDA_treatment_eco)
+summary(eigenvals(RDA_treatment_eco, 
                   model = 'constrained'))
 
-screeplot(RDA_treatment)
+screeplot(RDA_treatment_eco)
 
-signif_full = anova.cca(RDA_treatment, 
+signif_full = anova.cca(RDA_treatment_eco, 
                         parallel = getOption('mc.cores'))
 
 # signif_axis = anova.cca(RDA_treatment, 
