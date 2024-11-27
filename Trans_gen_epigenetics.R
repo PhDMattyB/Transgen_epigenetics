@@ -1089,6 +1089,17 @@ screeplot(RDA_treatment)
 signif_full = anova.cca(RDA_treatment, 
                         parallel = getOption('mc.cores'))
 
+RDA_treatment_eco = rda(mvalues ~ Comp1 + Comp2 + Comp3, 
+                    data = pheno_fish_final, 
+                    scale = T)
+
+RsquareAdj(RDA_treatment_eco)
+summary(eigenvals(RDA_treatment_eco, 
+                  model = 'constrained'))
+
+screeplot(RDA_treatment_eco)
+signif_full_eco = anova.cca(RDA_treatment_eco, 
+                        parallel = getOption('mc.cores'))
 # signif_axis = anova.cca(RDA_treatment, 
 #                         by = 'axis',
 #                         parallel = getOption('mc.cores'))
