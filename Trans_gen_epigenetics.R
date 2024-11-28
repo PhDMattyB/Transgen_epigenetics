@@ -977,6 +977,10 @@ meta_data = read_csv('Methylation_metadata.csv')
 
 F1_effects = read_csv('F1_effect_PCA_data.csv')
 
+
+meth_fish = mvalues %>% 
+  select(1)
+
 meth_fish_ID = meth_fish %>% 
   # separate(Location_data, 
   #         into = c('garbage', 
