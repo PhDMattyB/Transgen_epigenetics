@@ -1004,7 +1004,7 @@ meth_fish_ID = meth_fish %>%
   unite(col = Fish_ID, 
         sep = '_')
 
-pheno_fish = raw_data %>% 
+pheno_fish = F1_effects %>% 
   filter(str_detect(fish,
                     '_#G')) %>% 
   distinct(fish, 
@@ -1038,7 +1038,7 @@ pheno_fish_ID = pheno_fish_ID %>%
                         Fish_ID)) 
 
 
-pheno_fish = raw_data %>% 
+pheno_fish = F1_effects %>% 
   filter(str_detect(fish,
                     '_#G')) %>% 
   distinct(fish, 
@@ -1072,6 +1072,24 @@ mvalues_final = bind_cols(meth_fish_ID,
 ## If there are any FALSE we're fucked. 
 ## Shooting for all TRUES
 mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
+
+
+## TGP RDA 
+mvalues_only = mvalues %>% 
+  select(-1)
+
+TGP_RDA = rda(mvalues_only ~ Comp1 + Comp2 + Comp3, 
+                    data = pheno_fish_final, 
+                    scale = T)
+
+RsquareAdj(RDA_treatment)
+summary(eigenvals(RDA_treatment, 
+                  model = 'constrained'))
+
+screeplot(RDA_treatment)
+
+signif_full = anova.cca(RDA_treatment, 
+                        parallel = getOption('mc.cores'))
 
 
 # RAW whole body RDA ------------------------------------------------------
