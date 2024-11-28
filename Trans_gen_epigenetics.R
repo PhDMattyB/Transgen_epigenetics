@@ -971,12 +971,112 @@ ggplot()+
 
 
 
+# F1 effect no ecotype effect ---------------------------------------------
+mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
+meta_data = read_csv('Methylation_metadata.csv')
+
+F1_effects = read_csv('F1_effect_PCA_data.csv')
+
+meth_fish_ID = meth_fish %>% 
+  # separate(Location_data, 
+  #         into = c('garbage', 
+  #            'ID'), 
+  #          sep = '-') %>% 
+  separate_wider_regex(Location_data, 
+                       c(var1 = ".*?", 
+                         "-", 
+                         var2 = ".*")) %>% 
+  select(var2) %>% 
+  separate(var2, 
+           into = c('ID', 
+                    'ID2'), 
+           sep = '-') %>% 
+  mutate(new_vals = paste0('#G', 
+                           str_pad(ID2, 
+                                   0, 
+                                   side = 'left'))) %>% 
+  select(ID, 
+         new_vals) %>% 
+  unite(col = Fish_ID, 
+        sep = '_')
+
+pheno_fish = raw_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>% 
+  select(fish)
+
+pheno_fish_ID = pheno_fish %>% 
+  separate_wider_regex(fish, 
+                       c(var1 = ".*?", 
+                         "_", 
+                         var2 = ".*")) %>% 
+  separate_wider_regex(var2, 
+                       c(f1_temp = ".*?", 
+                         "@", 
+                         f2_temp = ".*")) %>% 
+  separate(f2_temp, 
+           into = c('f2_temp', 
+                    'trash'), 
+           sep = '[.]') %>% 
+  select(var1, 
+         f1_temp, 
+         f2_temp) 
+
+pheno_fish_ID$var1 = gsub("'", '', pheno_fish_ID$var1)
+
+pheno_fish_ID = pheno_fish_ID %>% 
+  unite(col = 'Fish_ID', 
+        sep = '')%>% 
+  mutate(Fish_ID = gsub("Myvat", 
+                        "MYV", 
+                        Fish_ID)) 
+
+
+pheno_fish = raw_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>% 
+  # select(Full_ID) %>% 
+  bind_cols(pheno_fish_ID, 
+            .)
+## identifying potential issues with phenotypic data
+## 5 individuals that were sequenced did not have the #G identifier
+## Four from GTS18@12 and one from MYVC12@12
+anti_join(meth_fish_ID,
+          pheno_fish_ID)
+
+
+pheno_fish_final = inner_join(meth_fish_ID, 
+                              pheno_fish) %>% 
+  arrange(Fish_ID)
+
+## now we need to order the phenotypic data and methylation data
+## they have to be in the same order otherwise this will all
+## be fucked. Right now they aren't. 
+## order the data by the Fish_ID column
+
+## Add the new id column to the methylation data
+
+mvalues_final = bind_cols(meth_fish_ID, 
+                          mvalues) %>% 
+  arrange(Fish_ID)  
+
+## need to check that everythings in order for the analyses
+## If there are any FALSE we're fucked. 
+## Shooting for all TRUES
+mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
+
+
 # RAW whole body RDA ------------------------------------------------------
 
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
 meta_data = read_csv('Methylation_metadata.csv')
-raw_data = read_csv('Raw_RDA_phenotypes.csv')
 
+## raw PCA phenotypes for the RDA association analysis
+raw_data = read_csv('Raw_RDA_phenotypes.csv')
 
 meth_fish = mvalues %>% 
   select(1)
