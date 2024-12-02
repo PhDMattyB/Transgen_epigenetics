@@ -233,6 +233,70 @@ for(i in 1:1575){
 #               specID = T)
 
 
+# F2 effects by ecotype ---------------------------------------------------
+
+F2_temp_mod_eco = procD.lm(gpa$coords ~ meta_data$F2*meta_data$ecotype, 
+                           iter = 999, 
+                           RRPP = T)
+
+F2_fitted_12deg_cold = F2_temp_mod_eco$GM$fitted[,,1]
+F2_fitted_12deg_cold_mat = as.matrix(F2_fitted_12deg_cold)
+F2_12deg_cold_array = array(F2_fitted_12deg_cold_mat, 
+                            dim = c(37, 2, 1))
+
+F2_fitted_12deg_warm = F2_temp_mod_eco$GM$fitted[,,206]
+F2_fitted_12deg_warm_mat = as.matrix(F2_fitted_12deg_warm)
+F2_12deg_warm_array = array(F2_fitted_12deg_warm_mat, 
+                            dim = c(37, 2, 1))
+
+F2_fitted_18deg_cold = F2_temp_mod_eco$GM$fitted[,,105]
+F2_fitted_18deg_cold_mat = as.matrix(F2_fitted_18deg_cold)
+F2_18deg_cold_array = array(F2_fitted_18deg_cold_mat, 
+                            dim = c(37, 2, 1))
+
+F2_fitted_18deg_warm = F2_temp_mod_eco$GM$fitted[,,310]
+F2_fitted_18deg_warm_mat = as.matrix(F2_fitted_18deg_warm)
+F2_18deg_warm_array = array(F2_fitted_18deg_warm_mat, 
+                            dim = c(37, 2, 1))
+
+F2_12deg_cold_range = c(1:50, 105:155, 412:461, 512:561, 798:847, 898:947, 1198:1247, 1298:1347)
+F2_12deg_warm_range = c(206:259, 310:359, 612:650, 701:746, 998:1047, 1098:1147, 1398:1447, 1475:1524)
+F2_18deg_cold_range = c(51:104, 156:205, 462:511, 562:611, 848:897, 948:997, 1248:1297, 1348:1397)
+F2_18deg_warm_range = c(260:309, 360:411, 651:700, 747:797, 1048:1097, 1148:1197, 1448:1474, 1525:1575)
+
+F2_temp_eco_array = array(0,
+                          dim = c(37, 2, 1575))
+
+for(i in F2_12deg_cold_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_12deg_cold_array[,,1]
+}
+
+for(i in F2_12deg_warm_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_12deg_warm_array[,,1]
+}
+
+for(i in F2_18deg_cold_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_18deg_cold_array[,,1]
+}
+
+for(i in F2_18deg_warm_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_18deg_warm_array[,,1]
+}
+
+F2_array_consensus = array(0, dim = c(37, 2, 1575))
+
+for(i in 1:1575){
+  F2_array_consensus[,,i] = F2_temp_eco_array[,,i] + mean_shape_array[,,1]
+}
+
+writeland.tps(F2_array_consensus,
+              file = 'WGP_ecotype_variation_landmarks.tps',
+              scale = NULL,
+              specID = T)
+
+
+
+
 # isolate ecotype effects -------------------------------------------------
 
 ## isolate effects due to warm cold divergence axis regardless of population
