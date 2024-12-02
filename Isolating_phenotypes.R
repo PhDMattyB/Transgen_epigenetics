@@ -138,10 +138,10 @@ F1_fitteed_18deg_mat = as.matrix(F1_fitted_18deg)
 F1_18deg_array = array(F1_fitteed_18deg_mat, 
                        dim = c(37, 2, 1))
 
-F1_12deg_cold_range = c()
-F1_12deg_warm_range = c()
-F1_18deg_cold_range = c()
-F1_18deg_warm_range = c()
+F1_12deg_cold_range = c(1:104, 412:511, 798:897, 1198:1297)
+F1_12deg_warm_range = c(206:309, 612:700, 998:1097, 1398:1474)
+F1_18deg_cold_range = c(105:205, 512:611, 898:997, 1298:1397)
+F1_18deg_warm_range = c(310:411, 701:797,1098:1197, 1475:1575)
 
 eco1_cold_range = c(1:204, 412:611, 798:997, 1198:1397)
 
