@@ -7,9 +7,12 @@
 ##
 ##############################
 
-
+## Office computer
 setwd('~/Parsons_Postdoc/Methylation_data/')
+
+## personal laptop
 setwd('~/Methylation_data/')
+
 
 library(tidyverse)
 library(geomorph)
