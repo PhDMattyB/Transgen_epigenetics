@@ -1082,13 +1082,15 @@ TGP_RDA = rda(mvalues_only ~ Comp1 + Comp2 + Comp3,
                     data = pheno_fish_final, 
                     scale = T)
 
-RsquareAdj(RDA_treatment)
-summary(eigenvals(RDA_treatment, 
+RsquareAdj(TGP_RDA)
+summary(eigenvals(TGP_RDA, 
                   model = 'constrained'))
 
-screeplot(RDA_treatment)
+screeplot(TGP_RDA)
 
-signif_full = anova.cca(RDA_treatment, 
+## Run after all other coding is finished
+## This will take a while
+signif_full = anova.cca(TGP_RDA, 
                         parallel = getOption('mc.cores'))
 
 
