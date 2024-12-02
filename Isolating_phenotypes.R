@@ -24,8 +24,9 @@ meta_data = read_csv('formattedDataEU.csv') %>%
              F1, 
              F2, 
              poppair, 
-             ecotype...12, 
-         csize_real) 
+             ecotype...13, 
+         csize_real) %>% 
+  rename(ecotype = ecotype...13)
 # %>% 
 #   unite(Ecotype, 
 #         c(poppair, 
@@ -117,6 +118,9 @@ for(i in 1:1575){
 #               file = 'F1_effect_landmarks_all_individuals.tps',
 #               scale = NULL, 
 #               specID = T)
+
+
+# F1 by ecotype effects ---------------------------------------------------
 
 
 
