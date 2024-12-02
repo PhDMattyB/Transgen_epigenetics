@@ -121,6 +121,46 @@ for(i in 1:1575){
 
 
 # F1 by ecotype effects ---------------------------------------------------
+F1_temp_mod = procD.lm(gpa$coords ~ meta_data$F1, 
+                       iter = 999, 
+                       RRPP = T)
+
+F1_fitted_12deg = F1_temp_mod$GM$fitted[,,1]
+F1_fitted_mat_12deg = as.matrix(F1_fitted_12deg)
+F1_12deg_array = array(F1_fitted_mat_12deg, 
+                       dim = c(37, 2, 1))
+
+F1_fitted_18deg = F1_temp_mod$GM$fitted[,,64]
+F1_fitteed_18deg_mat = as.matrix(F1_fitted_18deg)
+F1_18deg_array = array(F1_fitteed_18deg_mat, 
+                       dim = c(37, 2, 1))
+
+F1_12deg_range = c(1:104, 206:370, 411:511, 612:700, 789:897, 999:1097, 1198:1297, 1398:1474)
+
+F1_18deg_range = c(105:205, 371:410, 512:611, 701:788, 898:998, 1098:1197, 1298:1297, 1475:1575)
+
+F1_array = array(0, dim = c(37, 2, 1575))
+
+for(i in F1_12deg_range){
+  F1_array[,,i] = gpa$coords[,,i] - F1_12deg_array[,,1]
+}
+
+for(i in F1_18deg_range){
+  F1_array[,,i] = gpa$coords[,,i] - F1_18deg_array[,,1]
+}
+
+
+F1_array_consensus = array(0, dim = c(37, 2, 1575))
+
+for(i in 1:1575){
+  F1_array_consensus[,,i] = F1_array[,,i] + mean_shape_array[,,1]
+}
+
+# writeland.tps(F1_array_consensus, 
+#               file = 'F1_effect_landmarks_all_individuals.tps',
+#               scale = NULL, 
+#               specID = T)
+
 
 
 
