@@ -1094,6 +1094,22 @@ signif_full = anova.cca(TGP_RDA,
                         parallel = getOption('mc.cores'))
 
 
+TGP_RDA_eco = rda(mvalues_only ~ Comp1 + Comp2 + Comp3 * ecotype, 
+              data = pheno_fish_final, 
+              scale = T)
+
+RsquareAdj(TGP_RDA_eco)
+summary(eigenvals(TGP_RDA_eco, 
+                  model = 'constrained'))
+
+screeplot(TGP_RDA_eco)
+
+## Run after all other coding is finished
+## This will take a while 
+signif_full_eco = anova.cca(TGP_RDA_eco, 
+                        parallel = getOption('mc.cores'))
+
+
 # RAW whole body RDA ------------------------------------------------------
 
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')

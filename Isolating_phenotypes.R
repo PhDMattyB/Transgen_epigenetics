@@ -121,7 +121,7 @@ for(i in 1:1575){
 
 
 # F1 by ecotype effects ---------------------------------------------------
-F1_temp_mod = procD.lm(gpa$coords ~ meta_data$F1, 
+F1_temp_mod_eco = procD.lm(gpa$coords ~ meta_data$F1*meta_data$ecotype, 
                        iter = 999, 
                        RRPP = T)
 
