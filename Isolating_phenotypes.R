@@ -7,9 +7,12 @@
 ##
 ##############################
 
-
+## Office computer
 setwd('~/Parsons_Postdoc/Methylation_data/')
+
+## personal laptop
 setwd('~/Methylation_data/')
+
 
 library(tidyverse)
 library(geomorph)
@@ -125,41 +128,60 @@ F1_temp_mod_eco = procD.lm(gpa$coords ~ meta_data$F1*meta_data$ecotype,
                        iter = 999, 
                        RRPP = T)
 
-F1_fitted_12deg = F1_temp_mod$GM$fitted[,,1]
-F1_fitted_mat_12deg = as.matrix(F1_fitted_12deg)
-F1_12deg_array = array(F1_fitted_mat_12deg, 
-                       dim = c(37, 2, 1))
+F1_fitted_12deg_cold = F1_temp_mod_eco$GM$fitted[,,1]
+F1_fitted_12deg_cold_mat = as.matrix(F1_fitted_12deg_cold)
+F1_12deg_cold_array = array(F1_fitted_12deg_cold_mat, 
+                            dim = c(37, 2, 1))
 
-F1_fitted_18deg = F1_temp_mod$GM$fitted[,,64]
-F1_fitteed_18deg_mat = as.matrix(F1_fitted_18deg)
-F1_18deg_array = array(F1_fitteed_18deg_mat, 
-                       dim = c(37, 2, 1))
+F1_fitted_12deg_warm = F1_temp_mod_eco$GM$fitted[,,206]
+F1_fitted_12deg_warm_mat = as.matrix(F1_fitted_12deg_warm)
+F1_12deg_warm_array = array(F1_fitted_12deg_warm_mat, 
+                            dim = c(37, 2, 1))
 
-F1_12deg_range = c(1:104, 206:370, 411:511, 612:700, 789:897, 999:1097, 1198:1297, 1398:1474)
+F1_fitted_18deg_cold = F1_temp_mod_eco$GM$fitted[,,105]
+F1_fitted_18deg_cold_mat = as.matrix(F1_fitted_18deg_cold)
+F1_18deg_cold_array = array(F1_fitted_18deg_cold_mat, 
+                            dim = c(37, 2, 1))
 
-F1_18deg_range = c(105:205, 371:410, 512:611, 701:788, 898:998, 1098:1197, 1298:1297, 1475:1575)
+F1_fitted_18deg_warm = F1_temp_mod_eco$GM$fitted[,,310]
+F1_fitted_18deg_warm_mat = as.matrix(F1_fitted_18deg_warm)
+F1_18deg_warm_array = array(F1_fitted_18deg_warm_mat, 
+                            dim = c(37, 2, 1))
 
-F1_array = array(0, dim = c(37, 2, 1575))
+F1_12deg_cold_range = c(1:104, 412:511, 798:897, 1198:1297)
+F1_12deg_warm_range = c(206:309, 612:700, 998:1097, 1398:1474)
+F1_18deg_cold_range = c(105:205, 512:611, 898:997, 1298:1397)
+F1_18deg_warm_range = c(310:411, 701:797,1098:1197, 1475:1575)
 
-for(i in F1_12deg_range){
-  F1_array[,,i] = gpa$coords[,,i] - F1_12deg_array[,,1]
+F1_temp_eco_array = array(0,
+                          dim = c(37, 2, 1575))
+
+for(i in F1_12deg_cold_range){
+  F1_temp_eco_array[,,i] = gpa$coords[,,i] - F1_12deg_cold_array[,,1]
 }
 
-for(i in F1_18deg_range){
-  F1_array[,,i] = gpa$coords[,,i] - F1_18deg_array[,,1]
+for(i in F1_12deg_warm_range){
+  F1_temp_eco_array[,,i] = gpa$coords[,,i] - F1_12deg_warm_array[,,1]
 }
 
+for(i in F1_18deg_cold_range){
+  F1_temp_eco_array[,,i] = gpa$coords[,,i] - F1_18deg_cold_array[,,1]
+}
+
+for(i in F1_18deg_warm_range){
+  F1_temp_eco_array[,,i] = gpa$coords[,,i] - F1_18deg_warm_array[,,1]
+}
 
 F1_array_consensus = array(0, dim = c(37, 2, 1575))
 
 for(i in 1:1575){
-  F1_array_consensus[,,i] = F1_array[,,i] + mean_shape_array[,,1]
+  F1_array_consensus[,,i] = F1_temp_eco_array[,,i] + mean_shape_array[,,1]
 }
 
-# writeland.tps(F1_array_consensus, 
-#               file = 'F1_effect_landmarks_all_individuals.tps',
-#               scale = NULL, 
-#               specID = T)
+writeland.tps(F1_array_consensus,
+              file = 'TGP_ecotype_variation_landmarks.tps',
+              scale = NULL,
+              specID = T)
 
 
 
@@ -209,6 +231,70 @@ for(i in 1:1575){
 #               file = 'F2_effect_landmarks_all_individuals.tps',
 #               scale = NULL,
 #               specID = T)
+
+
+# F2 effects by ecotype ---------------------------------------------------
+
+F2_temp_mod_eco = procD.lm(gpa$coords ~ meta_data$F2*meta_data$ecotype, 
+                           iter = 999, 
+                           RRPP = T)
+
+F2_fitted_12deg_cold = F2_temp_mod_eco$GM$fitted[,,1]
+F2_fitted_12deg_cold_mat = as.matrix(F2_fitted_12deg_cold)
+F2_12deg_cold_array = array(F2_fitted_12deg_cold_mat, 
+                            dim = c(37, 2, 1))
+
+F2_fitted_12deg_warm = F2_temp_mod_eco$GM$fitted[,,206]
+F2_fitted_12deg_warm_mat = as.matrix(F2_fitted_12deg_warm)
+F2_12deg_warm_array = array(F2_fitted_12deg_warm_mat, 
+                            dim = c(37, 2, 1))
+
+F2_fitted_18deg_cold = F2_temp_mod_eco$GM$fitted[,,105]
+F2_fitted_18deg_cold_mat = as.matrix(F2_fitted_18deg_cold)
+F2_18deg_cold_array = array(F2_fitted_18deg_cold_mat, 
+                            dim = c(37, 2, 1))
+
+F2_fitted_18deg_warm = F2_temp_mod_eco$GM$fitted[,,310]
+F2_fitted_18deg_warm_mat = as.matrix(F2_fitted_18deg_warm)
+F2_18deg_warm_array = array(F2_fitted_18deg_warm_mat, 
+                            dim = c(37, 2, 1))
+
+F2_12deg_cold_range = c(1:50, 105:155, 412:461, 512:561, 798:847, 898:947, 1198:1247, 1298:1347)
+F2_12deg_warm_range = c(206:259, 310:359, 612:650, 701:746, 998:1047, 1098:1147, 1398:1447, 1475:1524)
+F2_18deg_cold_range = c(51:104, 156:205, 462:511, 562:611, 848:897, 948:997, 1248:1297, 1348:1397)
+F2_18deg_warm_range = c(260:309, 360:411, 651:700, 747:797, 1048:1097, 1148:1197, 1448:1474, 1525:1575)
+
+F2_temp_eco_array = array(0,
+                          dim = c(37, 2, 1575))
+
+for(i in F2_12deg_cold_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_12deg_cold_array[,,1]
+}
+
+for(i in F2_12deg_warm_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_12deg_warm_array[,,1]
+}
+
+for(i in F2_18deg_cold_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_18deg_cold_array[,,1]
+}
+
+for(i in F2_18deg_warm_range){
+  F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_18deg_warm_array[,,1]
+}
+
+F2_array_consensus = array(0, dim = c(37, 2, 1575))
+
+for(i in 1:1575){
+  F2_array_consensus[,,i] = F2_temp_eco_array[,,i] + mean_shape_array[,,1]
+}
+
+writeland.tps(F2_array_consensus,
+              file = 'WGP_ecotype_variation_landmarks.tps',
+              scale = NULL,
+              specID = T)
+
+
 
 
 # isolate ecotype effects -------------------------------------------------
@@ -343,6 +429,37 @@ ggplot(data = f1_pca_data)+
 
 # f1_pca_data %>% 
 #   write_csv('F1_effect_PCA_data.csv')
+
+## PCA of the TGP by ecotype effects
+TGP_eco = readland.tps('TGP_ecotype_variation_landmarks.tps', 
+                          specID = 'imageID', 
+                          readcurves = T)
+
+TGP_eco_gpa = gpagen(TGP_eco, 
+                curves = sliders)
+TGP_eco_pca = gm.prcomp(TGP_eco_gpa$coords)
+
+summary(TGP_eco_pca)
+
+TGP_eco_pca_vals = TGP_eco_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+TGP_eco_pca_data = bind_cols(meta_data, 
+                        TGP_eco_pca_vals)
+
+TGP_eco_pca_data$F1 = as.character(TGP_eco_pca_data$F1)
+TGP_eco_pca_data$F2 = as.character(TGP_eco_pca_data$F2)
+
+ggplot(data = TGP_eco_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = ecotype))
+
+TGP_eco_pca_data %>%
+  write_csv('TGP_ecotype_variation_PCA_data.csv')
+
 
 ## pca of the f2 effects
 f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
