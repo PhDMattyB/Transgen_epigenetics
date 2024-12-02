@@ -1089,7 +1089,7 @@ summary(eigenvals(TGP_RDA,
 screeplot(TGP_RDA)
 
 ## Run after all other coding is finished
-## This will take a while
+## This will take a while 
 signif_full = anova.cca(TGP_RDA, 
                         parallel = getOption('mc.cores'))
 
