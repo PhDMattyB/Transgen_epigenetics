@@ -491,6 +491,38 @@ ggplot(data = f2_pca_data)+
 # f2_pca_data %>% 
 #   write_csv('F2_effect_pca_data.csv')
 
+## PCA of the WGP by ecotype effects
+WGP_eco = readland.tps('WGP_ecotype_variation_landmarks.tps', 
+                       specID = 'imageID', 
+                       readcurves = T)
+
+WGP_eco_gpa = gpagen(WGP_eco, 
+                     curves = sliders)
+WGP_eco_pca = gm.prcomp(WGP_eco_gpa$coords)
+
+summary(WGP_eco_pca)
+
+WGP_eco_pca_vals = WGP_eco_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+WGP_eco_pca_data = bind_cols(meta_data, 
+                             WGP_eco_pca_vals)
+
+WGP_eco_pca_data$F1 = as.character(WGP_eco_pca_data$F1)
+WGP_eco_pca_data$F2 = as.character(WGP_eco_pca_data$F2)
+
+ggplot(data = WGP_eco_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F2, 
+                 shape = ecotype))
+
+
+WGP_eco_pca_data %>%
+  write_csv('WGP_ecotype_variation_PCA_data.csv')
+
+
 ## pca of the cold vs warm ecotype effects
 eco1_effects = readland.tps('Ecotype_effect_landmarks_all_individuals.tps',
                             specID = 'imageID',
