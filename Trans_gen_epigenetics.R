@@ -1109,6 +1109,138 @@ screeplot(TGP_RDA_eco)
 signif_full_eco = anova.cca(TGP_RDA_eco, 
                         parallel = getOption('mc.cores'))
 
+TGP_RDA_eco_inter = rda(mvalues_only ~ Comp1*ecotype + Comp2*ecotype + Comp3*ecotype, 
+                  data = pheno_fish_final, 
+                  scale = T)
+
+RsquareAdj(TGP_RDA_eco_inter)
+summary(eigenvals(TGP_RDA_eco_inter, 
+                  model = 'constrained'))
+
+screeplot(TGP_RDA_eco_inter)
+
+## Run after all other coding is finished
+## This will take a while 
+signif_full_eco_inter = anova.cca(TGP_RDA_eco_inter, 
+                            parallel = getOption('mc.cores'))
+
+
+
+vif.cca(TGP_RDA_eco)
+
+sum_rda = summary(RDA_treatment)
+
+sum_rda$species %>% 
+  as_tibble() %>% 
+  write_csv('RAW_Uncorrected_PCA_locations.csv')
+
+sum_rda$sites %>% 
+  as_tibble() %>% 
+  write_csv('RDA_Uncorrected_PCA_individuals.csv')
+
+sum_rda$biplot %>% 
+  as_tibble() %>% 
+  write_csv('RDA_Uncorrected_PCA_biplot.csv')
+
+
+rda_scores = scores(RDA_treatment, 
+                    choices = c(1:5), 
+                    display = 'species')
+
+hist(rda_scores[,1])
+hist(rda_scores[,2])
+hist(rda_scores[,3])
+hist(rda_scores[,4])
+hist(rda_scores[,5])
+
+rda_outliers_axis1 = outliers(rda_scores[,1], 3)
+# rda_outliers_axis2 = outliers(rda_scores[,2], 3)
+
+
+rda_out_axis1 = cbind.data.frame(rep(1, 
+                                     times = length(rda_outliers_axis1)), 
+                                 names(rda_outliers_axis1), 
+                                 unname(rda_outliers_axis1))
+
+rda_out_axis1 = rda_out_axis1 %>% 
+  as_tibble() %>%  
+  dplyr::rename(axis = 1, 
+                loc = 2, 
+                scores = 3)
+
+
+all_loc = rda_scores[,1]
+
+rda_normal = cbind.data.frame(rep(1, 
+                                  times = length(all_loc)), 
+                              names(all_loc),
+                              unname(all_loc))
+rda_normal = rda_normal %>% 
+  as_tibble() %>% 
+  dplyr::rename(axis = 1, 
+                loc = 2, 
+                scores = 3)
+
+rda_normal = rda_normal[!rda_normal$loc %in% rda_out_axis1$loc,]
+
+# write_csv(rda_normal,
+#           'RDA_RAW_PCaxes_nonoutliers_methylation.csv')
+# 
+# write_csv(rda_out_axis1,
+#           'RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+
+rda_out = as.data.frame(rda_out)
+all_loc = as.data.frame(all_loc)
+# test_pheno = as.data.frame(test_pheno)
+
+test_pheno2 = test_pheno %>% 
+  as_tibble() %>% 
+  mutate(pop_num = as.numeric(case_when(
+    Population == 'GTS' ~ '1',
+    Population == 'CSWY' ~ '2',
+    Population == 'ASHNW' ~ '3',
+    Population == 'ASHNC' ~ '4',
+    Population == 'MYVW' ~ '5',
+    Population == 'MYVC' ~ '6',
+    Population == 'SKRW' ~ '7',
+    Population == 'SKRC' ~ '8'))) %>% 
+  # dplyr::select(-Population) %>% 
+  as.data.frame()
+
+# nam = rda_out[1:45, 2]
+# out_loc = all_loc[nam,]
+# out_cor = apply(test_pheno,
+#                 2, 
+#                 function(x)cor(x, out_loc))
+
+foo = matrix(nrow=(45), 
+             ncol = 2)
+colnames(foo) = c('temps', 
+                  'pop_num')
+
+for (i in 1:length(rda_out$loc)){
+  nam = rda_out[i,2]
+  loc.gen = mvalues[,nam]
+  foo[i,] = apply(test_pheno,2,function(x)cor(x,loc.gen))
+}
+
+candidates = cbind.data.frame(rda_out, 
+                              foo)
+
+# candidates %>% 
+#   as_tibble() %>% 
+#   write_csv('RDA_outliers_methylation_correlations.csv')
+
+##check for duplicates
+length(candidates$loc[duplicated(candidates$loc)])
+
+for(i in 1:length(candidates$loc)){
+  bar = candidates[i,]
+  candidates[i,6] = names(which.max(abs(bar[4:5])))
+  candidates[i,7] = max(abs(bar[4:5]))
+}
+
+candidates
 
 
 # F1 effects with ecotype effect ------------------------------------------
