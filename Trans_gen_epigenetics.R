@@ -1126,9 +1126,9 @@ signif_full_eco_inter = anova.cca(TGP_RDA_eco_inter,
 
 
 
-vif.cca(TGP_RDA_eco)
+vif.cca(TGP_RDA_eco_inter)
 
-sum_rda = summary(RDA_treatment)
+sum_rda = summary(TGP_RDA_eco_inter)
 
 sum_rda$species %>% 
   as_tibble() %>% 
