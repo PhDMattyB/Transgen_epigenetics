@@ -483,6 +483,7 @@ f2_gpa = gpagen(f2_effects,
 f2_pca = gm.prcomp(f2_gpa$coords)
 
 summary(f2_pca)
+bsDimension(f2_pca$x)
 
 f2_pca_vals = f2_pca$x %>% 
   as_tibble() %>% 
