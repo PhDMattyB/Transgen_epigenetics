@@ -70,7 +70,12 @@ summary(allo_mod)
 
 ## Allometry is not significant. 
 
+allo_mod2 = procD.lm(gpa$coords ~ log(meta_data$csize_real)*meta_data$ecotype*meta_data$poppair, 
+                    iter = 999, 
+                    RRPP = T)
 
+summary(allo_mod2)
+## Theres an ecotype*lake allometric scaling effect
 # mean shape data ---------------------------------------------------------
 
 mean_shape = mshape(gpa$coords)
