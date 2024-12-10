@@ -16,6 +16,7 @@ setwd('~/Methylation_data/')
 
 library(tidyverse)
 library(geomorph)
+library(PCDimension)
 
 
 # metadata ----------------------------------------------------------------
@@ -305,7 +306,7 @@ writeland.tps(F2_array_consensus,
 # isolate ecotype effects -------------------------------------------------
 
 ## isolate effects due to warm cold divergence axis regardless of population
-ecotype_mod1 = procD.lm(gpa$coords ~ meta_data$ecotype...12, 
+ecotype_mod1 = procD.lm(gpa$coords ~ meta_data$ecotype, 
                        iter = 999, 
                        RRPP = T)
 
@@ -384,6 +385,8 @@ raw_pca = gm.prcomp(A = raw_gpa$coords)
 
 summary(raw_pca)
 
+bsDimension(raw_pca$x)
+
 raw_pca_vals = raw_pca$x %>% 
   as_tibble() %>% 
   select(1:5)
@@ -416,6 +419,8 @@ f1_pca = gm.prcomp(f1_gpa$coords)
 
 summary(f1_pca)
 
+bsDimension(f1_pca$x)
+
 f1_pca_vals = f1_pca$x %>% 
   as_tibble() %>% 
   select(1:5)
@@ -445,6 +450,8 @@ TGP_eco_gpa = gpagen(TGP_eco,
 TGP_eco_pca = gm.prcomp(TGP_eco_gpa$coords)
 
 summary(TGP_eco_pca)
+
+bsDimension(TGP_eco_pca$x)
 
 TGP_eco_pca_vals = TGP_eco_pca$x %>% 
   as_tibble() %>% 
