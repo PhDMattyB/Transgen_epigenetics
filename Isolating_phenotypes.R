@@ -385,7 +385,8 @@ raw_pca = gm.prcomp(A = raw_gpa$coords)
 
 summary(raw_pca)
 
-bsDimension(raw_pca$x)
+bsDimension(raw_pca$x, 
+            FUZZ = 0.01)
 
 raw_pca_vals = raw_pca$x %>% 
   as_tibble() %>% 
@@ -419,7 +420,8 @@ f1_pca = gm.prcomp(f1_gpa$coords)
 
 summary(f1_pca)
 
-bsDimension(f1_pca$x)
+bsDimension(f1_pca$x, 
+            FUZZ = 0.05)
 
 f1_pca_vals = f1_pca$x %>% 
   as_tibble() %>% 
@@ -551,6 +553,8 @@ eco1_gpa = gpagen(eco1_effects,
 eco1_pca = gm.prcomp(eco1_gpa$coords)
 
 summary(eco1_pca)
+
+bsDimension(eco1_pca$x)
 
 eco1_pca_vals = eco1_pca$x %>% 
   as_tibble() %>% 
