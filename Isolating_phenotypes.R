@@ -385,8 +385,7 @@ raw_pca = gm.prcomp(A = raw_gpa$coords)
 
 summary(raw_pca)
 
-bsDimension(raw_pca$x, 
-            FUZZ = 0.01)
+bsDimension(raw_pca$x)
 
 raw_pca_vals = raw_pca$x %>% 
   as_tibble() %>% 
