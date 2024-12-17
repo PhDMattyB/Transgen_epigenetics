@@ -600,6 +600,406 @@ ggplot(data = eco1_pca_data)+
 #   write_csv('Common_GPA_Ecotype_effect_pca_data.csv')
 
 
+
+# Flank shape -------------------------------------------------------------
+
+flank_data = readland.tps('Flank_shape.TPS', 
+                       specID = 'imageID', 
+                       readcurves = T)
+
+# bs_data = read_csv("epigenetic_landmark_data.csv") %>% 
+#   select(-na)
+# 
+# bs_data = as.matrix(bs_data)
+# 
+# arrayspecs(A = bs_data, 
+#            p = 37, 
+#            k = 2)
+
+
+# sliders = define.sliders(c(28:37,1))
+
+flank_gpa = gpagen(flank_data, 
+             print.progress = T)
+
+mean_flank_shape = mshape(flank_gpa$coords)
+matrix_mean_flank_shape = as.matrix(mean_flank_shape)
+mean_flank_shape_array = array(matrix_mean_flank_shape, 
+                         dim = c(7, 2, 1))
+
+
+
+# FLANK TGP EFFECTS -------------------------------------------------------
+
+
+F1_temp_mod_flank = procD.lm(flank_gpa$coords ~ meta_data$F1, 
+                       iter = 999, 
+                       RRPP = T)
+
+F1_fitted_12deg = F1_temp_mod_flank$GM$fitted[,,1]
+F1_fitted_mat_12deg = as.matrix(F1_fitted_12deg)
+F1_12deg_array = array(F1_fitted_mat_12deg, 
+                       dim = c(7, 2, 1))
+
+F1_fitted_18deg = F1_temp_mod_flank$GM$fitted[,,64]
+F1_fitteed_18deg_mat = as.matrix(F1_fitted_18deg)
+F1_18deg_array = array(F1_fitteed_18deg_mat, 
+                       dim = c(7, 2, 1))
+
+F1_12deg_range = c(1:104, 206:370, 411:511, 612:700, 789:897, 999:1097, 1198:1297, 1398:1474)
+
+F1_18deg_range = c(105:205, 371:410, 512:611, 701:788, 898:998, 1098:1197, 1298:1297, 1475:1575)
+
+flank_F1_array = array(0, dim = c(7, 2, 1575))
+
+for(i in F1_12deg_range){
+  flank_F1_array[,,i] = flank_gpa$coords[,,i] - F1_12deg_array[,,1]
+}
+
+for(i in F1_18deg_range){
+  flank_F1_array[,,i] = flank_gpa$coords[,,i] - F1_18deg_array[,,1]
+}
+
+
+flank_F1_array_consensus = array(0, dim = c(7, 2, 1575))
+
+for(i in 1:1575){
+  flank_F1_array_consensus[,,i] = flank_F1_array[,,i] + mean_flank_shape_array[,,1]
+}
+
+writeland.tps(flank_F1_array_consensus,
+              file = 'FLANK_TGP_all_individuals.tps',
+              scale = T,
+              specID = T)
+
+
+# FLANK WGP EFFECTS -------------------------------------------------------
+
+F2_temp_mod_flank = procD.lm(flank_gpa$coords ~ meta_data$F2, 
+                       iter = 999, 
+                       RRPP = T)
+
+
+F2_fitted_12deg = F2_temp_mod_flank$GM$fitted[,,1]
+F2_fitted_mat_12deg = as.matrix(F2_fitted_12deg)
+F2_12deg_array = array(F2_fitted_mat_12deg, 
+                       dim = c(7, 2, 1))
+
+F2_fitted_18deg = F2_temp_mod_flank$GM$fitted[,,35]
+F2_fitteed_18deg_mat = as.matrix(F2_fitted_18deg)
+F2_18deg_array = array(F2_fitteed_18deg_mat, 
+                       dim = c(7, 2, 1))
+
+F2_12deg_range = c(1:50, 105:155, 206:259, 310:359, 412:461, 512:563, 612:650, 701:746, 798:847, 898:947, 998:1047,
+                   1098:1147, 1198:1249, 1298:1347, 1398:1447, 1475:1525)
+
+F2_18deg_range = c(51:104, 156:205, 260:309, 360:411, 462:511, 564:611, 651:700, 747:797, 848:897, 948:997,
+                   1048:1097, 1148:1197, 1250:1297, 1348:1397, 1448:1474, 1525:1575)
+
+flank_F2_array = array(0, dim = c(7, 2, 1575))
+
+for(i in F2_12deg_range){
+  flank_F2_array[,,i] = flank_gpa$coords[,,i] - F2_12deg_array[,,1]
+}
+
+for(i in F2_18deg_range){
+  flank_F2_array[,,i] = flank_gpa$coords[,,i] - F2_18deg_array[,,1]
+}
+
+
+flank_F2_array_consensus = array(0, dim = c(7, 2, 1575))
+
+for(i in 1:1575){
+  flank_F2_array_consensus[,,i] = flank_F2_array[,,i] + mean_flank_shape_array[,,1]
+}
+
+writeland.tps(flank_F2_array_consensus,
+              file = 'FLANK_WGP_all_individuals.tps',
+              scale = NULL,
+              specID = T)
+
+
+# FLANK ECOTYPE EFFECTS ---------------------------------------------------
+
+ecotype_mod1_flank = procD.lm(flank_gpa$coords ~ meta_data$ecotype, 
+                        iter = 999, 
+                        RRPP = T)
+
+eco1_fitted_cold = ecotype_mod1_flank$GM$fitted[,,1]
+eco1_fitted_mat_cold = as.matrix(eco1_fitted_cold)
+eco1_cold_array = array(eco1_fitted_mat_cold, 
+                        dim = c(7, 2, 1))
+
+eco1_fitted_warm = ecotype_mod1_flank$GM$fitted[,,292]
+eco1_fitteed_warm_mat = as.matrix(eco1_fitted_warm)
+eco1_warm_array = array(eco1_fitteed_warm_mat, 
+                        dim = c(7, 2, 1))
+
+eco1_cold_range = c(1:204, 412:611, 798:997, 1198:1397)
+
+eco1_warm_range = c(205:411, 612:797, 998:1197, 1397:1575)
+
+flank_eco1_array = array(0, dim = c(7, 2, 1575))
+
+for(i in eco1_cold_range){
+  flank_eco1_array[,,i] = flank_gpa$coords[,,i] - eco1_cold_array[,,1]
+}
+
+for(i in eco1_warm_range){
+  flank_eco1_array[,,i] = flank_gpa$coords[,,i] - eco1_warm_array[,,1]
+}
+
+
+flank_eco1_array_consensus = array(0, dim = c(7, 2, 1575))
+
+for(i in 1:1575){
+  flank_eco1_array_consensus[,,i] = flank_eco1_array[,,i] + mean_flank_shape_array[,,1]
+}
+
+writeland.tps(flank_eco1_array_consensus,
+              file = 'FLANK_Ecotype_all_individuals.tps',
+              scale = NULL,
+              specID = T)
+
+
+# FLANK PCA phenotypes ----------------------------------------------------
+
+Flank_shape_data = readmulti.tps(c('Flank_shape.tps',
+                             'FLANK_TGP_all_individuals.tps',
+                             'FLANK_WGP_all_individuals.tps',
+                             'FLANK_Ecotype_all_individuals.tps'),
+                           specID = 'imageID')
+
+sliders = define.sliders(c(28:37,1))
+
+shape_gpa = gpagen(shape_data,
+                   print.progress = T,
+                   curves = sliders)
+
+id = read_csv('shape_data_id.csv')
+
+coord_sub = coords.subset(shape_gpa$coords,
+                          id$shape_data)
+
+raw_F2_coords = coord_sub$raw
+TGP_coords = coord_sub$TGP
+WGP_coods = coord_sub$WGP
+Eco_coords = coord_sub$Eco
+
+## pca of the raw landmark data
+# raw = readland.tps('F2_All_aligned_withsliders.tps',
+#                    specID = 'imageID',
+#                    readcurves = T)
+# 
+# 
+# raw_gpa = gpagen(raw,
+#              print.progress = T,
+#              curves = sliders)
+
+raw_pca = gm.prcomp(A = raw_F2_coords)
+# raw_pca = gm.prcomp(A = raw_gpa$coords)
+
+summary(raw_pca)
+
+raw_pca_dim = bsDimension(raw_pca$x)
+raw_pca_scree = screeplot(raw_pca)
+
+raw_pca_vals = raw_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+raw_pca_data = bind_cols(meta_data, 
+                         raw_pca_vals) 
+
+raw_pca_data$F1 = as.character(raw_pca_data$F1)
+raw_pca_data$F2 = as.character(raw_pca_data$F2)
+
+ggplot(data = raw_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = F2))
+
+# raw_pca_data %>%
+#   write_csv('Common_GPA_Unfilered_PCA_data.csv')
+
+
+
+## pca of the f1 effects
+# F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
+# 
+# f1_gpa = gpagen(F1_effects, 
+#                 curves = sliders)
+f1_pca = gm.prcomp(TGP_coords)
+summary(f1_pca)
+
+
+TGP_dim = bsDimension(f1_pca$x)
+TGP_pca_scree = screeplot(f1_pca)
+
+f1_pca_vals = f1_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+f1_pca_data = bind_cols(meta_data, 
+                        f1_pca_vals)
+
+f1_pca_data$F1 = as.character(f1_pca_data$F1)
+f1_pca_data$F2 = as.character(f1_pca_data$F2)
+
+ggplot(data = f1_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = F2))
+
+# f1_pca_data %>%
+#   write_csv('Common_GPA_TGP_PCA_data.csv')
+
+## PCA of the TGP by ecotype effects
+# TGP_eco = readland.tps('TGP_ecotype_variation_landmarks.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
+# 
+# TGP_eco_gpa = gpagen(TGP_eco, 
+#                 curves = sliders)
+
+# TGP_eco_pca = gm.prcomp(TGP_eco_gpa$coords)
+# 
+# summary(TGP_eco_pca)
+# 
+# bsDimension(TGP_eco_pca$x)
+# 
+# TGP_eco_pca_vals = TGP_eco_pca$x %>% 
+#   as_tibble() %>% 
+#   select(1:5)
+# 
+# TGP_eco_pca_data = bind_cols(meta_data, 
+#                         TGP_eco_pca_vals)
+# 
+# TGP_eco_pca_data$F1 = as.character(TGP_eco_pca_data$F1)
+# TGP_eco_pca_data$F2 = as.character(TGP_eco_pca_data$F2)
+# 
+# ggplot(data = TGP_eco_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F1, 
+#                  shape = ecotype))
+# 
+# TGP_eco_pca_data %>%
+#   write_csv('TGP_ecotype_variation_PCA_data.csv')
+
+
+## pca of the f2 effects
+# f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
+# 
+# f2_gpa = gpagen(f2_effects, 
+#                 curves = sliders)
+f2_pca = gm.prcomp(WGP_coods)
+
+summary(f2_pca)
+WGP_dim = bsDimension(f2_pca$x)
+WGP_pca_scree = screeplot(f2_pca)
+
+
+f2_pca_vals = f2_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+f2_pca_data = bind_cols(meta_data, 
+                        f2_pca_vals)
+
+f2_pca_data$F1 = as.character(f2_pca_data$F1)
+f2_pca_data$F2 = as.character(f2_pca_data$F2)
+
+ggplot(data = f2_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = F1, 
+                 shape = F2))
+
+# f2_pca_data %>%
+#   write_csv('Common_GPA_WGP_pca_data.csv')
+
+## PCA of the WGP by ecotype effects
+# WGP_eco = readland.tps('WGP_ecotype_variation_landmarks.tps', 
+#                        specID = 'imageID', 
+#                        readcurves = T)
+# 
+# WGP_eco_gpa = gpagen(WGP_eco, 
+#                      curves = sliders)
+# WGP_eco_pca = gm.prcomp(WGP_eco_gpa$coords)
+# 
+# summary(WGP_eco_pca)
+# 
+# WGP_eco_pca_vals = WGP_eco_pca$x %>% 
+#   as_tibble() %>% 
+#   select(1:5)
+# 
+# WGP_eco_pca_data = bind_cols(meta_data, 
+#                              WGP_eco_pca_vals)
+# 
+# WGP_eco_pca_data$F1 = as.character(WGP_eco_pca_data$F1)
+# WGP_eco_pca_data$F2 = as.character(WGP_eco_pca_data$F2)
+# 
+# ggplot(data = WGP_eco_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F2, 
+#                  shape = ecotype))
+# 
+# 
+# WGP_eco_pca_data %>%
+#   write_csv('WGP_ecotype_variation_PCA_data.csv')
+
+
+## pca of the cold vs warm ecotype effects
+# eco1_effects = readland.tps('Ecotype_effect_landmarks_all_individuals.tps',
+#                             specID = 'imageID',
+#                             readcurves = T)
+
+
+# eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
+
+# eco1_gpa = gpagen(eco1_effects, 
+#                 curves = sliders)
+eco1_pca = gm.prcomp(Eco_coords)
+
+summary(eco1_pca)
+
+eco_dim = bsDimension(eco1_pca$x)
+
+eco_scree = screeplot(eco1_pca)
+
+eco1_pca_vals = eco1_pca$x %>% 
+  as_tibble() %>% 
+  select(1:5)
+
+eco1_pca_data = bind_cols(meta_data, 
+                          eco1_pca_vals)
+
+# eco1_pca_data$F1 = as.character(eco1_pca_data$F1)
+# eco1_pca_data$F2 = as.character(eco1_pca_data$F2)
+
+ggplot(data = eco1_pca_data)+
+  geom_point(aes(x = Comp1, 
+                 y = Comp2, 
+                 col = ecotype))
+
+# eco1_pca_data %>%
+#   write_csv('Common_GPA_Ecotype_effect_pca_data.csv')
+
+
+
+
+
+
 # interlandmark distances -------------------------------------------------
 
 ## raw body shape data
