@@ -924,19 +924,40 @@ flank_Eco_coords = coord_sub$Eco
 
 F2_body_depth = interlmkdist(flank_raw_F2_coords, 
                                       lmks) %>% 
-  as_tibble()
+  as_tibble() %>% 
+  mutate(body_depth_measure = 'RAW_body_depth') %>% 
+  bind_cols(., 
+           meta_data)
 
 TGP_body_depth = interlmkdist(flank_TGP_coords, 
                              lmks) %>% 
-  as_tibble()
+  as_tibble()%>% 
+  mutate(body_depth_measure = 'TGP_body_depth') %>% 
+  bind_cols(., 
+            meta_data)
+
 
 WGP_body_depth = interlmkdist(flank_WGP_coods, 
                              lmks) %>% 
-  as_tibble()
+  as_tibble() %>% 
+  mutate(body_depth_measure = 'WGP_body_depth') %>% 
+  bind_cols(., 
+            meta_data)
 
 Eco_body_depth = interlmkdist(flank_Eco_coords, 
                              lmks) %>% 
-  as_tibble()
+  as_tibble() %>% 
+  mutate(body_depth_measure = 'Eco_body_depth') %>% 
+  bind_cols(., 
+            meta_data)
+
+body_depth_data = bind_rows(F2_body_depth, 
+                            TGP_body_depth, 
+                            WGP_body_depth, 
+                            Eco_body_depth)
+
+body_depth_data %>% 
+  write_csv('FLANK_body_depth_data.csv')
 
 
 
