@@ -459,53 +459,56 @@ ggplot(data = f1_pca_data)+
                  col = F1, 
                  shape = F2))
 
-# f1_pca_data %>% 
-#   write_csv('F1_effect_PCA_data.csv')
+# f1_pca_data %>%
+#   write_csv('Common_GPA_TGP_PCA_data.csv')
 
 ## PCA of the TGP by ecotype effects
-TGP_eco = readland.tps('TGP_ecotype_variation_landmarks.tps', 
-                          specID = 'imageID', 
-                          readcurves = T)
+# TGP_eco = readland.tps('TGP_ecotype_variation_landmarks.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
+# 
+# TGP_eco_gpa = gpagen(TGP_eco, 
+#                 curves = sliders)
 
-TGP_eco_gpa = gpagen(TGP_eco, 
-                curves = sliders)
-TGP_eco_pca = gm.prcomp(TGP_eco_gpa$coords)
-
-summary(TGP_eco_pca)
-
-bsDimension(TGP_eco_pca$x)
-
-TGP_eco_pca_vals = TGP_eco_pca$x %>% 
-  as_tibble() %>% 
-  select(1:5)
-
-TGP_eco_pca_data = bind_cols(meta_data, 
-                        TGP_eco_pca_vals)
-
-TGP_eco_pca_data$F1 = as.character(TGP_eco_pca_data$F1)
-TGP_eco_pca_data$F2 = as.character(TGP_eco_pca_data$F2)
-
-ggplot(data = TGP_eco_pca_data)+
-  geom_point(aes(x = Comp1, 
-                 y = Comp2, 
-                 col = F1, 
-                 shape = ecotype))
-
-TGP_eco_pca_data %>%
-  write_csv('TGP_ecotype_variation_PCA_data.csv')
+# TGP_eco_pca = gm.prcomp(TGP_eco_gpa$coords)
+# 
+# summary(TGP_eco_pca)
+# 
+# bsDimension(TGP_eco_pca$x)
+# 
+# TGP_eco_pca_vals = TGP_eco_pca$x %>% 
+#   as_tibble() %>% 
+#   select(1:5)
+# 
+# TGP_eco_pca_data = bind_cols(meta_data, 
+#                         TGP_eco_pca_vals)
+# 
+# TGP_eco_pca_data$F1 = as.character(TGP_eco_pca_data$F1)
+# TGP_eco_pca_data$F2 = as.character(TGP_eco_pca_data$F2)
+# 
+# ggplot(data = TGP_eco_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F1, 
+#                  shape = ecotype))
+# 
+# TGP_eco_pca_data %>%
+#   write_csv('TGP_ecotype_variation_PCA_data.csv')
 
 
 ## pca of the f2 effects
-f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
-                          specID = 'imageID', 
-                          readcurves = T)
-
-f2_gpa = gpagen(f2_effects, 
-                curves = sliders)
-f2_pca = gm.prcomp(f2_gpa$coords)
+# f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
+# 
+# f2_gpa = gpagen(f2_effects, 
+#                 curves = sliders)
+f2_pca = gm.prcomp(WGP_coods)
 
 summary(f2_pca)
-bsDimension(f2_pca$x)
+WGP_dim = bsDimension(f2_pca$x)
+WGP_pca_scree = screeplot(f2_pca)
+
 
 f2_pca_vals = f2_pca$x %>% 
   as_tibble() %>% 
@@ -523,58 +526,60 @@ ggplot(data = f2_pca_data)+
                  col = F1, 
                  shape = F2))
 
-# f2_pca_data %>% 
-#   write_csv('F2_effect_pca_data.csv')
+# f2_pca_data %>%
+#   write_csv('Common_GPA_WGP_pca_data.csv')
 
 ## PCA of the WGP by ecotype effects
-WGP_eco = readland.tps('WGP_ecotype_variation_landmarks.tps', 
-                       specID = 'imageID', 
-                       readcurves = T)
-
-WGP_eco_gpa = gpagen(WGP_eco, 
-                     curves = sliders)
-WGP_eco_pca = gm.prcomp(WGP_eco_gpa$coords)
-
-summary(WGP_eco_pca)
-
-WGP_eco_pca_vals = WGP_eco_pca$x %>% 
-  as_tibble() %>% 
-  select(1:5)
-
-WGP_eco_pca_data = bind_cols(meta_data, 
-                             WGP_eco_pca_vals)
-
-WGP_eco_pca_data$F1 = as.character(WGP_eco_pca_data$F1)
-WGP_eco_pca_data$F2 = as.character(WGP_eco_pca_data$F2)
-
-ggplot(data = WGP_eco_pca_data)+
-  geom_point(aes(x = Comp1, 
-                 y = Comp2, 
-                 col = F2, 
-                 shape = ecotype))
-
-
-WGP_eco_pca_data %>%
-  write_csv('WGP_ecotype_variation_PCA_data.csv')
+# WGP_eco = readland.tps('WGP_ecotype_variation_landmarks.tps', 
+#                        specID = 'imageID', 
+#                        readcurves = T)
+# 
+# WGP_eco_gpa = gpagen(WGP_eco, 
+#                      curves = sliders)
+# WGP_eco_pca = gm.prcomp(WGP_eco_gpa$coords)
+# 
+# summary(WGP_eco_pca)
+# 
+# WGP_eco_pca_vals = WGP_eco_pca$x %>% 
+#   as_tibble() %>% 
+#   select(1:5)
+# 
+# WGP_eco_pca_data = bind_cols(meta_data, 
+#                              WGP_eco_pca_vals)
+# 
+# WGP_eco_pca_data$F1 = as.character(WGP_eco_pca_data$F1)
+# WGP_eco_pca_data$F2 = as.character(WGP_eco_pca_data$F2)
+# 
+# ggplot(data = WGP_eco_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F2, 
+#                  shape = ecotype))
+# 
+# 
+# WGP_eco_pca_data %>%
+#   write_csv('WGP_ecotype_variation_PCA_data.csv')
 
 
 ## pca of the cold vs warm ecotype effects
-eco1_effects = readland.tps('Ecotype_effect_landmarks_all_individuals.tps',
-                            specID = 'imageID',
-                            readcurves = T)
+# eco1_effects = readland.tps('Ecotype_effect_landmarks_all_individuals.tps',
+#                             specID = 'imageID',
+#                             readcurves = T)
 
 
 # eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
 #                           specID = 'imageID', 
 #                           readcurves = T)
 
-eco1_gpa = gpagen(eco1_effects, 
-                curves = sliders)
-eco1_pca = gm.prcomp(eco1_gpa$coords)
+# eco1_gpa = gpagen(eco1_effects, 
+#                 curves = sliders)
+eco1_pca = gm.prcomp(Eco_coords)
 
 summary(eco1_pca)
 
-bsDimension(eco1_pca$x)
+eco_dim = bsDimension(eco1_pca$x)
+
+eco_scree = screeplot(eco1_pca)
 
 eco1_pca_vals = eco1_pca$x %>% 
   as_tibble() %>% 
@@ -591,8 +596,8 @@ ggplot(data = eco1_pca_data)+
                  y = Comp2, 
                  col = ecotype))
 
-# eco1_pca_data %>% 
-#   write_csv('Ecotype_effect_pca_data.csv')
+# eco1_pca_data %>%
+#   write_csv('Common_GPA_Ecotype_effect_pca_data.csv')
 
 
 # interlandmark distances -------------------------------------------------
