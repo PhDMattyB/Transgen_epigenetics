@@ -368,24 +368,21 @@ writeland.tps(eco1_array_consensus,
 
 # Phenotype PCA -----------------------------------------------------------
 
-shape_data = readmulti.tps(c('F2_All_aligned_withsliders.tps', 
-                             'F1_effect_landmarks_all_individuals.tps', 
-                             'F2_effect_landmarks_all_individuals.tps', 
-                             'Ecotype_effect_landmarks_all_individuals.tps'), 
+shape_data = readmulti.tps(c('F2_All_aligned_withsliders.tps',
+                             'F1_effect_landmarks_all_individuals.tps',
+                             'F2_effect_landmarks_all_individuals.tps',
+                             'Ecotype_effect_landmarks_all_individuals.tps'),
                            specID = 'imageID')
 
 sliders = define.sliders(c(28:37,1))
 
-shape_gpa = gpagen(shape_data, 
-                   print.progress = T, 
+shape_gpa = gpagen(shape_data,
+                   print.progress = T,
                    curves = sliders)
 
 id = read_csv('shape_data_id.csv')
-# common_df = geomorph.data.frame(coords = two.d.array(shape_gpa$coords),
-#                                 split = id$shape_data, 
-#                                 id = id$fish_id)
 
-coord_sub = coords.subset(shape_gpa$coords, 
+coord_sub = coords.subset(shape_gpa$coords,
                           id$shape_data)
 
 raw_F2_coords = coord_sub$raw
@@ -394,16 +391,17 @@ WGP_coods = coord_sub$WGP
 Eco_coords = coord_sub$Eco
 
 ## pca of the raw landmark data
-# raw = readland.tps('F2_All_aligned_withsliders.tps', 
-#                    specID = 'imageID', 
+# raw = readland.tps('F2_All_aligned_withsliders.tps',
+#                    specID = 'imageID',
 #                    readcurves = T)
 # 
 # 
-# raw_gpa = gpagen(raw, 
-#              print.progress = T, 
+# raw_gpa = gpagen(raw,
+#              print.progress = T,
 #              curves = sliders)
 
 raw_pca = gm.prcomp(A = raw_F2_coords)
+# raw_pca = gm.prcomp(A = raw_gpa$coords)
 
 summary(raw_pca)
 
@@ -426,24 +424,24 @@ ggplot(data = raw_pca_data)+
                  col = F1, 
                  shape = F2))
 
-# raw_pca_data %>% 
-#   write_csv('Unfilered_PCA_data.csv')
+# raw_pca_data %>%
+#   write_csv('Common_GPA_Unfilered_PCA_data.csv')
 
 
 
 ## pca of the f1 effects
-F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps', 
-                          specID = 'imageID', 
-                          readcurves = T)
-
-f1_gpa = gpagen(F1_effects, 
-                curves = sliders)
-f1_pca = gm.prcomp(f1_gpa$coords)
-
+# F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps', 
+#                           specID = 'imageID', 
+#                           readcurves = T)
+# 
+# f1_gpa = gpagen(F1_effects, 
+#                 curves = sliders)
+f1_pca = gm.prcomp(TGP_coords)
 summary(f1_pca)
 
-bsDimension(f1_pca$x, 
-            FUZZ = 0.05)
+
+TGP_dim = bsDimension(f1_pca$x)
+TGP_pca_scree = screeplot(f1_pca)
 
 f1_pca_vals = f1_pca$x %>% 
   as_tibble() %>% 
