@@ -123,10 +123,10 @@ for(i in 1:1575){
   F1_array_consensus[,,i] = F1_array[,,i] + mean_shape_array[,,1]
 }
 
-# writeland.tps(F1_array_consensus, 
-#               file = 'F1_effect_landmarks_all_individuals.tps',
-#               scale = NULL, 
-#               specID = T)
+writeland.tps(F1_array_consensus,
+              file = 'F1_effect_landmarks_all_individuals.tps',
+              scale = NULL,
+              specID = T)
 
 
 # F1 by ecotype effects ---------------------------------------------------
@@ -233,10 +233,10 @@ for(i in 1:1575){
   F2_array_consensus[,,i] = F2_array[,,i] + mean_shape_array[,,1]
 }
 
-# writeland.tps(F2_array_consensus,
-#               file = 'F2_effect_landmarks_all_individuals.tps',
-#               scale = NULL,
-#               specID = T)
+writeland.tps(F2_array_consensus,
+              file = 'F2_effect_landmarks_all_individuals.tps',
+              scale = NULL,
+              specID = T)
 
 
 # F2 effects by ecotype ---------------------------------------------------
@@ -289,14 +289,14 @@ for(i in F2_18deg_warm_range){
   F2_temp_eco_array[,,i] = gpa$coords[,,i] - F2_18deg_warm_array[,,1]
 }
 
-F2_array_consensus = array(0, dim = c(37, 2, 1575))
+Eco_array_consensus = array(0, dim = c(37, 2, 1575))
 
 for(i in 1:1575){
-  F2_array_consensus[,,i] = F2_temp_eco_array[,,i] + mean_shape_array[,,1]
+  Eco_array_consensus[,,i] = F2_temp_eco_array[,,i] + mean_shape_array[,,1]
 }
 
-writeland.tps(F2_array_consensus,
-              file = 'WGP_ecotype_variation_landmarks.tps',
+writeland.tps(Eco_array_consensus,
+              file = 'Ecotype_variation_landmarks.tps',
               scale = NULL,
               specID = T)
 
@@ -368,24 +368,47 @@ writeland.tps(eco1_array_consensus,
 
 # Phenotype PCA -----------------------------------------------------------
 
-
-
-## pca of the raw landmark data
-raw = readland.tps('F2_All_aligned_withsliders.tps', 
-                   specID = 'imageID', 
-                   readcurves = T)
+shape_data = readmulti.tps(c('F2_All_aligned_withsliders.tps', 
+                             'F1_effect_landmarks_all_individuals.tps', 
+                             'F2_effect_landmarks_all_individuals.tps', 
+                             'Ecotype_effect_landmarks_all_individuals.tps'), 
+                           specID = 'imageID')
 
 sliders = define.sliders(c(28:37,1))
 
-raw_gpa = gpagen(raw, 
-             print.progress = T, 
-             curves = sliders)
+shape_gpa = gpagen(shape_data, 
+                   print.progress = T, 
+                   curves = sliders)
 
-raw_pca = gm.prcomp(A = raw_gpa$coords)
+id = read_csv('shape_data_id.csv')
+# common_df = geomorph.data.frame(coords = two.d.array(shape_gpa$coords),
+#                                 split = id$shape_data, 
+#                                 id = id$fish_id)
+
+coord_sub = coords.subset(shape_gpa$coords, 
+                          id$shape_data)
+
+raw_F2_coords = coord_sub$raw
+TGP_coords = coord_sub$TGP
+WGP_coods = coord_sub$WGP
+Eco_coords = coord_sub$Eco
+
+## pca of the raw landmark data
+# raw = readland.tps('F2_All_aligned_withsliders.tps', 
+#                    specID = 'imageID', 
+#                    readcurves = T)
+# 
+# 
+# raw_gpa = gpagen(raw, 
+#              print.progress = T, 
+#              curves = sliders)
+
+raw_pca = gm.prcomp(A = raw_F2_coords)
 
 summary(raw_pca)
 
-bsDimension(raw_pca$x)
+raw_pca_dim = bsDimension(raw_pca$x)
+raw_pca_scree = screeplot(raw_pca)
 
 raw_pca_vals = raw_pca$x %>% 
   as_tibble() %>% 
