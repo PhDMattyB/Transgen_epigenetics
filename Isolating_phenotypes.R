@@ -400,8 +400,16 @@ raw_gpa = gpagen(raw,
              print.progress = T,
              curves = sliders)
 
-# raw_pca = gm.prcomp(A = raw_F2_coords)
+
+# raw_pca2 = gm.prcomp(A = raw_F2_coords)
 raw_pca = gm.prcomp(A = raw_gpa$coords)
+
+paran(x = raw_pca$x, 
+      iterations = 1000, 
+      all = T,
+      graph = T, 
+      seed = 1738)
+
 
 summary(raw_pca)
 
@@ -440,6 +448,13 @@ f1_gpa = gpagen(F1_effects,
                 curves = sliders)
 f1_pca = gm.prcomp(f1_gpa$coords)
 summary(f1_pca)
+
+paran(x = f1_pca$x, 
+      iterations = 1000, 
+      # all = T, 
+      graph = T, 
+      seed = 1738)
+
 
 TGP_dim = bsDimension(f1_pca$x)
 TGP_pca_scree = screeplot(f1_pca)
@@ -507,6 +522,13 @@ f2_gpa = gpagen(f2_effects,
 f2_pca = gm.prcomp(f2_gpa)
 
 summary(f2_pca)
+
+paran(x = f2_pca$x, 
+      iterations = 1000, 
+      all = T,
+      graph = T, 
+      seed = 1738)
+
 WGP_dim = bsDimension(f2_pca$x)
 WGP_pca_scree = screeplot(f2_pca)
 
@@ -574,6 +596,12 @@ eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individ
 eco1_gpa = gpagen(eco1_effects,
                 curves = sliders)
 eco1_pca = gm.prcomp(eco1_gpa)
+
+paran(x = eco1_pca$x, 
+      iterations = 1000, 
+      all = T,
+      graph = T, 
+      seed = 1738)
 
 summary(eco1_pca)
 
@@ -802,33 +830,32 @@ flank_raw_pca_scree = screeplot(flank_raw_pca)
 
 flank_raw_pca_vals = flank_raw_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  dplyr::select(1:2)
 
 flank_raw_pca_data = bind_cols(meta_data, 
                          flank_raw_pca_vals) 
 
-flank_raw_pca_data$F1 = as.character(flank_raw_pca_data$F1)
-flank_raw_pca_data$F2 = as.character(flank_raw_pca_data$F2)
-
-ggplot(data = flank_raw_pca_data)+
-  geom_point(aes(x = Comp1, 
-                 y = Comp2, 
-                 col = F1, 
-                 shape = F2))
+# flank_raw_pca_data$F1 = as.character(flank_raw_pca_data$F1)
+# flank_raw_pca_data$F2 = as.character(flank_raw_pca_data$F2)
+# 
+# ggplot(data = flank_raw_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F1, 
+#                  shape = F2))
 
 flank_raw_pca_data %>%
-  write_csv('Common_GPA_FLANK_F2_Unfilered_PCA_data.csv')
+  write_csv('UnCommon_GPA_FLANK_F2_Unfilered_PCA_data.csv')
 
 
 
 ## pca of the f1 effects
-# F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps', 
-#                           specID = 'imageID', 
-#                           readcurves = T)
-# 
-# f1_gpa = gpagen(F1_effects, 
-#                 curves = sliders)
-flank_f1_pca = gm.prcomp(flank_TGP_coords)
+flank_F1_effects = readland.tps('FLANK_TGP_all_individuals.tps',
+                          specID = 'imageID',
+                          readcurves = T)
+
+flank_f1_gpa = gpagen(flank_F1_effects)
+flank_f1_pca = gm.prcomp(flank_f1_gpa$coords)
 summary(flank_f1_pca)
 
 
@@ -837,7 +864,7 @@ flank_TGP_pca_scree = screeplot(flank_f1_pca)
 
 flank_f1_pca_vals = flank_f1_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  dplyr::select(1)
 
 flank_f1_pca_data = bind_cols(meta_data, 
                               flank_f1_pca_vals)
@@ -852,17 +879,16 @@ flank_f1_pca_data = bind_cols(meta_data,
 #                  shape = F2))
 
 flank_f1_pca_data %>%
-  write_csv('Common_GPA_FLANK_TGP_PCA_data.csv')
+  write_csv('UnCommon_GPA_FLANK_TGP_PCA_data.csv')
 
 
 ## pca of the f2 effects
-# f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
-#                           specID = 'imageID', 
-#                           readcurves = T)
-# 
-# f2_gpa = gpagen(f2_effects, 
-#                 curves = sliders)
-flank_f2_pca = gm.prcomp(flank_WGP_coods)
+flank_f2_effects = readland.tps('FLANK_WGP_all_individuals.tps',
+                          specID = 'imageID',
+                          readcurves = T)
+
+flank_f2_gpa = gpagen(flank_f2_effects)
+flank_f2_pca = gm.prcomp(flank_f2_gpa$coords)
 
 summary(flank_f2_pca)
 flank_WGP_dim = bsDimension(flank_f2_pca$x)
@@ -871,23 +897,22 @@ flank_WGP_pca_scree = screeplot(flank_f2_pca)
 
 flank_f2_pca_vals = flank_f2_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  select(1)
 
 flank_f2_pca_data = bind_cols(meta_data, 
                               flank_f2_pca_vals)
 
 
 flank_f2_pca_data %>%
-  write_csv('Common_GPA_FLANK_WGP_pca_data.csv')
+  write_csv('UnCommon_GPA_FLANK_WGP_pca_data.csv')
 
 
-# eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
-#                           specID = 'imageID', 
-#                           readcurves = T)
+flank_eco1_effects = readland.tps('FLANK_Ecotype_all_individuals.tps',
+                          specID = 'imageID',
+                          readcurves = T)
 
-# eco1_gpa = gpagen(eco1_effects, 
-#                 curves = sliders)
-flank_eco1_pca = gm.prcomp(flank_Eco_coords)
+flank_eco1_gpa = gpagen(flank_eco1_effects)
+flank_eco1_pca = gm.prcomp(flank_eco1_gpa$coords)
 
 summary(flank_eco1_pca)
 
@@ -897,14 +922,14 @@ flank_eco_scree = screeplot(flank_eco1_pca)
 
 flank_eco1_pca_vals = flank_eco1_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  dplyr::select(1)
 
 flank_eco1_pca_data = bind_cols(meta_data, 
                                 flank_eco1_pca_vals)
 
 
 flank_eco1_pca_data %>%
-  write_csv('Common_GPA_FLANK_Ecotype_effect_pca_data.csv')
+  write_csv('UnCommon_GPA_FLANK_Ecotype_effect_pca_data.csv')
 
 
 # FLANK body depth --------------------------------------------------------
