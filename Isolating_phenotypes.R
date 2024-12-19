@@ -583,7 +583,7 @@ eco_scree = screeplot(eco1_pca)
 
 eco1_pca_vals = eco1_pca$x %>% 
   as_tibble() %>% 
-  dplyr::select(1:5)
+  dplyr::select(1:2)
 
 eco1_pca_data = bind_cols(meta_data, 
                         eco1_pca_vals)
@@ -591,13 +591,13 @@ eco1_pca_data = bind_cols(meta_data,
 # eco1_pca_data$F1 = as.character(eco1_pca_data$F1)
 # eco1_pca_data$F2 = as.character(eco1_pca_data$F2)
 
-ggplot(data = eco1_pca_data)+
-  geom_point(aes(x = Comp1, 
-                 y = Comp2, 
-                 col = ecotype))
+# ggplot(data = eco1_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = ecotype))
 
-# eco1_pca_data %>%
-#   write_csv('Common_GPA_Ecotype_effect_pca_data.csv')
+eco1_pca_data %>%
+  write_csv('UnCommon_GPA_Ecotype_effect_pca_data.csv')
 
 
 
@@ -763,37 +763,36 @@ writeland.tps(flank_eco1_array_consensus,
 
 # FLANK PCA phenotypes ----------------------------------------------------
 
-Flank_shape_data = readmulti.tps(c('Flank_shape.tps',
-                             'FLANK_TGP_all_individuals.tps',
-                             'FLANK_WGP_all_individuals.tps',
-                             'FLANK_Ecotype_all_individuals.tps'),
-                           specID = 'imageID')
-
-
-flank_shape_gpa = gpagen(Flank_shape_data,
-                   print.progress = T)
-
-id = read_csv('shape_data_id.csv')
-
-coord_sub = coords.subset(flank_shape_gpa$coords,
-                          id$shape_data)
-
-flank_raw_F2_coords = coord_sub$raw
-flank_TGP_coords = coord_sub$TGP
-flank_WGP_coods = coord_sub$WGP
-flank_Eco_coords = coord_sub$Eco
+# Flank_shape_data = readmulti.tps(c('Flank_shape.tps',
+#                              'FLANK_TGP_all_individuals.tps',
+#                              'FLANK_WGP_all_individuals.tps',
+#                              'FLANK_Ecotype_all_individuals.tps'),
+#                            specID = 'imageID')
+# 
+# 
+# flank_shape_gpa = gpagen(Flank_shape_data,
+#                    print.progress = T)
+# 
+# id = read_csv('shape_data_id.csv')
+# 
+# coord_sub = coords.subset(flank_shape_gpa$coords,
+#                           id$shape_data)
+# 
+# flank_raw_F2_coords = coord_sub$raw
+# flank_TGP_coords = coord_sub$TGP
+# flank_WGP_coods = coord_sub$WGP
+# flank_Eco_coords = coord_sub$Eco
 
 ## pca of the raw landmark data
-# raw = readland.tps('F2_All_aligned_withsliders.tps',
-#                    specID = 'imageID',
-#                    readcurves = T)
-# 
-# 
-# raw_gpa = gpagen(raw,
-#              print.progress = T,
-#              curves = sliders)
+flank_raw = readland.tps('Flank_shape.tps',
+                   specID = 'imageID',
+                   readcurves = T)
 
-flank_raw_pca = gm.prcomp(A = flank_raw_F2_coords)
+
+flank_raw_gpa = gpagen(flank_raw,
+             print.progress = T)
+
+flank_raw_pca = gm.prcomp(A = flank_raw_gpa$coords)
 # raw_pca = gm.prcomp(A = raw_gpa$coords)
 
 summary(flank_raw_pca)
