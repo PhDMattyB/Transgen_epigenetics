@@ -412,22 +412,22 @@ raw_pca_scree = screeplot(raw_pca)
 
 raw_pca_vals = raw_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  dplyr::select(1:4)
 
 raw_pca_data = bind_cols(meta_data, 
       raw_pca_vals) 
+# 
+# raw_pca_data$F1 = as.character(raw_pca_data$F1)
+# raw_pca_data$F2 = as.character(raw_pca_data$F2)
+# 
+# ggplot(data = raw_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F1, 
+#                  shape = F2))
 
-raw_pca_data$F1 = as.character(raw_pca_data$F1)
-raw_pca_data$F2 = as.character(raw_pca_data$F2)
-
-ggplot(data = raw_pca_data)+
-  geom_point(aes(x = Comp1, 
-                 y = Comp2, 
-                 col = F1, 
-                 shape = F2))
-
-# raw_pca_data %>%
-#   write_csv('Common_GPA_Unfilered_PCA_data.csv')
+raw_pca_data %>%
+  write_csv('UnCommon_GPA_Unfilered_F2_PCA_data.csv')
 
 
 
@@ -446,22 +446,22 @@ TGP_pca_scree = screeplot(f1_pca)
 
 f1_pca_vals = f1_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  dplyr::select(1)
 
 f1_pca_data = bind_cols(meta_data, 
                         f1_pca_vals)
 
-f1_pca_data$F1 = as.character(f1_pca_data$F1)
-f1_pca_data$F2 = as.character(f1_pca_data$F2)
+# f1_pca_data$F1 = as.character(f1_pca_data$F1)
+# f1_pca_data$F2 = as.character(f1_pca_data$F2)
+# 
+# ggplot(data = f1_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F1, 
+#                  shape = F2))
 
-ggplot(data = f1_pca_data)+
-  geom_point(aes(x = Comp1, 
-                 y = Comp2, 
-                 col = F1, 
-                 shape = F2))
-
-# f1_pca_data %>%
-#   write_csv('Common_GPA_TGP_PCA_data.csv')
+f1_pca_data %>%
+  write_csv('UnCommon_GPA_TGP_PCA_data.csv')
 
 ## PCA of the TGP by ecotype effects
 # TGP_eco = readland.tps('TGP_ecotype_variation_landmarks.tps', 
@@ -498,38 +498,36 @@ ggplot(data = f1_pca_data)+
 
 
 ## pca of the f2 effects
-# f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps', 
-#                           specID = 'imageID', 
-#                           readcurves = T)
-# 
-# f2_gpa = gpagen(f2_effects, 
-#                 curves = sliders)
-f2_pca = gm.prcomp(WGP_coods)
+f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps',
+                          specID = 'imageID',
+                          readcurves = T)
+
+f2_gpa = gpagen(f2_effects,
+                curves = sliders)
+f2_pca = gm.prcomp(f2_gpa)
 
 summary(f2_pca)
 WGP_dim = bsDimension(f2_pca$x)
 WGP_pca_scree = screeplot(f2_pca)
-WGP_parallel = fa.parallel(f2_pca$x,  
-            fa = 'pc')
 
 f2_pca_vals = f2_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  dplyr::select(1:2)
 
 f2_pca_data = bind_cols(meta_data, 
                         f2_pca_vals)
 
-f2_pca_data$F1 = as.character(f2_pca_data$F1)
-f2_pca_data$F2 = as.character(f2_pca_data$F2)
+# f2_pca_data$F1 = as.character(f2_pca_data$F1)
+# f2_pca_data$F2 = as.character(f2_pca_data$F2)
+# 
+# ggplot(data = f2_pca_data)+
+#   geom_point(aes(x = Comp1, 
+#                  y = Comp2, 
+#                  col = F1, 
+#                  shape = F2))
 
-ggplot(data = f2_pca_data)+
-  geom_point(aes(x = Comp1, 
-                 y = Comp2, 
-                 col = F1, 
-                 shape = F2))
-
-# f2_pca_data %>%
-#   write_csv('Common_GPA_WGP_pca_data.csv')
+f2_pca_data %>%
+  write_csv('UnCommon_GPA_WGP_pca_data.csv')
 
 ## PCA of the WGP by ecotype effects
 # WGP_eco = readland.tps('WGP_ecotype_variation_landmarks.tps', 
@@ -569,13 +567,13 @@ ggplot(data = f2_pca_data)+
 #                             readcurves = T)
 
 
-# eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps', 
-#                           specID = 'imageID', 
-#                           readcurves = T)
+eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps',
+                          specID = 'imageID',
+                          readcurves = T)
 
-# eco1_gpa = gpagen(eco1_effects, 
-#                 curves = sliders)
-eco1_pca = gm.prcomp(Eco_coords)
+eco1_gpa = gpagen(eco1_effects,
+                curves = sliders)
+eco1_pca = gm.prcomp(eco1_gpa)
 
 summary(eco1_pca)
 
@@ -585,7 +583,7 @@ eco_scree = screeplot(eco1_pca)
 
 eco1_pca_vals = eco1_pca$x %>% 
   as_tibble() %>% 
-  select(1:5)
+  dplyr::select(1:5)
 
 eco1_pca_data = bind_cols(meta_data, 
                         eco1_pca_vals)
