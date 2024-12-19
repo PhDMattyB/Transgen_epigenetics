@@ -368,45 +368,47 @@ writeland.tps(eco1_array_consensus,
 
 # Phenotype PCA -----------------------------------------------------------
 
-shape_data = readmulti.tps(c('F2_All_aligned_withsliders.tps',
-                             'F1_effect_landmarks_all_individuals.tps',
-                             'F2_effect_landmarks_all_individuals.tps',
-                             'Ecotype_effect_landmarks_all_individuals.tps'),
-                           specID = 'imageID')
-
-sliders = define.sliders(c(28:37,1))
-
-shape_gpa = gpagen(shape_data,
-                   print.progress = T,
-                   curves = sliders)
-
-id = read_csv('shape_data_id.csv')
-
-coord_sub = coords.subset(shape_gpa$coords,
-                          id$shape_data)
-
-raw_F2_coords = coord_sub$raw
-TGP_coords = coord_sub$TGP
-WGP_coods = coord_sub$WGP
-Eco_coords = coord_sub$Eco
+# shape_data = readmulti.tps(c('F2_All_aligned_withsliders.tps',
+#                              'F1_effect_landmarks_all_individuals.tps',
+#                              'F2_effect_landmarks_all_individuals.tps',
+#                              'Ecotype_effect_landmarks_all_individuals.tps'),
+#                            specID = 'imageID')
+# 
+# sliders = define.sliders(c(28:37,1))
+# 
+# shape_gpa = gpagen(shape_data,
+#                    print.progress = T,
+#                    curves = sliders)
+# 
+# id = read_csv('shape_data_id.csv')
+# 
+# coord_sub = coords.subset(shape_gpa$coords,
+#                           id$shape_data)
+# 
+# raw_F2_coords = coord_sub$raw
+# TGP_coords = coord_sub$TGP
+# WGP_coods = coord_sub$WGP
+# Eco_coords = coord_sub$Eco
 
 ## pca of the raw landmark data
-# raw = readland.tps('F2_All_aligned_withsliders.tps',
-#                    specID = 'imageID',
-#                    readcurves = T)
-# 
-# 
-# raw_gpa = gpagen(raw,
-#              print.progress = T,
-#              curves = sliders)
+raw = readland.tps('F2_All_aligned_withsliders.tps',
+                   specID = 'imageID',
+                   readcurves = T)
 
-raw_pca = gm.prcomp(A = raw_F2_coords)
-# raw_pca = gm.prcomp(A = raw_gpa$coords)
+
+raw_gpa = gpagen(raw,
+             print.progress = T,
+             curves = sliders)
+
+# raw_pca = gm.prcomp(A = raw_F2_coords)
+raw_pca = gm.prcomp(A = raw_gpa$coords)
 
 summary(raw_pca)
 
 raw_pca_dim = bsDimension(raw_pca$x)
 raw_pca_scree = screeplot(raw_pca)
+
+## four components in the raw data
 
 raw_pca_vals = raw_pca$x %>% 
   as_tibble() %>% 
@@ -442,6 +444,8 @@ summary(f1_pca)
 
 TGP_dim = bsDimension(f1_pca$x)
 TGP_pca_scree = screeplot(f1_pca)
+TGP_parallel = fa.parallel(f1_pca$x,  
+            fa = 'pc')
 
 f1_pca_vals = f1_pca$x %>% 
   as_tibble() %>% 
@@ -508,7 +512,8 @@ f2_pca = gm.prcomp(WGP_coods)
 summary(f2_pca)
 WGP_dim = bsDimension(f2_pca$x)
 WGP_pca_scree = screeplot(f2_pca)
-
+WGP_parallel = fa.parallel(f2_pca$x,  
+            fa = 'pc')
 
 f2_pca_vals = f2_pca$x %>% 
   as_tibble() %>% 
