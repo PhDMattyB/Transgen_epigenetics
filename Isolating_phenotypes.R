@@ -402,19 +402,23 @@ raw_gpa = gpagen(raw,
 
 
 # raw_pca2 = gm.prcomp(A = raw_F2_coords)
+
+
+raw_pca3 = gm.prcomp(A = gpa$coords)
+
 raw_pca = gm.prcomp(A = raw_gpa$coords)
 
-paran(x = raw_pca$x, 
+paran(x = raw_pca3$x, 
       iterations = 1000, 
       all = T,
       graph = T, 
       seed = 1738)
 
 
-summary(raw_pca)
+summary(raw_pca3)
 
-raw_pca_dim = bsDimension(raw_pca$x)
-raw_pca_scree = screeplot(raw_pca)
+raw_pca_dim = bsDimension(raw_pca3$x)
+screeplot(raw_pca3)
 
 ## four components in the raw data
 
@@ -440,13 +444,15 @@ raw_pca_data %>%
 
 
 ## pca of the f1 effects
-F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps',
-                          specID = 'imageID',
-                          readcurves = T)
+# F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps',
+#                           specID = 'imageID',
+#                           readcurves = T)
+# 
+# f1_gpa = gpagen(F1_effects,
+#                 curves = sliders)
 
-f1_gpa = gpagen(F1_effects,
-                curves = sliders)
-f1_pca = gm.prcomp(f1_gpa$coords)
+F1_array_consensus
+f1_pca = gm.prcomp(F1_array_consensus)
 summary(f1_pca)
 
 paran(x = f1_pca$x, 
@@ -457,7 +463,7 @@ paran(x = f1_pca$x,
 
 
 TGP_dim = bsDimension(f1_pca$x)
-TGP_pca_scree = screeplot(f1_pca)
+screeplot(f1_pca)
 
 f1_pca_vals = f1_pca$x %>% 
   as_tibble() %>% 
@@ -513,13 +519,16 @@ f1_pca_data %>%
 
 
 ## pca of the f2 effects
-f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps',
-                          specID = 'imageID',
-                          readcurves = T)
+# f2_effects = readland.tps('F2_effect_landmarks_all_individuals.tps',
+#                           specID = 'imageID',
+#                           readcurves = T)
+# 
+# f2_gpa = gpagen(f2_effects,
+#                 curves = sliders)
 
-f2_gpa = gpagen(f2_effects,
-                curves = sliders)
-f2_pca = gm.prcomp(f2_gpa)
+F2_array_consensus
+
+f2_pca = gm.prcomp(F2_array_consensus)
 
 summary(f2_pca)
 
@@ -530,11 +539,11 @@ paran(x = f2_pca$x,
       seed = 1738)
 
 WGP_dim = bsDimension(f2_pca$x)
-WGP_pca_scree = screeplot(f2_pca)
+screeplot(f2_pca)
 
 f2_pca_vals = f2_pca$x %>% 
   as_tibble() %>% 
-  dplyr::select(1:2)
+  dplyr::select(1:4)
 
 f2_pca_data = bind_cols(meta_data, 
                         f2_pca_vals)
@@ -589,13 +598,16 @@ f2_pca_data %>%
 #                             readcurves = T)
 
 
-eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps',
-                          specID = 'imageID',
-                          readcurves = T)
+# eco1_effects = readland.tps('ecotype_effect_per_population_landmarks_all_individuals.tps',
+#                           specID = 'imageID',
+#                           readcurves = T)
+# eco1_effects
+# eco1_gpa = gpagen(eco1_effects,
+#                 curves = sliders)
 
-eco1_gpa = gpagen(eco1_effects,
-                curves = sliders)
-eco1_pca = gm.prcomp(eco1_gpa)
+eco1_array_consensus
+
+eco1_pca = gm.prcomp(eco1_array_consensus)
 
 paran(x = eco1_pca$x, 
       iterations = 1000, 
@@ -607,7 +619,7 @@ summary(eco1_pca)
 
 eco_dim = bsDimension(eco1_pca$x)
 
-eco_scree = screeplot(eco1_pca)
+screeplot(eco1_pca)
 
 eco1_pca_vals = eco1_pca$x %>% 
   as_tibble() %>% 
