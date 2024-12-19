@@ -432,20 +432,17 @@ ggplot(data = raw_pca_data)+
 
 
 ## pca of the f1 effects
-# F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps', 
-#                           specID = 'imageID', 
-#                           readcurves = T)
-# 
-# f1_gpa = gpagen(F1_effects, 
-#                 curves = sliders)
-f1_pca = gm.prcomp(TGP_coords)
-summary(f1_pca)
+F1_effects = readland.tps('F1_effect_landmarks_all_individuals.tps',
+                          specID = 'imageID',
+                          readcurves = T)
 
+f1_gpa = gpagen(F1_effects,
+                curves = sliders)
+f1_pca = gm.prcomp(f1_gpa$coords)
+summary(f1_pca)
 
 TGP_dim = bsDimension(f1_pca$x)
 TGP_pca_scree = screeplot(f1_pca)
-TGP_parallel = fa.parallel(f1_pca$x,  
-            fa = 'pc')
 
 f1_pca_vals = f1_pca$x %>% 
   as_tibble() %>% 
