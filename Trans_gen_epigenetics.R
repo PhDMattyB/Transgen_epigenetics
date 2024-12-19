@@ -1770,6 +1770,7 @@ meta_data = read_csv('Methylation_metadata.csv')
 
 ## raw PCA phenotypes for the RDA association analysis
 raw_data = read_csv('Raw_RDA_phenotypes.csv')
+raw_data = read_csv('UnCommon_GPA_Unfilered_F2_PCA_data.csv')
 
 meth_fish = mvalues %>% 
   select(1)
@@ -1866,10 +1867,11 @@ arrange(Fish_ID)
 ## Shooting for all TRUES
 mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
 
-mvalues_only = mvalues %>% 
-  select(-1)
+mvalues_only = mvalues_final %>% 
+  select(-1, 
+         -2)
 
-RDA_raw_ecotype = rda(mvalues_only ~ Comp1*ecotype + Comp2*ecotype + Comp3*ecotype, 
+RDA_raw_ecotype = rda(mvalues_only ~ Comp1*ecotype_bin + Comp2*ecotype_bin + Comp3*ecotype_bin + Comp4*ecotype_bin +csize_real, 
                     data = pheno_fish_final, 
                     scale = T)
 
