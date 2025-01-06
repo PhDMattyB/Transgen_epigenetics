@@ -406,12 +406,15 @@ raw_gpa = gpagen(raw,
 
 raw_pca3 = gm.prcomp(A = gpa$coords)
 
-raw_pca = gm.prcomp(A = raw_gpa$coords)
+# raw_pca = gm.prcomp(A = raw_gpa$coords)
+
+AG_test = AuerGervini(raw_pca3$x)
+agDimension(AG_test)
 
 paran(x = raw_pca3$x, 
       iterations = 1000, 
-      all = T,
-      graph = T, 
+      # all = T,
+      graph = F, 
       seed = 1738)
 
 
