@@ -2048,5 +2048,17 @@ candidates_clean = candidates %>%
 
 table(candidates_clean$predictor)
 
+pRDA_raw_ecotype = rda(mvalues_only ~ Comp1 + Condition(ecotype)+ Comp2 + Condition(ecotype) + Comp3 + Condition(ecotype)+ ecotype_bin + csize_real + Condition(ecotype), 
+                      data = pheno_fish_final, 
+                      scale = T)
+
+RsquareAdj(RDA_raw_ecotype)
+summary(eigenvals(RDA_raw_ecotype, 
+                  model = 'constrained'))
+
+screeplot(RDA_raw_ecotype)
+
+signif_full_raw_ecotype = anova.cca(RDA_raw_ecotype, 
+                                    parallel = getOption('mc.cores'))
 
 
