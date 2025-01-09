@@ -1871,7 +1871,7 @@ mvalues_only = mvalues_final %>%
   select(-1, 
          -2)
 
-RDA_raw_ecotype = rda(mvalues_only ~ Comp1*ecotype_bin + Comp2*ecotype_bin + Comp3*ecotype_bin + Comp4*ecotype_bin +csize_real, 
+RDA_raw_ecotype = rda(mvalues_only ~ Comp1*ecotype_bin + Comp2*ecotype_bin + Comp3*ecotype_bin +csize_real, 
                     data = pheno_fish_final, 
                     scale = T)
 
@@ -1884,25 +1884,25 @@ screeplot(RDA_raw_ecotype)
 signif_full_raw_ecotype = anova.cca(RDA_raw_ecotype, 
                         parallel = getOption('mc.cores'))
 
-RDA_treatment_eco = rda(mvalues ~ Comp1 + Comp2 + Comp3, 
-                    data = pheno_fish_final, 
-                    scale = T)
-
-RsquareAdj(RDA_treatment_eco)
-summary(eigenvals(RDA_treatment_eco, 
-                  model = 'constrained'))
-
-screeplot(RDA_treatment_eco)
-signif_full_eco = anova.cca(RDA_treatment_eco, 
-                        parallel = getOption('mc.cores'))
+# RDA_treatment_eco = rda(mvalues ~ Comp1 + Comp2 + Comp3, 
+#                     data = pheno_fish_final, 
+#                     scale = T)
+# 
+# RsquareAdj(RDA_treatment_eco)
+# summary(eigenvals(RDA_treatment_eco, 
+#                   model = 'constrained'))
+# 
+# screeplot(RDA_treatment_eco)
+# signif_full_eco = anova.cca(RDA_treatment_eco, 
+#                         parallel = getOption('mc.cores'))
 # signif_axis = anova.cca(RDA_treatment, 
 #                         by = 'axis',
 #                         parallel = getOption('mc.cores'))
 
 
-vif.cca(RDA_treatment)
+vif.cca(RDA_raw_ecotype)
 
-sum_rda = summary(RDA_treatment)
+sum_rda = summary(RDA_raw_ecotype)
 
 sum_rda$species %>% 
   as_tibble() %>% 
@@ -1917,7 +1917,7 @@ sum_rda$biplot %>%
   write_csv('RDA_Uncorrected_PCA_biplot.csv')
 
 
-rda_scores = scores(RDA_treatment, 
+rda_scores = scores(RDA_raw_ecotype, 
                     choices = c(1:5), 
                     display = 'species')
 
@@ -1963,7 +1963,7 @@ rda_normal = rda_normal[!rda_normal$loc %in% rda_out_axis1$loc,]
 # write_csv(rda_out_axis1,
 #           'RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
 
-rda_out = as.data.frame(rda_out)
+rda_out = as.data.frame(rda_out_axis1)
 all_loc = as.data.frame(all_loc)
 # test_pheno = as.data.frame(test_pheno)
 
