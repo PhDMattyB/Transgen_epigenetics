@@ -2037,10 +2037,16 @@ length(candidates$loc[duplicated(candidates$loc)])
 
 for(i in 1:length(candidates$loc)){
   bar = candidates[i,]
-  candidates[i,6] = names(which.max(abs(bar[4:5])))
-  candidates[i,7] = max(abs(bar[4:5]))
+  candidates[i,9] = names(which.max(abs(bar[4:8])))
+  candidates[i,10] = max(abs(bar[4:8]))
 }
 
-candidates
+candidates_clean = candidates %>% 
+  as_tibble() %>% 
+  rename(predictor = V9, 
+         correlation = V10)
+
+table(candidates_clean$predictor)
+
 
 
