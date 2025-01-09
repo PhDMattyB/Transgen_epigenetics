@@ -1966,20 +1966,41 @@ rda_normal = rda_normal[!rda_normal$loc %in% rda_out_axis1$loc,]
 rda_out = as.data.frame(rda_out_axis1)
 all_loc = as.data.frame(all_loc)
 # test_pheno = as.data.frame(test_pheno)
-
-test_pheno2 = test_pheno %>% 
-  as_tibble() %>% 
+raw_pheno_fixed = pheno_fish_final %>% 
+  unite(col = 'Population2',
+        c('poppair', 
+                'ecotype'),
+        sep = '', 
+        remove = F) %>% 
   mutate(pop_num = as.numeric(case_when(
-    Population == 'GTS' ~ '1',
-    Population == 'CSWY' ~ '2',
-    Population == 'ASHNW' ~ '3',
-    Population == 'ASHNC' ~ '4',
-    Population == 'MYVW' ~ '5',
-    Population == 'MYVC' ~ '6',
-    Population == 'SKRW' ~ '7',
-    Population == 'SKRC' ~ '8'))) %>% 
-  # dplyr::select(-Population) %>% 
+    Population2 == 'gts_cswyw' ~ '1',
+    Population2 == 'gts_cswyc' ~ '2',
+    Population2 == 'ashnw' ~ '3',
+    Population2 == 'ashnc' ~ '4',
+    Population2 == 'myvtw' ~ '5',
+    Population2 == 'mytvc' ~ '6',
+    Population2 == 'skrw' ~ '7',
+    Population2 == 'skrc' ~ '8'))) %>% 
+  select(ecotype_bin, 
+         Comp1, 
+         Comp2, 
+         Comp3, 
+         csize_real) %>% 
   as.data.frame()
+  
+# test_pheno2 = test_pheno %>% 
+#   as_tibble() %>% 
+#   mutate(pop_num = as.numeric(case_when(
+#     Population == 'GTS' ~ '1',
+#     Population == 'CSWY' ~ '2',
+#     Population == 'ASHNW' ~ '3',
+#     Population == 'ASHNC' ~ '4',
+#     Population == 'MYVW' ~ '5',
+#     Population == 'MYVC' ~ '6',
+#     Population == 'SKRW' ~ '7',
+#     Population == 'SKRC' ~ '8'))) %>% 
+#   # dplyr::select(-Population) %>% 
+#   as.data.frame()
 
 # nam = rda_out[1:45, 2]
 # out_loc = all_loc[nam,]
@@ -1987,15 +2008,21 @@ test_pheno2 = test_pheno %>%
 #                 2, 
 #                 function(x)cor(x, out_loc))
 
-foo = matrix(nrow=(45), 
-             ncol = 2)
-colnames(foo) = c('temps', 
-                  'pop_num')
+mvalue_num = as.data.frame(mvalues_only)
+
+foo = matrix(nrow=(7367), 
+             ncol = 5)
+colnames(foo) = c('ecotype_bin',
+                  'Comp1', 
+                  'Comp2', 
+                  'Comp3', 
+                  'csize')
+# Comp1*ecotype_bin + Comp2*ecotype_bin + Comp3*ecotype_bin +csize_real
 
 for (i in 1:length(rda_out$loc)){
   nam = rda_out[i,2]
-  loc.gen = mvalues[,nam]
-  foo[i,] = apply(test_pheno,2,function(x)cor(x,loc.gen))
+  loc.gen = mvalue_num[,nam]
+  foo[i,] = apply(raw_pheno_fixed,2,function(x)cor(x,loc.gen))
 }
 
 candidates = cbind.data.frame(rda_out, 
