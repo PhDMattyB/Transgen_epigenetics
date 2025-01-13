@@ -2048,6 +2048,10 @@ candidates_clean = candidates %>%
 
 table(candidates_clean$predictor)
 
+# candidates %>%
+#   as_tibble() %>%
+#   write_csv('RDA_outliers_meth_RAW_correlations.csv')
+
 pRDA_raw_ecotype = rda(mvalues_only ~ Comp1 + Condition(ecotype)+ Comp2 + Condition(ecotype) + Comp3 + Condition(ecotype)+ ecotype_bin + csize_real + Condition(ecotype), 
                       data = pheno_fish_final, 
                       scale = T)
@@ -2208,3 +2212,6 @@ pcandidates_clean = pcandidates %>%
 
 table(pcandidates_clean$predictor)
 
+# pcandidates %>%
+#   as_tibble() %>%
+#   write_csv('pRDA_outliers_meth_RAW_correlations.csv')
