@@ -2058,12 +2058,13 @@ table(candidates_clean$predictor)
 raw_rda_cand_loc = candidates_clean$loc
 
 raw_rda_cand = mvalues %>% 
-  select(any_of(cand_loc))
+  select(any_of(raw_rda_cand_loc))
 
-cand_methy = bind_cols(meta_data, 
-                       cand_methy)
+raw_rda_cand = bind_cols(pheno_fish_final, 
+                       raw_rda_cand) %>% 
+  as_tibble()
 
-cand_methy %>% 
+raw_rda_cand %>% 
   arrange(Population,
           temps) %>% 
   View()
