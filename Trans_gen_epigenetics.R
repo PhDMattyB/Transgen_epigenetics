@@ -2055,9 +2055,9 @@ table(candidates_clean$predictor)
 
 # raw rda graphs ----------------------------------------------------------
 
-cand_loc = candidates$loc
+raw_rda_cand_loc = candidates_clean$loc
 
-cand_methy = mvalues %>% 
+raw_rda_cand = mvalues %>% 
   select(any_of(cand_loc))
 
 cand_methy = bind_cols(meta_data, 
