@@ -2052,6 +2052,486 @@ table(candidates_clean$predictor)
 #   as_tibble() %>%
 #   write_csv('RDA_outliers_meth_RAW_correlations.csv')
 
+
+# raw rda graphs ----------------------------------------------------------
+
+cand_loc = candidates$loc
+
+cand_methy = mvalues %>% 
+  select(any_of(cand_loc))
+
+cand_methy = bind_cols(meta_data, 
+                       cand_methy)
+
+cand_methy %>% 
+  arrange(Population,
+          temps) %>% 
+  View()
+
+cand_methy_pivot = cand_methy %>% 
+  group_by(SampleID, 
+           Population, 
+           temps, 
+           F1_temp, 
+           F2_temp, 
+           Ecotype) %>% 
+  pivot_longer(cols = starts_with('chr'),
+               names_to = 'methy_loc', 
+               values_to = 'Methylation') %>% 
+  separate(col = methy_loc, 
+           into = c('Chromosome', 
+                    'BP'), 
+           sep = '-') %>% 
+  arrange(Chromosome, 
+          BP)
+
+cand_methy_pivot$temps = as.character(cand_methy_pivot$temps)
+
+
+# cand_methy_pivot %>% 
+#   filter(Population %in% c('ASHNC', 
+#                            'ASHNW')) %>% 
+#   ggplot()+
+#   geom_point(aes(x = BP, 
+#                  y = Methylation, 
+#                  col = temps))+
+#   facet_grid(~Chromosome)
+
+# cand_methy_pivot %>%
+#   filter(Population == 'ASHNC') %>%
+#   group_by(Population,
+#            temps) %>%
+#   distinct(Chromosome,
+#            BP,
+#            .keep_all = T) %>%
+#   arrange(Chromosome,
+#           BP,
+#           temps) %>%
+#   View()
+
+F1_temps_pal = c('#0077b6', 
+                 '#a2d2ff', 
+                 '#ef959c',
+                 '#ef233c')
+
+cand_methy_pivot$Chromosome = factor(cand_methy_pivot$Chromosome, 
+                                     levels = c('chrIII', 
+                                                'chrIV', 
+                                                'chrVI', 
+                                                'chrXI', 
+                                                'chrXII', 
+                                                'chrXIII', 
+                                                'chrXVI', 
+                                                'chrXX', 
+                                                'chrUn'))
+
+
+ASHNC_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'ASHNC') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps), 
+              col = 'black',
+              pch = 21,
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'ASHN Cold')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        # axis.title.y = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'none')
+
+
+ASHNW_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'ASHNW') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps),
+              col = 'black', 
+              pch = 21,
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'ASHN Warm', 
+       x = 'Base pair position')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.y = element_blank(), 
+        # axis.title.y = element_text(size = 14), 
+        axis.text.y = element_text(size = 12),
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'none')
+
+
+ASHN_meth_outliers = ASHNC_outlier_plot/ASHNW_outlier_plot
+
+
+MYVC_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'MYVC') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps),
+              col = 'black', 
+              pch = 21,
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'MYV Cold', 
+       x = 'Base pair position')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        # axis.title.y = element_text(size = 14), 
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'none')
+
+MYVW_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'MYVW') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps),
+              col = 'black', 
+              pch = 21,
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'MYV Warm', 
+       x = 'Base pair position')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title = element_blank(), 
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'none')
+
+MYV_meth_outliers = MYVC_outlier_plot/MYVW_outlier_plot
+
+SKRC_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'SKRC') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps),
+              col = 'black', 
+              pch = 21,
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'SKR Cold', 
+       x = 'Base pair position')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        # axis.title.y = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'none')
+
+
+SKRW_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'SKRW') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps),
+              col = 'black', 
+              pch = 21, 
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'SKR Warm', 
+       x = 'Base pair position')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'none')
+
+SKR_meth_outlier = SKRC_outlier_plot/SKRW_outlier_plot
+
+
+CSWY_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'CSWY') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps),
+              col = 'black', 
+              pch = 21,
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'CSWY Cold', 
+       x = 'Base pair position')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_text(size = 14), 
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        # axis.title.y = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'bottom')
+
+GTS_outlier_plot = cand_methy_pivot %>% 
+  filter(Population == 'GTS') %>% 
+  group_by(Population, 
+           temps) %>% 
+  distinct(Chromosome, 
+           BP, 
+           .keep_all = T) %>% 
+  ggplot()+
+  # geom_point(aes(x = BP, 
+  #                y = Methylation, 
+  #                col = temps))+
+  geom_jitter(aes(x = BP, 
+                  y = Methylation, 
+                  fill = temps),
+              col = 'black', 
+              pch = 21,
+              size = 2,
+              width = 0, 
+              height = 0.05)+
+  scale_y_continuous(expand = c(0,0), 
+                     limits = c(-6.0, 1.0), 
+                     breaks = c(-6.0, 
+                                -5.0, 
+                                -4.0, 
+                                -3.0, 
+                                -2.0, 
+                                -1.0, 
+                                0.0, 
+                                1.0))+
+  geom_hline(yintercept = 0.0)+
+  labs(title = 'GTS Warm', 
+       x = 'Base pair position')+
+  scale_fill_manual(values = F1_temps_pal)+
+  facet_grid(~Chromosome)+
+  theme(axis.title.x = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(size = 12, 
+                                  face = 'bold'),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid = element_blank(), 
+        legend.title = element_blank(), 
+        legend.position = 'bottom')
+
+CSWY_GTS_meth_outlier = CSWY_outlier_plot/GTS_outlier_plot
+
+
+BIG_METHY = (ASHNC_outlier_plot|ASHNW_outlier_plot)/(MYVC_outlier_plot|MYVW_outlier_plot)/(SKRC_outlier_plot|SKRW_outlier_plot)/(CSWY_outlier_plot|GTS_outlier_plot)
+
+ggsave('Big_methylaton_treatment_plot.tiff', 
+       plot = BIG_METHY, 
+       dpi = 'retina', 
+       units = 'cm', 
+       height = 25, 
+       width = 40)
+
+
+# raw partial rda ---------------------------------------------------------
+
+
 pRDA_raw_ecotype = rda(mvalues_only ~ Comp1 + Condition(ecotype)+ Comp2 + Condition(ecotype) + Comp3 + Condition(ecotype)+ ecotype_bin + csize_real + Condition(ecotype), 
                       data = pheno_fish_final, 
                       scale = T)
