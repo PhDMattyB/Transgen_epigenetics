@@ -2185,26 +2185,26 @@ for (i in 1:length(prda_out$loc)){
   foo[i,] = apply(raw_pheno_fixed,2,function(x)cor(x,loc.gen))
 }
 
-candidates = cbind.data.frame(rda_out, 
+pcandidates = cbind.data.frame(prda_out, 
                               foo)
 
-# candidates %>% 
-#   as_tibble() %>% 
-#   write_csv('RDA_outliers_methylation_correlations.csv')
+# pcandidates %>%
+#   as_tibble() %>%
+#   write_csv('pRDA_outliers_methylation_correlations.csv')
 
 ##check for duplicates
-length(candidates$loc[duplicated(candidates$loc)])
+length(pcandidates$loc[duplicated(pcandidates$loc)])
 
-for(i in 1:length(candidates$loc)){
-  bar = candidates[i,]
-  candidates[i,9] = names(which.max(abs(bar[4:8])))
-  candidates[i,10] = max(abs(bar[4:8]))
+for(i in 1:length(pcandidates$loc)){
+  bar = pcandidates[i,]
+  pcandidates[i,9] = names(which.max(abs(bar[4:8])))
+  pcandidates[i,10] = max(abs(bar[4:8]))
 }
 
-candidates_clean = candidates %>% 
+pcandidates_clean = pcandidates %>% 
   as_tibble() %>% 
   rename(predictor = V9, 
          correlation = V10)
 
-table(candidates_clean$predictor)
+table(pcandidates_clean$predictor)
 
