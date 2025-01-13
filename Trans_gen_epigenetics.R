@@ -2064,18 +2064,17 @@ raw_rda_cand = bind_cols(pheno_fish_final,
                        raw_rda_cand) %>% 
   as_tibble()
 
-raw_rda_cand %>% 
-  arrange(Population,
-          temps) %>% 
-  View()
+# raw_rda_cand %>% 
+#   arrange(poppair,
+#           ecotype) %>% 
+#   View()
 
-cand_methy_pivot = cand_methy %>% 
-  group_by(SampleID, 
-           Population, 
-           temps, 
-           F1_temp, 
-           F2_temp, 
-           Ecotype) %>% 
+raw_rda_cand_pivot = raw_rda_cand %>% 
+  group_by(Fish_ID, 
+           poppair, 
+           ecotype, 
+           F1, 
+           F2) %>% 
   pivot_longer(cols = starts_with('chr'),
                names_to = 'methy_loc', 
                values_to = 'Methylation') %>% 
