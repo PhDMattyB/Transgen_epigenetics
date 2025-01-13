@@ -2061,4 +2061,150 @@ screeplot(pRDA_raw_ecotype)
 prda_signif_raw_ecotype = anova.cca(pRDA_raw_ecotype, 
                                     parallel = getOption('mc.cores'))
 
+vif.cca(pRDA_raw_ecotype)
+
+sum_prda = summary(pRDA_raw_ecotype)
+
+sum_prda$species %>% 
+  as_tibble() %>% 
+  write_csv('pRAW_Uncorrected_PCA_locations.csv')
+
+sum_prda$sites %>% 
+  as_tibble() %>% 
+  write_csv('pRDA_Uncorrected_PCA_individuals.csv')
+
+sum_prda$biplot %>% 
+  as_tibble() %>% 
+  write_csv('pRDA_Uncorrected_PCA_biplot.csv')
+
+
+prda_scores = scores(pRDA_raw_ecotype, 
+                    choices = c(1:4), 
+                    display = 'species')
+
+hist(prda_scores[,1])
+hist(prda_scores[,2])
+hist(prda_scores[,3])
+hist(prda_scores[,4])
+
+prda_outliers_axis1 = outliers(prda_scores[,1], 3)
+# rda_outliers_axis2 = outliers(rda_scores[,2], 3)
+
+
+prda_out_axis1 = cbind.data.frame(rep(1, 
+                                     times = length(prda_outliers_axis1)), 
+                                 names(prda_outliers_axis1), 
+                                 unname(prda_outliers_axis1))
+
+prda_out_axis1 = prda_out_axis1 %>% 
+  as_tibble() %>%  
+  dplyr::rename(axis = 1, 
+                loc = 2, 
+                scores = 3)
+
+
+all_loc = prda_scores[,1]
+
+prda_normal = cbind.data.frame(rep(1, 
+                                  times = length(all_loc)), 
+                              names(all_loc),
+                              unname(all_loc))
+prda_normal = prda_normal %>% 
+  as_tibble() %>% 
+  dplyr::rename(axis = 1, 
+                loc = 2, 
+                scores = 3)
+
+prda_normal = prda_normal[!prda_normal$loc %in% prda_out_axis1$loc,]
+
+# write_csv(prda_normal,
+#           'pRDA_RAW_PCaxes_nonoutliers_methylation.csv')
+# 
+# write_csv(prda_out_axis1,
+#           'pRDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+
+prda_out = as.data.frame(prda_out_axis1)
+pall_loc = as.data.frame(all_loc)
+# test_pheno = as.data.frame(test_pheno)
+raw_pheno_fixed = pheno_fish_final %>% 
+  unite(col = 'Population2',
+        c('poppair', 
+          'ecotype'),
+        sep = '', 
+        remove = F) %>% 
+  mutate(pop_num = as.numeric(case_when(
+    Population2 == 'gts_cswyw' ~ '1',
+    Population2 == 'gts_cswyc' ~ '2',
+    Population2 == 'ashnw' ~ '3',
+    Population2 == 'ashnc' ~ '4',
+    Population2 == 'myvtw' ~ '5',
+    Population2 == 'mytvc' ~ '6',
+    Population2 == 'skrw' ~ '7',
+    Population2 == 'skrc' ~ '8'))) %>% 
+  select(ecotype_bin, 
+         Comp1, 
+         Comp2, 
+         Comp3, 
+         csize_real) %>% 
+  as.data.frame()
+
+# test_pheno2 = test_pheno %>% 
+#   as_tibble() %>% 
+#   mutate(pop_num = as.numeric(case_when(
+#     Population == 'GTS' ~ '1',
+#     Population == 'CSWY' ~ '2',
+#     Population == 'ASHNW' ~ '3',
+#     Population == 'ASHNC' ~ '4',
+#     Population == 'MYVW' ~ '5',
+#     Population == 'MYVC' ~ '6',
+#     Population == 'SKRW' ~ '7',
+#     Population == 'SKRC' ~ '8'))) %>% 
+#   # dplyr::select(-Population) %>% 
+#   as.data.frame()
+
+# nam = rda_out[1:45, 2]
+# out_loc = all_loc[nam,]
+# out_cor = apply(test_pheno,
+#                 2, 
+#                 function(x)cor(x, out_loc))
+
+mvalue_num = as.data.frame(mvalues_only)
+
+foo = matrix(nrow=(2662), 
+             ncol = 5)
+colnames(foo) = c('ecotype',
+                  'Comp1', 
+                  'Comp2', 
+                  'Comp3', 
+                  'csize')
+# Comp1*ecotype_bin + Comp2*ecotype_bin + Comp3*ecotype_bin +csize_real
+
+for (i in 1:length(prda_out$loc)){
+  nam = prda_out[i,2]
+  loc.gen = mvalue_num[,nam]
+  foo[i,] = apply(raw_pheno_fixed,2,function(x)cor(x,loc.gen))
+}
+
+candidates = cbind.data.frame(rda_out, 
+                              foo)
+
+# candidates %>% 
+#   as_tibble() %>% 
+#   write_csv('RDA_outliers_methylation_correlations.csv')
+
+##check for duplicates
+length(candidates$loc[duplicated(candidates$loc)])
+
+for(i in 1:length(candidates$loc)){
+  bar = candidates[i,]
+  candidates[i,9] = names(which.max(abs(bar[4:8])))
+  candidates[i,10] = max(abs(bar[4:8]))
+}
+
+candidates_clean = candidates %>% 
+  as_tibble() %>% 
+  rename(predictor = V9, 
+         correlation = V10)
+
+table(candidates_clean$predictor)
 
