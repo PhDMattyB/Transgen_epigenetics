@@ -2085,7 +2085,8 @@ raw_rda_cand_pivot = raw_rda_cand %>%
   arrange(Chromosome, 
           BP)
 
-cand_methy_pivot$temps = as.character(cand_methy_pivot$temps)
+raw_rda_cand_pivot$F1 = as.character(raw_rda_cand_pivot$F1)
+raw_rda_cand_pivot$F2 = as.character(raw_rda_cand_pivot$F2)
 
 
 # cand_methy_pivot %>% 
@@ -2114,22 +2115,23 @@ F1_temps_pal = c('#0077b6',
                  '#ef959c',
                  '#ef233c')
 
-cand_methy_pivot$Chromosome = factor(cand_methy_pivot$Chromosome, 
-                                     levels = c('chrIII', 
-                                                'chrIV', 
-                                                'chrVI', 
-                                                'chrXI', 
-                                                'chrXII', 
-                                                'chrXIII', 
-                                                'chrXVI', 
-                                                'chrXX', 
-                                                'chrUn'))
+# raw_rda_cand_pivot$Chromosome = factor(raw_rda_cand_pivot$Chromosome, 
+#                                      levels = c('chrIII', 
+#                                                 'chrIV', 
+#                                                 'chrVI', 
+#                                                 'chrXI', 
+#                                                 'chrXII', 
+#                                                 'chrXIII', 
+#                                                 'chrXVI', 
+#                                                 'chrXX', 
+#                                                 'chrUn'))
 
 
-ASHNC_outlier_plot = cand_methy_pivot %>% 
-  filter(Population == 'ASHNC') %>% 
-  group_by(Population, 
-           temps) %>% 
+ASHNC_outlier_plot = raw_rda_cand_pivot %>% 
+  filter(poppair == 'ashn', 
+         ecotype == 'c') %>% 
+  # group_by(poppair, 
+  #          temps) %>% 
   distinct(Chromosome, 
            BP, 
            .keep_all = T) %>% 
