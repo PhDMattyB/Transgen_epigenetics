@@ -972,91 +972,7 @@ ggplot()+
 
 
 # WGP effect modeled eco effect -------------------------------------------
-mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
-meta_data = read_csv('Methylation_metadata.csv')
-
-F1_effects = read_csv('F1_effect_PCA_data.csv')
-
-
-meth_fish = mvalues %>% 
-  select(1)
-
-meth_fish_ID = meth_fish %>% 
-  # separate(Location_data, 
-  #         into = c('garbage', 
-  #            'ID'), 
-  #          sep = '-') %>% 
-  separate_wider_regex(Location_data, 
-                       c(var1 = ".*?", 
-                         "-", 
-                         var2 = ".*")) %>% 
-  select(var2) %>% 
-  separate(var2, 
-           into = c('ID', 
-                    'ID2'), 
-           sep = '-') %>% 
-  mutate(new_vals = paste0('#G', 
-                           str_pad(ID2, 
-                                   0, 
-                                   side = 'left'))) %>% 
-  select(ID, 
-         new_vals) %>% 
-  unite(col = Fish_ID, 
-        sep = '_')
-
-pheno_fish = F1_effects %>% 
-  filter(str_detect(fish,
-                    '_#G')) %>% 
-  distinct(fish, 
-           .keep_all = T) %>% 
-  select(fish)
-
-pheno_fish_ID = pheno_fish %>% 
-  separate_wider_regex(fish, 
-                       c(var1 = ".*?", 
-                         "_", 
-                         var2 = ".*")) %>% 
-  separate_wider_regex(var2, 
-                       c(f1_temp = ".*?", 
-                         "@", 
-                         f2_temp = ".*")) %>% 
-  separate(f2_temp, 
-           into = c('f2_temp', 
-                    'trash'), 
-           sep = '[.]') %>% 
-  select(var1, 
-         f1_temp, 
-         f2_temp) 
-
-pheno_fish_ID$var1 = gsub("'", '', pheno_fish_ID$var1)
-
-pheno_fish_ID = pheno_fish_ID %>% 
-  unite(col = 'Fish_ID', 
-        sep = '')%>% 
-  mutate(Fish_ID = gsub("Myvat", 
-                        "MYV", 
-                        Fish_ID)) 
-
-
-pheno_fish = F1_effects %>% 
-  filter(str_detect(fish,
-                    '_#G')) %>% 
-  distinct(fish, 
-           .keep_all = T) %>% 
-  # select(Full_ID) %>% 
-  bind_cols(pheno_fish_ID, 
-            .)
-## identifying potential issues with phenotypic data
-## 5 individuals that were sequenced did not have the #G identifier
-## Four from GTS18@12 and one from MYVC12@12
-anti_join(meth_fish_ID,
-          pheno_fish_ID)
-
-
-pheno_fish_final = inner_join(meth_fish_ID, 
-                              pheno_fish) %>% 
-  arrange(Fish_ID)
-
+ 
 ## now we need to order the phenotypic data and methylation data
 ## they have to be in the same order otherwise this will all
 ## be fucked. Right now they aren't. 
@@ -1074,61 +990,30 @@ mvalues_final = bind_cols(meth_fish_ID,
 mvalues_final$Fish_ID == pheno_fish_final$Fish_ID
 
 
-## TGP RDA 
+## WGP RDA 
 mvalues_only = mvalues %>% 
   select(-1)
 
-TGP_RDA = rda(mvalues_only ~ Comp1 + Comp2 + Comp3, 
+WGP_RDA = rda(mvalues_only ~ Comp1*ecotype + Comp2*ecotype + Comp3*ecotype + csize_real, 
               data = pheno_fish_final, 
               scale = T)
 
-RsquareAdj(TGP_RDA)
-summary(eigenvals(TGP_RDA, 
+RsquareAdj(WGP_RDA)
+summary(eigenvals(WGP_RDA, 
                   model = 'constrained'))
 
-screeplot(TGP_RDA)
+screeplot(WGP_RDA)
 
 ## Run after all other coding is finished
 ## This will take a while 
-TGP_signif_full = anova.cca(TGP_RDA, 
+WGP_signif_full = anova.cca(WGP_RDA, 
                             parallel = getOption('mc.cores'))
 
 
-TGP_RDA_eco = rda(mvalues_only ~ Comp1 + Comp2 + Comp3 * ecotype, 
-                  data = pheno_fish_final, 
-                  scale = T)
 
-RsquareAdj(TGP_RDA_eco)
-summary(eigenvals(TGP_RDA_eco, 
-                  model = 'constrained'))
+vif.cca(WGP_RDA)
 
-screeplot(TGP_RDA_eco)
-
-## Run after all other coding is finished
-## This will take a while 
-signif_full_eco = anova.cca(TGP_RDA_eco, 
-                            parallel = getOption('mc.cores'))
-
-TGP_RDA_eco_inter = rda(mvalues_only ~ Comp1*ecotype + Comp2*ecotype + Comp3*ecotype, 
-                        data = pheno_fish_final, 
-                        scale = T)
-
-RsquareAdj(TGP_RDA_eco_inter)
-summary(eigenvals(TGP_RDA_eco_inter, 
-                  model = 'constrained'))
-
-screeplot(TGP_RDA_eco_inter)
-
-## Run after all other coding is finished
-## This will take a while 
-signif_full_eco_inter = anova.cca(TGP_RDA_eco_inter, 
-                                  parallel = getOption('mc.cores'))
-
-
-
-vif.cca(TGP_RDA_eco_inter)
-
-sum_rda = summary(TGP_RDA_eco_inter)
+sum_WGP_rda = summary(WGP_RDA)
 
 
 
@@ -1270,7 +1155,7 @@ mvalues_only = mvalues %>%
 # signif_full_eco = anova.cca(TGP_RDA_eco, 
 #                         parallel = getOption('mc.cores'))
 
-TGP_RDA_eco_inter = rda(mvalues_only ~ Comp1*ecotype + Comp2*ecotype + Comp3*ecotype, 
+TGP_RDA_eco_inter = rda(mvalues_only ~ Comp1*ecotype + Comp2*ecotype + Comp3*ecotype + csize_real, 
                   data = pheno_fish_final, 
                   scale = T)
 
@@ -2135,6 +2020,10 @@ ASHNC_outlier_plot = raw_rda_cand_pivot %>%
   distinct(Chromosome, 
            BP, 
            .keep_all = T) %>% 
+  unite(col = 'temps', 
+        c('F1', 
+          'F2'), 
+        sep = '_') %>% 
   ggplot()+
   # geom_point(aes(x = BP, 
   #                y = Methylation, 
@@ -2147,16 +2036,16 @@ ASHNC_outlier_plot = raw_rda_cand_pivot %>%
               size = 2,
               width = 0, 
               height = 0.05)+
-  scale_y_continuous(expand = c(0,0), 
-                     limits = c(-6.0, 1.0), 
-                     breaks = c(-6.0, 
-                                -5.0, 
-                                -4.0, 
-                                -3.0, 
-                                -2.0, 
-                                -1.0, 
-                                0.0, 
-                                1.0))+
+  # scale_y_continuous(expand = c(0,0), 
+  #                    limits = c(-6.0, 1.0), 
+  #                    breaks = c(-6.0, 
+  #                               -5.0, 
+  #                               -4.0, 
+  #                               -3.0, 
+  #                               -2.0, 
+  #                               -1.0, 
+  #                               0.0, 
+  #                               1.0))+
   geom_hline(yintercept = 0.0)+
   labs(title = 'ASHN Cold')+
   scale_fill_manual(values = F1_temps_pal)+
