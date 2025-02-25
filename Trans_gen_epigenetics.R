@@ -2025,30 +2025,33 @@ TGP_clean_pheno_fish_final = inner_join(meth_fish_ID,
 TGP_clean_mvalues_final = bind_cols(meth_fish_ID, 
                               mvalues) %>% 
   arrange(Fish_ID)  %>% 
-  filter(Fish_ID != 'GTS18_12_EU1_#G1', 
-         Fish_ID != 'GTS18_12_EU1_#G2',
-         Fish_ID != 'GTS18_12_EU1_#G3',
-         Fish_ID != 'GTS18_12_EU1_#G4')
+  filter(Fish_ID != 'GTS1812_EU1_#G1', 
+         Fish_ID != 'GTS1812_EU1_#G2',
+         Fish_ID != 'GTS1812_EU1_#G3',
+         Fish_ID != 'GTS1812_EU1_#G4')
 
 ## need to check that everythings in order for the analyses
 ## If there are any FALSE we're fucked. 
 ## Shooting for all TRUES
 TGP_clean_mvalues_final$Fish_ID == TGP_clean_pheno_fish_final$Fish_ID
 
-
+# setdiff(TGP_clean_mvalues_final$Fish_ID, 
+#         TGP_clean_pheno_fish_final$Fish_ID)
 ## TGP RDA 
-TGP_clean_mvalues_only = mvalues %>% 
-  select(-1)
+TGP_clean_mvalues_only = TGP_clean_mvalues_final %>% 
+  # select(-1) %>% 
+  select(-Location_data, 
+         -Fish_ID)
 
 TGP_clean_eco_RDA = rda(TGP_clean_mvalues_only ~ TGPclean + F1text + TGPclean*F1text, 
                   data = TGP_clean_pheno_fish_final, 
                   scale = T)
 
-RsquareAdj(TGP_eco_RDA)
-summary(eigenvals(TGP_eco_RDA, 
+RsquareAdj(TGP_clean_eco_RDA)
+summary(eigenvals(TGP_clean_eco_RDA, 
                   model = 'constrained'))
 
-screeplot(TGP_eco_RDA)
+screeplot(TGP_clean_eco_RDA)
 
 ## Run after all other coding is finished
 ## This will take a while 
