@@ -2305,6 +2305,29 @@ WGP_clean_mvalues_only = WGP_clean_mvalues_final %>%
   select(-Location_data, 
          -Fish_ID)
 
+WGP_clean_pheno_fish_final %>% 
+  separate(col = Fish_ID, 
+           into = c('stuff', 
+                    'things', 
+                    'lastthing'), 
+           sep = '_', 
+           remove = F) %>% 
+  separate(col = stuff, 
+           into = c(''))
+
+
+read_csv('Raw_RDA_phenotypes.csv') %>% 
+  select(fish, 
+         F1, 
+         F2, 
+         poppair, 
+         ecotype, 
+          csize_real) %>% 
+  write_csv('rda_meta_data.csv')
+
+
+
+
 WGP_clean_eco_RDA = rda(WGP_clean_mvalues_only ~ WGPclean + F1text + WGPclean*F1text, 
                         data = WGP_clean_pheno_fish_final, 
                         scale = T)
@@ -3388,3 +3411,4 @@ table(pcandidates_clean$predictor)
 # pcandidates %>%
 #   as_tibble() %>%
 #   write_csv('pRDA_outliers_meth_RAW_correlations.csv')
+
