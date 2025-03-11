@@ -1931,6 +1931,50 @@ TGP_candidates %>%
 
 # TGP_ cleaned data -------------------------------------------------------
 TGP_clean_data = read_csv('tgp_wgp_CandiscCleaned_data.csv')
+
+TGP_pheno_fish = TGP_clean_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>% 
+  select(fish)
+
+TGP_pheno_fish_ID = TGP_pheno_fish %>% 
+  separate_wider_regex(fish, 
+                       c(var1 = ".*?", 
+                         "_", 
+                         var2 = ".*")) %>% 
+  separate_wider_regex(var2, 
+                       c(f1_temp = ".*?", 
+                         "@", 
+                         f2_temp = ".*")) %>% 
+  separate(f2_temp, 
+           into = c('f2_temp', 
+                    'trash'), 
+           sep = '[.]') %>% 
+  select(var1, 
+         f1_temp, 
+         f2_temp) 
+
+TGP_pheno_fish_ID$var1 = gsub("'", '', TGP_pheno_fish_ID$var1)
+
+TGP_pheno_fish_ID = TGP_pheno_fish_ID %>% 
+  unite(col = 'Fish_ID', 
+        sep = '')%>% 
+  mutate(Fish_ID = gsub("Myvat", 
+                        "MYV", 
+                        Fish_ID)) 
+
+
+TGP_pheno_fish = TGP_clean_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+  # select(Full_ID) %>% 
+  bind_cols(TGP_pheno_fish_ID, 
+            .)
+
+
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
 
 meth_fish = mvalues %>%
@@ -1962,57 +2006,16 @@ meth_fish_ID = meth_fish %>%
   unite(col = Fish_ID, 
         sep = '_')
 
-pheno_fish = TGP_clean_data %>% 
-  filter(str_detect(fish,
-                    '_#G')) %>% 
-  distinct(fish, 
-           .keep_all = T) %>% 
-  select(fish)
 
-pheno_fish_ID = pheno_fish %>% 
-  separate_wider_regex(fish, 
-                       c(var1 = ".*?", 
-                         "_", 
-                         var2 = ".*")) %>% 
-  separate_wider_regex(var2, 
-                       c(f1_temp = ".*?", 
-                         "@", 
-                         f2_temp = ".*")) %>% 
-  separate(f2_temp, 
-           into = c('f2_temp', 
-                    'trash'), 
-           sep = '[.]') %>% 
-  select(var1, 
-         f1_temp, 
-         f2_temp) 
-
-pheno_fish_ID$var1 = gsub("'", '', pheno_fish_ID$var1)
-
-pheno_fish_ID = pheno_fish_ID %>% 
-  unite(col = 'Fish_ID', 
-        sep = '')%>% 
-  mutate(Fish_ID = gsub("Myvat", 
-                        "MYV", 
-                        Fish_ID)) 
-
-
-pheno_fish = TGP_clean_data %>% 
-  filter(str_detect(fish,
-                    '_#G')) %>% 
-  distinct(fish, 
-           .keep_all = T) %>% 
-  # select(Full_ID) %>% 
-  bind_cols(pheno_fish_ID, 
-            .)
 ## identifying potential issues with phenotypic data
 ## 5 individuals that were sequenced did not have the #G identifier
 ## Four from GTS18@12 and one from MYVC12@12
 anti_join(meth_fish_ID,
-          pheno_fish_ID)
+          TGP_pheno_fish_ID)
 
 
 TGP_clean_pheno_fish_final = inner_join(meth_fish_ID, 
-                                  pheno_fish) %>% 
+                                  TGP_pheno_fish) %>% 
   arrange(Fish_ID)
 
 ## now we need to order the phenotypic data and methylation data
@@ -2042,6 +2045,55 @@ TGP_clean_mvalues_only = TGP_clean_mvalues_final %>%
   # select(-1) %>% 
   select(-Location_data, 
          -Fish_ID)
+
+tgp_clean_meta = TGP_clean_pheno_fish_final %>% 
+  separate(col = Fish_ID, 
+           into = c('Morph', 
+                    'Temps'), 
+           sep = '1',
+           remove = F) %>%
+  mutate(ecotype = as.character(case_when(
+    Morph == 'ASHNC' ~ 'C',
+    Morph == 'ASHNW' ~ 'w', 
+    Morph == 'MYVC' ~ 'c', 
+    Morph == 'MYVW' ~ 'w', 
+    Morph == 'SKRC' ~ 'c', 
+    Morph == 'SKRW' ~ 'w', 
+    Morph == 'CSWY' ~ 'c', 
+    Morph == 'GTS' ~ 'w')))
+
+meta_data = read_csv('formattedDataEU.csv') %>% 
+  select(fish, 
+         ID, 
+         Full_ID, 
+         F1, 
+         F2, 
+         poppair, 
+         ecotype...13, 
+         csize_real) %>% 
+  rename(ecotype = ecotype...13) %>% 
+  select(fish, 
+         csize_real) 
+# %>% 
+#   filter(grepl('#G', fish))
+
+
+tgp_clean_meta2 = inner_join(tgp_clean_meta, 
+           meta_data, 
+           by = 'fish') 
+
+tgp_clean_meta2 %>% write_csv('TGP_clean_meta_data.csv')
+
+tgp_clean_meta2$Fish_ID == TGP_clean_mvalues_final$Fish_ID
+
+tgp_clean_meta2%>% 
+  filter(Fish_ID != 'GTS1812_EU1_#G1', 
+         Fish_ID != 'GTS1812_EU1_#G2',
+         Fish_ID != 'GTS1812_EU1_#G3',
+         Fish_ID != 'GTS1812_EU1_#G4')
+
+tgp_clean_meta2$Fish_ID == TGP_clean_mvalues_final$Fish_ID
+
 
 TGP_clean_eco_RDA = rda(TGP_clean_mvalues_only ~ TGPclean + F1text + TGPclean*F1text, 
                   data = TGP_clean_pheno_fish_final, 
