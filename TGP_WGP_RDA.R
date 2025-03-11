@@ -178,15 +178,15 @@ TGP_clean_eco_RDA2 = rda(TGP_clean_mvalues_only ~ TGPclean + F1text,
                          data = TGP_clean_pheno_fish_final,
                          scale = T)
 
-RsquareAdj(TGP_clean_eco_RDA)
-summary(eigenvals(TGP_clean_eco_RDA, 
+RsquareAdj(TGP_clean_RDA_full)
+summary(eigenvals(TGP_clean_RDA_full, 
                   model = 'constrained'))
 
-screeplot(TGP_clean_eco_RDA)
+screeplot(TGP_clean_RDA_full)
 
 ## Run after all other coding is finished
 ## This will take a while 
-TGP_eco_signif_full = anova.cca(TGP_clean_eco_RDA, 
+TGP_signif_full = anova.cca(TGP_clean_RDA_full, 
                                 parallel = getOption('mc.cores'))
 
 TGP_eco_signif_full2 = anova.cca(TGP_clean_eco_RDA2,
