@@ -174,9 +174,9 @@ TGP_clean_RDA_full = rda(TGP_clean_mvalues_only ~ TGPclean + ecotype + TGPclean*
                         data = TGP_clean_pheno_fish_final, 
                         scale = T)
 
-TGP_clean_eco_RDA2 = rda(TGP_clean_mvalues_only ~ TGPclean + F1text,
-                         data = TGP_clean_pheno_fish_final,
-                         scale = T)
+# TGP_clean_eco_RDA2 = rda(TGP_clean_mvalues_only ~ TGPclean + F1text,
+#                          data = TGP_clean_pheno_fish_final,
+#                          scale = T)
 
 RsquareAdj(TGP_clean_RDA_full)
 summary(eigenvals(TGP_clean_RDA_full, 
@@ -189,80 +189,80 @@ screeplot(TGP_clean_RDA_full)
 TGP_signif_full = anova.cca(TGP_clean_RDA_full, 
                                 parallel = getOption('mc.cores'))
 
-TGP_eco_signif_full2 = anova.cca(TGP_clean_eco_RDA2,
-                                 parallel = getOption('mc.cores'))
+# TGP_eco_signif_full2 = anova.cca(TGP_clean_eco_RDA2,
+#                                  parallel = getOption('mc.cores'))
 
-vif.cca(TGP_clean_eco_RDA2)
+vif.cca(TGP_clean_RDA_full)
 
-TGP_clean_sum_rda2 = summary(TGP_clean_eco_RDA2)
+TGP_clean_sum = summary(TGP_clean_RDA_full)
 
-TGP_clean_sum_rda2$species %>%
+TGP_clean_sum$species %>%
   as_tibble() %>%
   write_csv('TGP_clean_RDA_Uncorrected_PCA_locations.csv')
 
-TGP_clean_sum_rda2$sites %>%
+TGP_clean_sum$sites %>%
   as_tibble() %>%
   write_csv('TGP_clean_RDA_Uncorrected_PCA_individuals.csv')
 
-TGP_clean_sum_rda2$biplot %>%
+TGP_clean_sum$biplot %>%
   as_tibble() %>%
   write_csv('TGP_clean_RDA_Uncorrected_PCA_biplot.csv')
 
 
-TGP_clean_rda_scores2 = scores(TGP_clean_eco_RDA2,
+TGP_clean_rda_scores = scores(TGP_clean_RDA_full,
                                choices = c(1:5),
                                display = 'species')
 # 
-hist(TGP_clean_rda_scores2[,1])
-hist(TGP_rda_scores[,2])
-hist(TGP_rda_scores[,3])
-hist(TGP_rda_scores[,4])
-hist(TGP_rda_scores[,5])
+hist(TGP_clean_rda_scores[,1])
+# hist(TGP_rda_scores[,2])
+# hist(TGP_rda_scores[,3])
+# hist(TGP_rda_scores[,4])
+# hist(TGP_rda_scores[,5])
 # 
-TGP2_clean_rda_outliers_axis1 = outliers(TGP_clean_rda_scores2[,1], 3)
+TGP_clean_rda_outliers_axis1 = outliers(TGP_clean_rda_scores[,1], 3)
 # 
 # 
-TGP2_clean_rda_out_axis1 = cbind.data.frame(rep(1,
-                                                times = length(TGP2_clean_rda_outliers_axis1)),
-                                            names(TGP2_clean_rda_outliers_axis1),
-                                            unname(TGP2_clean_rda_outliers_axis1))
+TGP_clean_rda_out_axis1 = cbind.data.frame(rep(1,
+                                                times = length(TGP_clean_rda_outliers_axis1)),
+                                            names(TGP_clean_rda_outliers_axis1),
+                                            unname(TGP_clean_rda_outliers_axis1))
 # 
-TGP2_clean_rda_out_axis1 = TGP2_clean_rda_out_axis1 %>%
+TGP_clean_rda_out_axis1 = TGP_clean_rda_out_axis1 %>%
   as_tibble() %>%
   dplyr::rename(axis = 1,
                 loc = 2,
                 scores = 3)
 # 
 # 
-TGP_all_loc2 = TGP_clean_rda_scores2[,1]
+TGP_all_loc = TGP_clean_rda_scores[,1]
 # 
-TGP2_rda_normal = cbind.data.frame(rep(2,
-                                       times = length(TGP_all_loc2)),
-                                   names(TGP_all_loc2),
-                                   unname(TGP_all_loc2))
-TGP2_rda_normal = TGP2_rda_normal %>%
+TGP_rda_normal = cbind.data.frame(rep(2,
+                                       times = length(TGP_all_loc)),
+                                   names(TGP_all_loc),
+                                   unname(TGP_all_loc))
+TGP_rda_normal = TGP_rda_normal %>%
   as_tibble() %>%
   dplyr::rename(axis = 1,
                 loc = 2,
                 scores = 3)
 # 
-TGP2_rda_normal = TGP2_rda_normal[!TGP2_rda_normal$loc %in% TGP2_clean_rda_out_axis1$loc,]
+TGP_rda_normal = TGP_rda_normal[!TGP_rda_normal$loc %in% TGP_clean_rda_out_axis1$loc,]
 # 
-write_csv(TGP2_rda_normal,
-          'TGP2_clean_RDA_PCaxes_nonoutliers_methylation.csv')
+write_csv(TGP_rda_normal,
+          'TGP_clean_RDA_PCaxes_nonoutliers_methylation.csv')
 
-write_csv(TGP2_clean_rda_out_axis1,
-          'TGP2_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+write_csv(TGP_clean_rda_out_axis1,
+          'TGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
 # 
-TGP2_clean_rda_out = as.data.frame(TGP2_clean_rda_out_axis1)
-TGP2_all_loc = as.data.frame(TGP_all_loc2)
-TGP_clean_pheno_fish_final2 = as.data.frame(TGP_clean_pheno_fish_final)
+TGP_clean_rda_out = as.data.frame(TGP_clean_rda_out_axis1)
+TGP_all_loc = as.data.frame(TGP_all_loc)
+TGP_clean_pheno_fish_final = as.data.frame(TGP_clean_pheno_fish_final)
 # 
-TGP_clean_phenotypes = TGP_clean_pheno_fish_final2 %>%
+TGP_clean_phenotypes = TGP_clean_pheno_fish_final %>%
   as_tibble() %>%
   mutate(eco_num = as.numeric(case_when(
-    F1text == 'cold' ~ '1',
-    F1text == 'warm' ~ '2'))) %>%
+    ecotype == 'c' ~ '1',
+    ecotype == 'w' ~ '2'))) %>%
   # dplyr::select(-Population) %>%
   as.data.frame()
 
@@ -272,27 +272,29 @@ TGP_clean_phenotypes = TGP_clean_pheno_fish_final2 %>%
 # #                 2, 
 # #                 function(x)cor(x, out_loc))
 # 
-foo = matrix(nrow=(948),
-             ncol = 2)
+foo = matrix(nrow=(2184),
+             ncol = 4)
 # colnames(foo) = c('TGP_clean',
 #                   'eco_num', 
 #                   'interaction')
 colnames(foo) = c('TGP_clean',
-                  'eco_num')
+                  'eco_num', 
+                  'Interaction', 
+                  'csize')
 
 TGP_clean_phenotypes = TGP_clean_phenotypes %>% 
   dplyr::select(TGPclean, 
-                eco_num) 
-# %>% 
-#   mutate(interaction = TGPclean*eco_num)
+                eco_num, 
+                csize_real) %>%
+  mutate(interaction = TGPclean*eco_num)
 
-for (i in 1:length(TGP2_clean_rda_out$loc)){
-  nam = TGP2_clean_rda_out[i,2]
+for (i in 1:length(TGP_clean_rda_out$loc)){
+  nam = TGP_clean_rda_out[i,2]
   loc.gen = TGP_clean_mvalues_only[,nam]
   foo[i,] = apply(TGP_clean_phenotypes,2,function(x)cor(x,loc.gen))
 }
 
-TGP2_clean_candidates = cbind.data.frame(TGP2_clean_rda_out,
+TGP_clean_candidates = cbind.data.frame(TGP_clean_rda_out,
                                          foo)
 
 TGP2_clean_candidates %>%
