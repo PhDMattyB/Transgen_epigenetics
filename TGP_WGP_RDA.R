@@ -487,3 +487,87 @@ meta_data = read_csv('formattedDataEU.csv') %>%
 func_data = read_csv("4Bar_AllFactors.csv") %>% 
   bind_cols(meta_data, 
             .)
+
+func_pheno_fish = func_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>% 
+  select(fish)
+
+func_pheno_fish_ID = func_pheno_fish %>% 
+  separate_wider_regex(fish, 
+                       c(var1 = ".*?", 
+                         "_", 
+                         var2 = ".*")) %>% 
+  separate_wider_regex(var2, 
+                       c(f1_temp = ".*?", 
+                         "@", 
+                         f2_temp = ".*")) %>% 
+  separate(f2_temp, 
+           into = c('f2_temp', 
+                    'trash'), 
+           sep = '[.]') %>% 
+  select(var1, 
+         f1_temp, 
+         f2_temp) 
+
+func_pheno_fish_ID$var1 = gsub("'", '', func_pheno_fish_ID$var1)
+
+func_pheno_fish_ID = func_pheno_fish_ID %>% 
+  unite(col = 'Fish_ID', 
+        sep = '')%>% 
+  mutate(Fish_ID = gsub("Myvat", 
+                        "MYV", 
+                        Fish_ID)) 
+
+
+func_pheno_fish = func_data %>%
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>%  
+  # dplyr::select(Full_ID) %>%
+  bind_cols(.,
+            func_pheno_fish_ID)
+
+
+
+anti_join(meth_fish_ID,
+          func_pheno_fish_ID)
+
+
+func_clean_pheno_fish_final = inner_join(meth_fish_ID, 
+                                        func_pheno_fish) %>% 
+  arrange(Fish_ID)
+
+## now we need to order the phenotypic data and methylation data
+## they have to be in the same order otherwise this will all
+## be fucked. Right now they aren't. 
+## order the data by the Fish_ID column
+
+## Add the new id column to the methylation data
+
+func_clean_mvalues_final = bind_cols(meth_fish_ID, 
+                                    mvalues) %>% 
+  arrange(Fish_ID)  %>% 
+  filter(Fish_ID != 'GTS1812_EU1_#G1', 
+         Fish_ID != 'GTS1812_EU1_#G2',
+         Fish_ID != 'GTS1812_EU1_#G3',
+         Fish_ID != 'GTS1812_EU1_#G4', 
+         Fish_ID != 'MYVC1212_EU4_#G1')
+
+func_clean_mvalues_final$Fish_ID == func_clean_pheno_fish_final$Fish_ID
+
+
+## need to check that everythings in order for the analyses
+## If there are any FALSE we're fucked. 
+## Shooting for all TRUES
+
+# setdiff(TGP_clean_mvalues_final$Fish_ID, 
+#         TGP_clean_pheno_fish_final$Fish_ID)
+## TGP RDA 
+TGP_clean_mvalues_only = TGP_clean_mvalues_final %>% 
+  # select(-1) %>% 
+  select(-Location_data, 
+         -Fish_ID)
