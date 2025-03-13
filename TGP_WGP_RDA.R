@@ -297,24 +297,193 @@ for (i in 1:length(TGP_clean_rda_out$loc)){
 TGP_clean_candidates = cbind.data.frame(TGP_clean_rda_out,
                                          foo)
 
-TGP2_clean_candidates %>%
+TGP_clean_candidates %>%
   as_tibble() %>%
-  write_csv('TGP2_clean_RDA_outliers_methylation_correlations.csv')
+  write_csv('TGP_clean_RDA_outliers_methylation_correlations.csv')
 # 
 ##check for duplicates
-length(TGP2_clean_candidates$loc[duplicated(TGP2_clean_candidates$loc)])
+length(TGP_clean_candidates$loc[duplicated(TGP_clean_candidates$loc)])
 # 
-for(i in 1:length(TGP2_clean_candidates$loc)){
-  bar = TGP2_clean_candidates[i,]
-  TGP2_clean_candidates[i,6] = names(which.max(abs(bar[4:5])))
-  TGP2_clean_candidates[i,7] = max(abs(bar[4:5]))
+for(i in 1:length(TGP_clean_candidates$loc)){
+  bar = TGP_clean_candidates[i,]
+  TGP_clean_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  TGP_clean_candidates[i,9] = max(abs(bar[4:7]))
 }
 # 
-TGP2_clean_candidates %>% 
+TGP_clean_candidates %>% 
   as_tibble() %>%
-  rename(Association = V6, 
-         Correlation = V7) %>%
-  write_csv("TGP2_clean_RDA_CAND_corr.csv") %>% 
+  rename(Association = V8, 
+         Correlation = V9) %>%
+  write_csv("TGP_clean_RDA_CAND_corr.csv") %>% 
   group_by(Association) %>% 
   summarize(n = n())
 
+
+# WGP_clean RDA -----------------------------------------------------------
+
+
+WGP_clean_RDA_full = rda(TGP_clean_mvalues_only ~ WGPclean + ecotype + WGPclean*ecotype + csize_real, 
+                         data = TGP_clean_pheno_fish_final, 
+                         scale = T)
+
+# WGP_clean_eco_RDA2 = rda(WGP_clean_mvalues_only ~ WGPclean + F1text,
+#                          data = WGP_clean_pheno_fish_final,
+#                          scale = T)
+
+RsquareAdj(WGP_clean_RDA_full)
+summary(eigenvals(WGP_clean_RDA_full, 
+                  model = 'constrained'))
+
+screeplot(WGP_clean_RDA_full)
+
+## Run after all other coding is finished
+## This will take a while 
+WGP_signif_full = anova.cca(WGP_clean_RDA_full, 
+                            parallel = getOption('mc.cores'))
+
+# WGP_eco_signif_full2 = anova.cca(WGP_clean_eco_RDA2,
+#                                  parallel = getOption('mc.cores'))
+
+vif.cca(WGP_clean_RDA_full)
+
+WGP_clean_sum = summary(WGP_clean_RDA_full)
+
+WGP_clean_sum$species %>%
+  as_tibble() %>%
+  write_csv('WGP_clean_RDA_Uncorrected_PCA_locations.csv')
+
+WGP_clean_sum$sites %>%
+  as_tibble() %>%
+  write_csv('WGP_clean_RDA_Uncorrected_PCA_individuals.csv')
+
+WGP_clean_sum$biplot %>%
+  as_tibble() %>%
+  write_csv('WGP_clean_RDA_Uncorrected_PCA_biplot.csv')
+
+
+WGP_clean_rda_scores = scores(WGP_clean_RDA_full,
+                              choices = c(1:5),
+                              display = 'species')
+# 
+hist(WGP_clean_rda_scores[,1])
+# hist(WGP_rda_scores[,2])
+# hist(WGP_rda_scores[,3])
+# hist(WGP_rda_scores[,4])
+# hist(WGP_rda_scores[,5])
+# 
+WGP_clean_rda_outliers_axis1 = outliers(WGP_clean_rda_scores[,1], 3)
+# 
+# 
+WGP_clean_rda_out_axis1 = cbind.data.frame(rep(1,
+                                               times = length(WGP_clean_rda_outliers_axis1)),
+                                           names(WGP_clean_rda_outliers_axis1),
+                                           unname(WGP_clean_rda_outliers_axis1))
+# 
+WGP_clean_rda_out_axis1 = WGP_clean_rda_out_axis1 %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+# 
+WGP_all_loc = WGP_clean_rda_scores[,1]
+# 
+WGP_rda_normal = cbind.data.frame(rep(2,
+                                      times = length(WGP_all_loc)),
+                                  names(WGP_all_loc),
+                                  unname(WGP_all_loc))
+WGP_rda_normal = WGP_rda_normal %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+WGP_rda_normal = WGP_rda_normal[!WGP_rda_normal$loc %in% WGP_clean_rda_out_axis1$loc,]
+# 
+write_csv(WGP_rda_normal,
+          'WGP_clean_RDA_PCaxes_nonoutliers_methylation.csv')
+
+write_csv(WGP_clean_rda_out_axis1,
+          'WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+# 
+WGP_clean_rda_out = as.data.frame(WGP_clean_rda_out_axis1)
+WGP_all_loc = as.data.frame(WGP_all_loc)
+WGP_clean_pheno_fish_final = as.data.frame(WGP_clean_pheno_fish_final)
+# 
+WGP_clean_phenotypes = TGP_clean_pheno_fish_final %>%
+  as_tibble() %>%
+  mutate(eco_num = as.numeric(case_when(
+    ecotype == 'c' ~ '1',
+    ecotype == 'w' ~ '2'))) %>%
+  # dplyr::select(-Population) %>%
+  as.data.frame()
+
+# # nam = rda_out[1:45, 2]
+# # out_loc = all_loc[nam,]
+# # out_cor = apply(test_pheno,
+# #                 2, 
+# #                 function(x)cor(x, out_loc))
+# 
+foo = matrix(nrow=(3121),
+             ncol = 4)
+# colnames(foo) = c('WGP_clean',
+#                   'eco_num', 
+#                   'interaction')
+colnames(foo) = c('WGP_clean',
+                  'eco_num', 
+                  'Interaction', 
+                  'csize')
+
+WGP_clean_phenotypes = WGP_clean_phenotypes %>% 
+  dplyr::select(WGPclean, 
+                eco_num, 
+                csize_real) %>%
+  mutate(interaction = WGPclean*eco_num)
+
+for (i in 1:length(WGP_clean_rda_out$loc)){
+  nam = WGP_clean_rda_out[i,2]
+  loc.gen = TGP_clean_mvalues_only[,nam]
+  foo[i,] = apply(WGP_clean_phenotypes,2,function(x)cor(x,loc.gen))
+}
+
+WGP_clean_candidates = cbind.data.frame(WGP_clean_rda_out,
+                                        foo)
+
+WGP_clean_candidates %>%
+  as_tibble() %>%
+  write_csv('WGP_clean_RDA_outliers_methylation_correlations.csv')
+# 
+##check for duplicates
+length(WGP_clean_candidates$loc[duplicated(WGP_clean_candidates$loc)])
+# 
+for(i in 1:length(WGP_clean_candidates$loc)){
+  bar = WGP_clean_candidates[i,]
+  WGP_clean_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  WGP_clean_candidates[i,9] = max(abs(bar[4:7]))
+}
+# 
+WGP_clean_candidates %>% 
+  as_tibble() %>%
+  rename(Association = V8, 
+         Correlation = V9) %>%
+  write_csv("WGP_clean_RDA_CAND_corr.csv") %>% 
+  group_by(Association) %>% 
+  summarize(n = n())
+
+
+# 4bar linkage RDA --------------------------------------------------------
+
+meta_data = read_csv('formattedDataEU.csv') %>% 
+  select(fish, 
+         ID, 
+         Full_ID, 
+         F1, 
+         F2, 
+         poppair, 
+         ecotype...13, 
+         csize_real) %>% 
+  rename(ecotype = ecotype...13) 
+
+func_data = read_csv("4Bar_AllFactors.csv") %>% 
+  bind_cols(meta_data, 
+            .)
