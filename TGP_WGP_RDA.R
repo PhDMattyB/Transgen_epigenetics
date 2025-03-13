@@ -575,6 +575,12 @@ func_clean_mvalues_only = func_clean_mvalues_final %>%
 func_ORIG_clean_RDA_full = rda(func_clean_mvalues_only ~ PreMax_KT + ecotype + PreMax_KT*ecotype + csize_real, 
                          data = func_clean_pheno_fish_final, 
                          scale = T)
+RsquareAdj(func_ORIG_clean_RDA_full)
+summary(eigenvals(func_ORIG_clean_RDA_full, 
+                  model = 'constrained'))
+screeplot(func_ORIG_clean_RDA_full)
+func_ORIG_signif_full = anova.cca(func_ORIG_clean_RDA_full, 
+                             parallel = getOption('mc.cores'))
 
 # func_clean_eco_RDA2 = rda(func_clean_mvalues_only ~ funcclean + F1text,
 #                          data = func_clean_pheno_fish_final,
