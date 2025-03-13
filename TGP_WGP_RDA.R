@@ -567,7 +567,156 @@ func_clean_mvalues_final$Fish_ID == func_clean_pheno_fish_final$Fish_ID
 # setdiff(TGP_clean_mvalues_final$Fish_ID, 
 #         TGP_clean_pheno_fish_final$Fish_ID)
 ## TGP RDA 
-TGP_clean_mvalues_only = TGP_clean_mvalues_final %>% 
+func_clean_mvalues_only = func_clean_mvalues_final %>% 
   # select(-1) %>% 
   select(-Location_data, 
          -Fish_ID)
+
+func_ORIG_clean_RDA_full = rda(func_clean_mvalues_only ~ PreMax_KT + ecotype + PreMax_KT*ecotype + csize_real, 
+                         data = func_clean_pheno_fish_final, 
+                         scale = T)
+
+# func_clean_eco_RDA2 = rda(func_clean_mvalues_only ~ funcclean + F1text,
+#                          data = func_clean_pheno_fish_final,
+#                          scale = T)
+
+RsquareAdj(func_clean_RDA_full)
+summary(eigenvals(func_clean_RDA_full, 
+                  model = 'constrained'))
+
+screeplot(func_clean_RDA_full)
+
+## Run after all other coding is finished
+## This will take a while 
+func_signif_full = anova.cca(func_clean_RDA_full, 
+                            parallel = getOption('mc.cores'))
+
+# func_eco_signif_full2 = anova.cca(func_clean_eco_RDA2,
+#                                  parallel = getOption('mc.cores'))
+
+vif.cca(func_clean_RDA_full)
+
+func_clean_sum = summary(func_clean_RDA_full)
+
+func_clean_sum$species %>%
+  as_tibble() %>%
+  write_csv('func_clean_RDA_Uncorrected_PCA_locations.csv')
+
+func_clean_sum$sites %>%
+  as_tibble() %>%
+  write_csv('func_clean_RDA_Uncorrected_PCA_individuals.csv')
+
+func_clean_sum$biplot %>%
+  as_tibble() %>%
+  write_csv('func_clean_RDA_Uncorrected_PCA_biplot.csv')
+
+
+func_clean_rda_scores = scores(func_clean_RDA_full,
+                              choices = c(1:5),
+                              display = 'species')
+# 
+hist(func_clean_rda_scores[,1])
+# hist(func_rda_scores[,2])
+# hist(func_rda_scores[,3])
+# hist(func_rda_scores[,4])
+# hist(func_rda_scores[,5])
+# 
+func_clean_rda_outliers_axis1 = outliers(func_clean_rda_scores[,1], 3)
+# 
+# 
+func_clean_rda_out_axis1 = cbind.data.frame(rep(1,
+                                               times = length(func_clean_rda_outliers_axis1)),
+                                           names(func_clean_rda_outliers_axis1),
+                                           unname(func_clean_rda_outliers_axis1))
+# 
+func_clean_rda_out_axis1 = func_clean_rda_out_axis1 %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+# 
+func_all_loc = func_clean_rda_scores[,1]
+# 
+func_rda_normal = cbind.data.frame(rep(2,
+                                      times = length(func_all_loc)),
+                                  names(func_all_loc),
+                                  unname(func_all_loc))
+func_rda_normal = func_rda_normal %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+func_rda_normal = func_rda_normal[!func_rda_normal$loc %in% func_clean_rda_out_axis1$loc,]
+# 
+write_csv(func_rda_normal,
+          'func_clean_RDA_PCaxes_nonoutliers_methylation.csv')
+
+write_csv(func_clean_rda_out_axis1,
+          'func_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+# 
+func_clean_rda_out = as.data.frame(func_clean_rda_out_axis1)
+func_all_loc = as.data.frame(func_all_loc)
+func_clean_pheno_fish_final = as.data.frame(func_clean_pheno_fish_final)
+# 
+func_clean_phenotypes = func_clean_pheno_fish_final %>%
+  as_tibble() %>%
+  mutate(eco_num = as.numeric(case_when(
+    ecotype == 'c' ~ '1',
+    ecotype == 'w' ~ '2'))) %>%
+  # dplyr::select(-Population) %>%
+  as.data.frame()
+
+# # nam = rda_out[1:45, 2]
+# # out_loc = all_loc[nam,]
+# # out_cor = apply(test_pheno,
+# #                 2, 
+# #                 function(x)cor(x, out_loc))
+# 
+foo = matrix(nrow=(2184),
+             ncol = 4)
+# colnames(foo) = c('func_clean',
+#                   'eco_num', 
+#                   'interaction')
+colnames(foo) = c('func_clean',
+                  'eco_num', 
+                  'Interaction', 
+                  'csize')
+
+func_clean_phenotypes = func_clean_phenotypes %>% 
+  dplyr::select(funcclean, 
+                eco_num, 
+                csize_real) %>%
+  mutate(interaction = funcclean*eco_num)
+
+for (i in 1:length(func_clean_rda_out$loc)){
+  nam = func_clean_rda_out[i,2]
+  loc.gen = func_clean_mvalues_only[,nam]
+  foo[i,] = apply(func_clean_phenotypes,2,function(x)cor(x,loc.gen))
+}
+
+func_clean_candidates = cbind.data.frame(func_clean_rda_out,
+                                        foo)
+
+func_clean_candidates %>%
+  as_tibble() %>%
+  write_csv('func_clean_RDA_outliers_methylation_correlations.csv')
+# 
+##check for duplicates
+length(func_clean_candidates$loc[duplicated(func_clean_candidates$loc)])
+# 
+for(i in 1:length(func_clean_candidates$loc)){
+  bar = func_clean_candidates[i,]
+  func_clean_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  func_clean_candidates[i,9] = max(abs(bar[4:7]))
+}
+# 
+func_clean_candidates %>% 
+  as_tibble() %>%
+  rename(Association = V8, 
+         Correlation = V9) %>%
+  write_csv("func_clean_RDA_CAND_corr.csv") %>% 
+  group_by(Association) %>% 
+  summarize(n = n())
+
