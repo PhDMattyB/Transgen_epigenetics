@@ -735,40 +735,180 @@ func_ORIG_opercular_signif_full = anova.cca(func_ORIG_operc_RDA_full,
 
 vif.cca(func_ORIG_operc_RDA_full)
 
-func_orig_clean_sum = summary(func_ORIG_signif_full)
+func_orig_opercular_clean_sum = summary(func_ORIG_operc_RDA_full)
 
-func_orig_clean_sum$species %>%
+func_orig_opercular_clean_sum$species %>%
   as_tibble() %>%
-  write_csv('func_orig_RDA_Uncorrected_PCA_locations.csv')
+  write_csv('func_orig_opercular_RDA_Uncorrected_PCA_locations.csv')
 
-func_orig_clean_sum$sites %>%
+func_orig_opercular_clean_sum$sites %>%
   as_tibble() %>%
-  write_csv('func_orig_RDA_Uncorrected_PCA_individuals.csv')
+  write_csv('func_orig_opercular_RDA_Uncorrected_PCA_individuals.csv')
 
-func_orig_clean_sum$biplot %>%
+func_orig_opercular_clean_sum$biplot %>%
   as_tibble() %>%
-  write_csv('func_orig_RDA_Uncorrected_PCA_biplot.csv')
+  write_csv('func_orig_opercular_RDA_Uncorrected_PCA_biplot.csv')
 
 
-func_orig_rda_scores = scores(func_ORIG_clean_RDA_full,
+func_orig_operc_rda_scores = scores(func_ORIG_operc_RDA_full,
                               choices = c(1:5),
                               display = 'species')
 # 
-hist(func_orig_rda_scores[,1])
+hist(func_orig_operc_rda_scores[,1])
 # hist(func_rda_scores[,2])
 # hist(func_rda_scores[,3])
 # hist(func_rda_scores[,4])
 # hist(func_rda_scores[,5])
 # 
-func_orig_rda_outliers_axis1 = outliers(func_orig_rda_scores[,1], 3)
+func_orig_operc_rda_outliers_axis1 = outliers(func_orig_operc_rda_scores[,1], 3)
 # 
 # 
-func_orig_rda_out_axis1 = cbind.data.frame(rep(1,
-                                               times = length(func_orig_rda_outliers_axis1)),
-                                           names(func_orig_rda_outliers_axis1),
-                                           unname(func_orig_rda_outliers_axis1))
+func_orig_operc_rda_out_axis1 = cbind.data.frame(rep(1,
+                                               times = length(func_orig_operc_rda_outliers_axis1)),
+                                           names(func_orig_operc_rda_outliers_axis1),
+                                           unname(func_orig_operc_rda_outliers_axis1))
 # 
-func_orig_rda_out_axis1 = func_orig_rda_out_axis1 %>%
+func_orig_operc_rda_out_axis1 = func_orig_operc_rda_out_axis1 %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+# 
+func_all_loc_operc = func_orig_operc_rda_scores[,1]
+# 
+func_rda_normal_operc = cbind.data.frame(rep(2,
+                                       times = length(func_all_loc_operc)),
+                                   names(func_all_loc_operc),
+                                   unname(func_all_loc_operc))
+func_rda_normal_operc = func_rda_normal_operc %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+func_rda_normal_operc = func_rda_normal_operc[!func_rda_normal_operc$loc %in% func_orig_operc_rda_out_axis1$loc,]
+# 
+write_csv(func_rda_normal_operc,
+          'func_orig_opercular_RDA_PCaxes_nonoutliers_methylation.csv')
+
+write_csv(func_orig_operc_rda_out_axis1,
+          'func_orig_opercular_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+# 
+func_orig_operc_rda_out = as.data.frame(func_orig_operc_rda_out_axis1)
+func_all_loc_operc = as.data.frame(func_all_loc_operc)
+func_orig_pheno_fish_final = as.data.frame(func_orig_pheno_fish_final)
+# 
+func_orig_operc_phenotypes = func_clean_pheno_fish_final %>%
+  as_tibble() %>%
+  mutate(eco_num = as.numeric(case_when(
+    ecotype == 'c' ~ '1',
+    ecotype == 'w' ~ '2'))) %>%
+  # dplyr::select(-Population) %>%
+  as.data.frame()
+
+# # nam = rda_out[1:45, 2]
+# # out_loc = all_loc[nam,]
+# # out_cor = apply(test_pheno,
+# #                 2, 
+# #                 function(x)cor(x, out_loc))
+# 
+foo = matrix(nrow=(11),
+             ncol = 4)
+# colnames(foo) = c('func_orig',
+#                   'eco_num', 
+#                   'interaction')
+colnames(foo) = c('orig_opercular_kt',
+                  'eco_num', 
+                  'Interaction', 
+                  'csize')
+
+func_orig_operckt = func_orig_operc_phenotypes %>% 
+  dplyr::select(Opercular_KT, 
+                eco_num, 
+                csize_real) %>%
+  mutate(interaction = Opercular_KT*eco_num)
+
+for (i in 1:length(func_orig_operc_rda_out$loc)){
+  nam = func_orig_operc_rda_out[i,2]
+  loc.gen = func_clean_mvalues_only[,nam]
+  foo[i,] = apply(func_orig_operckt,2,function(x)cor(x,loc.gen))
+}
+
+func_orig_operc_candidates = cbind.data.frame(func_orig_operc_rda_out,
+                                               foo)
+
+func_orig_operc_candidates %>%
+  as_tibble() %>%
+  write_csv('func_orig_opercKT_RDA_outliers_methylation_correlations.csv')
+# 
+##check for duplicates
+length(func_orig_operc_candidates$loc[duplicated(func_orig_operc_candidates$loc)])
+# 
+for(i in 1:length(func_orig_operc_candidates$loc)){
+  bar = func_orig_operc_candidates[i,]
+  func_orig_operc_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  func_orig_operc_candidates[i,9] = max(abs(bar[4:7]))
+}
+# 
+func_orig_operc_candidates %>% 
+  as_tibble() %>%
+  rename(Association = V8, 
+         Correlation = V9) %>%
+  write_csv("func_orig_operc_RDA_CAND_corr.csv") %>% 
+  group_by(Association) %>% 
+  summarize(n = n())
+
+
+# TGP premax KT -----------------------------------------------------------
+
+func_TGP_premax_RDA_full = rda(func_clean_mvalues_only ~ PreMax_KT_F1 + ecotype + PreMax_KT_F1*ecotype + csize_real, 
+                               data = func_clean_pheno_fish_final, 
+                               scale = T)
+RsquareAdj(func_TGP_premax_RDA_full)
+summary(eigenvals(func_TGP_premax_RDA_full, 
+                  model = 'constrained'))
+screeplot(func_TGP_premax_RDA_full)
+func_TGP_premax_signif_full = anova.cca(func_TGP_premax_RDA_full, 
+                                  parallel = getOption('mc.cores'))
+
+
+vif.cca(func_TGP_premax_RDA_full)
+
+func_TGP_premax_sum = summary(func_TGP_premax_signif_full)
+
+func_TGP_premax_sum$species %>%
+  as_tibble() %>%
+  write_csv('func_TGP_premax_RDA_Uncorrected_PCA_locations.csv')
+
+func_TGP_premax_sum$sites %>%
+  as_tibble() %>%
+  write_csv('func_TGP_premax_RDA_Uncorrected_PCA_individuals.csv')
+
+func_TGP_premax_sum$biplot %>%
+  as_tibble() %>%
+  write_csv('func_TGP_premax_RDA_Uncorrected_PCA_biplot.csv')
+
+
+func_TGP_premax_rda_scores = scores(func_TGP_premax_RDA_full,
+                              choices = c(1:5),
+                              display = 'species')
+# 
+hist(func_TGP_premax_rda_scores[,1])
+# hist(func_rda_scores[,2])
+# hist(func_rda_scores[,3])
+# hist(func_rda_scores[,4])
+# hist(func_rda_scores[,5])
+# 
+func_TGP_premax_rda_outliers_axis1 = outliers(func_TGP_premax_rda_scores[,1], 3)
+# 
+# 
+func_TGP_premax_rda_outliers_axis1 = cbind.data.frame(rep(1,
+                                               times = length(func_TGP_premax_rda_outliers_axis1)),
+                                           names(func_TGP_premax_rda_outliers_axis1),
+                                           unname(func_TGP_premax_rda_outliers_axis1))
+# 
+func_TGP_premax_rda_outliers_axis1 = func_TGP_premax_rda_outliers_axis1 %>%
   as_tibble() %>%
   dplyr::rename(axis = 1,
                 loc = 2,
