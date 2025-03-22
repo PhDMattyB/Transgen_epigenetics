@@ -862,7 +862,7 @@ func_orig_operc_candidates %>%
 
 # TGP premax KT -----------------------------------------------------------
 
-func_TGP_premax_RDA_full = rda(func_clean_mvalues_only ~ PreMax_KT_F1 + ecotype + PreMax_KT_F1*ecotype + csize_real, 
+func_TGP_operc_RDA_full = rda(func_clean_mvalues_only ~ Opercular_KT_F1 + ecotype + Opercular_KT_F1*ecotype + csize_real, 
                                data = func_clean_pheno_fish_final, 
                                scale = T)
 RsquareAdj(func_TGP_premax_RDA_full)
@@ -915,31 +915,31 @@ func_TGP_premax_rda_outliers_axis1 = func_TGP_premax_rda_outliers_axis1 %>%
                 scores = 3)
 # 
 # 
-func_all_loc = func_orig_rda_scores[,1]
+func_TGP_premax_all_loc = func_TGP_premax_rda_scores[,1]
 # 
-func_rda_normal = cbind.data.frame(rep(2,
-                                       times = length(func_all_loc)),
-                                   names(func_all_loc),
-                                   unname(func_all_loc))
-func_rda_normal = func_rda_normal %>%
+func_TGP_premax_all_loc = cbind.data.frame(rep(2,
+                                       times = length(func_TGP_premax_all_loc)),
+                                   names(func_TGP_premax_all_loc),
+                                   unname(func_TGP_premax_all_loc))
+func_TGP_premax_all_loc = func_TGP_premax_all_loc %>%
   as_tibble() %>%
   dplyr::rename(axis = 1,
                 loc = 2,
                 scores = 3)
 # 
-func_rda_normal = func_rda_normal[!func_rda_normal$loc %in% func_orig_rda_out_axis1$loc,]
+func_TGP_premax_all_loc = func_TGP_premax_all_loc[!func_TGP_premax_all_loc$loc %in% func_TGP_premax_rda_outliers_axis1$loc,]
 # 
-write_csv(func_rda_normal,
-          'func_orig_RDA_PCaxes_nonoutliers_methylation.csv')
+write_csv(func_TGP_premax_all_loc,
+          'func_TGP_premax_RDA_PCaxes_nonoutliers_methylation.csv')
 
-write_csv(func_orig_rda_out_axis1,
-          'func_orig_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+write_csv(func_TGP_premax_rda_outliers_axis1,
+          'func_TGP_premax_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
 # 
-func_orig_rda_out = as.data.frame(func_orig_rda_out_axis1)
-func_all_loc = as.data.frame(func_all_loc)
-func_orig_pheno_fish_final = as.data.frame(func_orig_pheno_fish_final)
+func_TGP_premax_rda_out = as.data.frame(func_TGP_premax_rda_outliers_axis1)
+func_TGP_premax_all_loc = as.data.frame(func_TGP_premax_all_loc)
+func_pheno_fish_final = as.data.frame(func_clean_pheno_fish_final)
 # 
-func_orig_phenotypes = func_clean_pheno_fish_final %>%
+func_TGP_phenotypes = func_clean_pheno_fish_final %>%
   as_tibble() %>%
   mutate(eco_num = as.numeric(case_when(
     ecotype == 'c' ~ '1',
@@ -953,49 +953,330 @@ func_orig_phenotypes = func_clean_pheno_fish_final %>%
 # #                 2, 
 # #                 function(x)cor(x, out_loc))
 # 
-foo = matrix(nrow=(7),
+foo = matrix(nrow=(1),
              ncol = 4)
 # colnames(foo) = c('func_orig',
 #                   'eco_num', 
 #                   'interaction')
-colnames(foo) = c('orig_premax_kt',
+colnames(foo) = c('TGP_premax_kt',
                   'eco_num', 
                   'Interaction', 
                   'csize')
 
-func_orig_premaxkt = func_orig_phenotypes %>% 
+func_TGP_premaxkt = func_TGP_phenotypes %>% 
   dplyr::select(PreMax_KT, 
                 eco_num, 
                 csize_real) %>%
   mutate(interaction = PreMax_KT*eco_num)
 
-for (i in 1:length(func_orig_rda_out$loc)){
-  nam = func_orig_rda_out[i,2]
+for (i in 1:length(func_TGP_premax_rda_out$loc)){
+  nam = func_TGP_premax_rda_out[i,2]
   loc.gen = func_clean_mvalues_only[,nam]
-  foo[i,] = apply(func_orig_premaxkt,2,function(x)cor(x,loc.gen))
+  foo[i,] = apply(func_TGP_premaxkt,2,function(x)cor(x,loc.gen))
 }
 
-func_orig_premax_candidates = cbind.data.frame(func_orig_rda_out,
+func_TGP_premax_candidates = cbind.data.frame(func_TGP_premax_rda_out,
                                                foo)
 
-func_orig_candidates %>%
+func_TGP_premax_candidates %>%
   as_tibble() %>%
-  write_csv('func_orig_premax_RDA_outliers_methylation_correlations.csv')
+  write_csv('func_TGP_premax_RDA_outliers_methylation_correlations.csv')
 # 
 ##check for duplicates
-length(func_orig_premax_candidates$loc[duplicated(func_orig_premax_candidates$loc)])
+length(func_TGP_premax_candidates$loc[duplicated(func_TGP_premax_candidates$loc)])
 # 
-for(i in 1:length(func_orig_premax_candidates$loc)){
-  bar = func_orig_premax_candidates[i,]
-  func_orig_premax_candidates[i,8] = names(which.max(abs(bar[4:7])))
-  func_orig_premax_candidates[i,9] = max(abs(bar[4:7]))
+for(i in 1:length(func_TGP_premax_candidates$loc)){
+  bar = func_TGP_premax_candidates[i,]
+  func_TGP_premax_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  func_TGP_premax_candidates[i,9] = max(abs(bar[4:7]))
 }
 # 
-func_orig_premax_candidates %>% 
+func_TGP_premax_candidates %>% 
   as_tibble() %>%
   rename(Association = V8, 
          Correlation = V9) %>%
-  write_csv("func_orig_premax_RDA_CAND_corr.csv") %>% 
+  write_csv("func_TGP_premax_RDA_CAND_corr.csv") %>% 
+  group_by(Association) %>% 
+  summarize(n = n())
+
+
+
+# TGP opercular KT --------------------------------------------------------
+
+func_TGP_operc_RDA_full = rda(func_clean_mvalues_only ~ Opercular_KT_F1 + ecotype + Opercular_KT_F1*ecotype + csize_real, 
+                               data = func_clean_pheno_fish_final, 
+                               scale = T)
+RsquareAdj(func_TGP_operc_RDA_full)
+summary(eigenvals(func_TGP_operc_RDA_full, 
+                  model = 'constrained'))
+screeplot(func_TGP_operc_RDA_full)
+func_TGP_opercu_signif_full = anova.cca(func_TGP_operc_RDA_full, 
+                                        parallel = getOption('mc.cores'))
+
+
+vif.cca(func_TGP_operc_RDA_full)
+
+func_TGP_operc_sum = summary(func_TGP_operc_RDA_full)
+
+func_TGP_operc_sum$species %>%
+  as_tibble() %>%
+  write_csv('func_TGP_operc_RDA_Uncorrected_PCA_locations.csv')
+
+func_TGP_operc_sum$sites %>%
+  as_tibble() %>%
+  write_csv('func_TGP_operc_RDA_Uncorrected_PCA_individuals.csv')
+
+func_TGP_operc_sum$biplot %>%
+  as_tibble() %>%
+  write_csv('func_TGP_operc_RDA_Uncorrected_PCA_biplot.csv')
+
+
+func_TGP_operc_rda_scores = scores(func_TGP_operc_RDA_full,
+                                    choices = c(1:5),
+                                    display = 'species')
+# 
+hist(func_TGP_operc_rda_scores[,1])
+# hist(func_rda_scores[,2])
+# hist(func_rda_scores[,3])
+# hist(func_rda_scores[,4])
+# hist(func_rda_scores[,5])
+# 
+func_TGP_operc_rda_outliers_axis1 = outliers(func_TGP_operc_rda_scores[,1], 3)
+# 
+# 
+func_TGP_operc_rda_outliers_axis1 = cbind.data.frame(rep(1,
+                                                          times = length(func_TGP_operc_rda_outliers_axis1)),
+                                                      names(func_TGP_operc_rda_outliers_axis1),
+                                                      unname(func_TGP_operc_rda_outliers_axis1))
+# 
+func_TGP_operc_rda_outliers_axis1 = func_TGP_operc_rda_outliers_axis1 %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+# 
+func_TGP_operc_all_loc = func_TGP_operc_rda_scores[,1]
+# 
+func_TGP_operc_all_loc = cbind.data.frame(rep(2,
+                                               times = length(func_TGP_operc_all_loc)),
+                                           names(func_TGP_operc_all_loc),
+                                           unname(func_TGP_operc_all_loc))
+func_TGP_operc_all_loc = func_TGP_operc_all_loc %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+func_TGP_operc_all_loc = func_TGP_operc_all_loc[!func_TGP_operc_all_loc$loc %in% func_TGP_operc_rda_outliers_axis1$loc,]
+# 
+write_csv(func_TGP_operc_all_loc,
+          'func_TGP_operc_RDA_PCaxes_nonoutliers_methylation.csv')
+
+write_csv(func_TGP_operc_rda_outliers_axis1,
+          'func_TGP_operc_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+# 
+func_TGP_operc_rda_out = as.data.frame(func_TGP_operc_rda_outliers_axis1)
+func_TGP_operc_all_loc = as.data.frame(func_TGP_operc_all_loc)
+func_pheno_fish_final = as.data.frame(func_clean_pheno_fish_final)
+# 
+func_TGP_phenotypes = func_clean_pheno_fish_final %>%
+  as_tibble() %>%
+  mutate(eco_num = as.numeric(case_when(
+    ecotype == 'c' ~ '1',
+    ecotype == 'w' ~ '2'))) %>%
+  # dplyr::select(-Population) %>%
+  as.data.frame()
+
+# # nam = rda_out[1:45, 2]
+# # out_loc = all_loc[nam,]
+# # out_cor = apply(test_pheno,
+# #                 2, 
+# #                 function(x)cor(x, out_loc))
+# 
+foo = matrix(nrow=(11),
+             ncol = 4)
+# colnames(foo) = c('func_orig',
+#                   'eco_num', 
+#                   'interaction')
+colnames(foo) = c('TGP_operc_kt',
+                  'eco_num', 
+                  'Interaction', 
+                  'csize')
+
+func_TGP_operckt = func_TGP_phenotypes %>% 
+  dplyr::select(Opercular_KT_F1, 
+                eco_num, 
+                csize_real) %>%
+  mutate(interaction = Opercular_KT_F1*eco_num)
+
+for (i in 1:length(func_TGP_operc_rda_out$loc)){
+  nam = func_TGP_operc_rda_out[i,2]
+  loc.gen = func_clean_mvalues_only[,nam]
+  foo[i,] = apply(func_TGP_operckt,2,function(x)cor(x,loc.gen))
+}
+
+func_TGP_operc_candidates = cbind.data.frame(func_TGP_operc_rda_out,
+                                              foo)
+
+func_TGP_operc_candidates %>%
+  as_tibble() %>%
+  write_csv('func_TGP_operc_RDA_outliers_methylation_correlations.csv')
+# 
+##check for duplicates
+length(func_TGP_operc_candidates$loc[duplicated(func_TGP_operc_candidates$loc)])
+# 
+for(i in 1:length(func_TGP_operc_candidates$loc)){
+  bar = func_TGP_operc_candidates[i,]
+  func_TGP_operc_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  func_TGP_operc_candidates[i,9] = max(abs(bar[4:7]))
+}
+# 
+func_TGP_operc_candidates %>% 
+  as_tibble() %>%
+  rename(Association = V8, 
+         Correlation = V9) %>%
+  write_csv("func_TGP_operc_RDA_CAND_corr.csv") %>% 
+  group_by(Association) %>% 
+  summarize(n = n())
+
+
+# WGP premax kt -----------------------------------------------------------
+
+func_WGP_operc_RDA_full = rda(func_clean_mvalues_only ~ PreMax_KT_F2 + ecotype + PreMax_KT_F2*ecotype + csize_real, 
+                              data = func_clean_pheno_fish_final, 
+                              scale = T)
+RsquareAdj(func_WGP_premax_RDA_full)
+summary(eigenvals(func_WGP_premax_RDA_full, 
+                  model = 'constrained'))
+screeplot(func_WGP_premax_RDA_full)
+func_WGP_premax_signif_full = anova.cca(func_WGP_premax_RDA_full, 
+                                        parallel = getOption('mc.cores'))
+
+
+vif.cca(func_WGP_premax_RDA_full)
+
+func_WGP_premax_sum = summary(func_WGP_premax_signif_full)
+
+func_WGP_premax_sum$species %>%
+  as_tibble() %>%
+  write_csv('func_WGP_premax_RDA_Uncorrected_PCA_locations.csv')
+
+func_WGP_premax_sum$sites %>%
+  as_tibble() %>%
+  write_csv('func_WGP_premax_RDA_Uncorrected_PCA_individuals.csv')
+
+func_WGP_premax_sum$biplot %>%
+  as_tibble() %>%
+  write_csv('func_WGP_premax_RDA_Uncorrected_PCA_biplot.csv')
+
+
+func_WGP_premax_rda_scores = scores(func_WGP_premax_RDA_full,
+                                    choices = c(1:5),
+                                    display = 'species')
+# 
+hist(func_WGP_premax_rda_scores[,1])
+# hist(func_rda_scores[,2])
+# hist(func_rda_scores[,3])
+# hist(func_rda_scores[,4])
+# hist(func_rda_scores[,5])
+# 
+func_WGP_premax_rda_outliers_axis1 = outliers(func_WGP_premax_rda_scores[,1], 3)
+# 
+# 
+func_WGP_premax_rda_outliers_axis1 = cbind.data.frame(rep(1,
+                                                          times = length(func_WGP_premax_rda_outliers_axis1)),
+                                                      names(func_WGP_premax_rda_outliers_axis1),
+                                                      unname(func_WGP_premax_rda_outliers_axis1))
+# 
+func_WGP_premax_rda_outliers_axis1 = func_WGP_premax_rda_outliers_axis1 %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+# 
+func_WGP_premax_all_loc = func_WGP_premax_rda_scores[,1]
+# 
+func_WGP_premax_all_loc = cbind.data.frame(rep(2,
+                                               times = length(func_WGP_premax_all_loc)),
+                                           names(func_WGP_premax_all_loc),
+                                           unname(func_WGP_premax_all_loc))
+func_WGP_premax_all_loc = func_WGP_premax_all_loc %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+func_WGP_premax_all_loc = func_WGP_premax_all_loc[!func_WGP_premax_all_loc$loc %in% func_WGP_premax_rda_outliers_axis1$loc,]
+# 
+write_csv(func_WGP_premax_all_loc,
+          'func_WGP_premax_RDA_PCaxes_nonoutliers_methylation.csv')
+
+write_csv(func_WGP_premax_rda_outliers_axis1,
+          'func_WGP_premax_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+# 
+func_WGP_premax_rda_out = as.data.frame(func_WGP_premax_rda_outliers_axis1)
+func_WGP_premax_all_loc = as.data.frame(func_WGP_premax_all_loc)
+func_pheno_fish_final = as.data.frame(func_clean_pheno_fish_final)
+# 
+func_WGP_phenotypes = func_clean_pheno_fish_final %>%
+  as_tibble() %>%
+  mutate(eco_num = as.numeric(case_when(
+    ecotype == 'c' ~ '1',
+    ecotype == 'w' ~ '2'))) %>%
+  # dplyr::select(-Population) %>%
+  as.data.frame()
+
+# # nam = rda_out[1:45, 2]
+# # out_loc = all_loc[nam,]
+# # out_cor = apply(test_pheno,
+# #                 2, 
+# #                 function(x)cor(x, out_loc))
+# 
+foo = matrix(nrow=(1),
+             ncol = 4)
+# colnames(foo) = c('func_orig',
+#                   'eco_num', 
+#                   'interaction')
+colnames(foo) = c('WGP_premax_kt',
+                  'eco_num', 
+                  'Interaction', 
+                  'csize')
+
+func_WGP_premaxkt = func_WGP_phenotypes %>% 
+  dplyr::select(PreMax_KT, 
+                eco_num, 
+                csize_real) %>%
+  mutate(interaction = PreMax_KT*eco_num)
+
+for (i in 1:length(func_WGP_premax_rda_out$loc)){
+  nam = func_WGP_premax_rda_out[i,2]
+  loc.gen = func_clean_mvalues_only[,nam]
+  foo[i,] = apply(func_WGP_premaxkt,2,function(x)cor(x,loc.gen))
+}
+
+func_WGP_premax_candidates = cbind.data.frame(func_WGP_premax_rda_out,
+                                              foo)
+
+func_WGP_premax_candidates %>%
+  as_tibble() %>%
+  write_csv('func_WGP_premax_RDA_outliers_methylation_correlations.csv')
+# 
+##check for duplicates
+length(func_WGP_premax_candidates$loc[duplicated(func_WGP_premax_candidates$loc)])
+# 
+for(i in 1:length(func_WGP_premax_candidates$loc)){
+  bar = func_WGP_premax_candidates[i,]
+  func_WGP_premax_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  func_WGP_premax_candidates[i,9] = max(abs(bar[4:7]))
+}
+# 
+func_WGP_premax_candidates %>% 
+  as_tibble() %>%
+  rename(Association = V8, 
+         Correlation = V9) %>%
+  write_csv("func_WGP_premax_RDA_CAND_corr.csv") %>% 
   group_by(Association) %>% 
   summarize(n = n())
 
