@@ -1283,7 +1283,7 @@ func_WGP_premax_candidates %>%
 
 # WGP opercular KT --------------------------------------------------------
 
-func_WGP_operc_RDA_full = rda(func_clean_mvalues_only ~ Opercular_KT_F2 + ecotype + Opercular_F2*ecotype + csize_real, 
+func_WGP_operc_RDA_full = rda(func_clean_mvalues_only ~ Opercular_KT_F2 + ecotype + Opercular_KT_F2*ecotype + csize_real, 
                                data = func_clean_pheno_fish_final, 
                                scale = T)
 RsquareAdj(func_WGP_operc_RDA_full)
