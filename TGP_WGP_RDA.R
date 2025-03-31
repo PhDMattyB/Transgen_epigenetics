@@ -1980,3 +1980,151 @@ orig_body_clean_mvalues_only = orig_body_clean_mvalues_final %>%
   # select(-1) %>% 
   select(-Location_data, 
          -Fish_ID)
+
+BODY_ORIG_RDA_full = rda(orig_body_clean_mvalues_only ~ Comp1*ecotype + Comp2*ecotype + Comp3*ecotype + ecotype + csize_real, 
+                        data = orig_body_clean_pheno_fish_final, 
+                        scale = T)
+
+# ORIG_clean_eco_RDA2 = rda(ORIG_clean_mvalues_only ~ ORIGclean + F1text,
+#                          data = ORIG_clean_pheno_fish_final,
+#                          scale = T)
+
+RsquareAdj(BODY_ORIG_RDA_full)
+summary(eigenvals(BODY_ORIG_RDA_full, 
+                  model = 'constrained'))
+
+screeplot(BODY_ORIG_RDA_full)
+
+## Run after all other coding is finished
+## This will take a while 
+BODY_ORIG_signif_full = anova.cca(BODY_ORIG_RDA_full, 
+                                 parallel = getOption('mc.cores'))
+
+# ORIG_eco_signif_full2 = anova.cca(ORIG_clean_eco_RDA2,
+#                                  parallel = getOption('mc.cores'))
+
+vif.cca(BODY_ORIG_RDA_full)
+
+BODY_ORIG_clean_sum = summary(BODY_ORIG_RDA_full)
+
+BODY_ORIG_clean_sum$species %>%
+  as_tibble() %>%
+  write_csv('BODY_ORIG_clean_RDA_Uncorrected_PCA_locations.csv')
+
+BODY_ORIG_clean_sum$sites %>%
+  as_tibble() %>%
+  write_csv('BODY_ORIG_clean_RDA_Uncorrected_PCA_individuals.csv')
+
+BODY_ORIG_clean_sum$biplot %>%
+  as_tibble() %>%
+  write_csv('BODY_ORIG_clean_RDA_Uncorrected_PCA_biplot.csv')
+
+
+BODY_ORIG_clean_rda_scores = scores(BODY_ORIG_RDA_full,
+                                   choices = c(1:5),
+                                   display = 'species')
+# 
+hist(BODY_ORIG_clean_rda_scores[,1])
+# hist(BODY_ORIG_rda_scores[,2])
+# hist(BODY_ORIG_rda_scores[,3])
+# hist(BODY_ORIG_rda_scores[,4])
+# hist(BODY_ORIG_rda_scores[,5])
+# 
+BODY_ORIG_clean_rda_outliers_axis1 = outliers(BODY_ORIG_clean_rda_scores[,1], 3)
+# 
+# 
+BODY_ORIG_clean_rda_out_axis1 = cbind.data.frame(rep(1,
+                                                    times = length(BODY_ORIG_clean_rda_outliers_axis1)),
+                                                names(BODY_ORIG_clean_rda_outliers_axis1),
+                                                unname(BODY_ORIG_clean_rda_outliers_axis1))
+# 
+BODY_ORIG_clean_rda_out_axis1 = BODY_ORIG_clean_rda_out_axis1 %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+# 
+BODY_ORIG_all_loc = BODY_ORIG_clean_rda_scores[,1]
+# 
+BODY_ORIG_rda_normal = cbind.data.frame(rep(2,
+                                           times = length(BODY_ORIG_all_loc)),
+                                       names(BODY_ORIG_all_loc),
+                                       unname(BODY_ORIG_all_loc))
+BODY_ORIG_rda_normal = BODY_ORIG_rda_normal %>%
+  as_tibble() %>%
+  dplyr::rename(axis = 1,
+                loc = 2,
+                scores = 3)
+# 
+BODY_ORIG_rda_normal = BODY_ORIG_rda_normal[!BODY_ORIG_rda_normal$loc %in% BODY_ORIG_clean_rda_out_axis1$loc,]
+# 
+write_csv(BODY_ORIG_rda_normal,
+          'BODY_ORIG_clean_RDA_PCaxes_nonoutliers_methylation.csv')
+
+write_csv(BODY_ORIG_clean_rda_out_axis1,
+          'BODY_ORIG_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')
+# 
+BODY_ORIG_clean_rda_out = as.data.frame(BODY_ORIG_clean_rda_out_axis1)
+BODY_ORIG_all_loc = as.data.frame(BODY_ORIG_all_loc)
+BODY_ORIG_clean_pheno_fish_final = as.data.frame(BODY_clean_pheno_fish_final)
+# BODY_clean_pheno_fish_final
+BODY_ORIG_clean_phenotypes = BODY_ORIG_clean_pheno_fish_final %>%
+  as_tibble() %>%
+  mutate(eco_num = as.numeric(case_when(
+    ecotype == 'c' ~ '1',
+    ecotype == 'w' ~ '2'))) %>%
+  # dplyr::select(-Population) %>%
+  as.data.frame()
+
+# # nam = rda_out[1:45, 2]
+# # out_loc = all_loc[nam,]
+# # out_cor = apply(test_pheno,
+# #                 2, 
+# #                 function(x)cor(x, out_loc))
+# 
+foo = matrix(nrow=(3121),
+             ncol = 4)
+# colnames(foo) = c('BODY_ORIG_clean',
+#                   'eco_num', 
+#                   'interaction')
+colnames(foo) = c('BODY_ORIG_clean',
+                  'eco_num', 
+                  'Interaction', 
+                  'csize')
+
+BODY_ORIG_clean_phenotypes = BODY_ORIG_clean_phenotypes %>% 
+  dplyr::select(ORIGclean, 
+                eco_num, 
+                csize_real) %>%
+  mutate(interaction = ORIGclean*eco_num)
+
+for (i in 1:length(BODY_ORIG_clean_rda_out$loc)){
+  nam = BODY_ORIG_clean_rda_out[i,2]
+  loc.gen = BODY_clean_mvalues_only[,nam]
+  foo[i,] = apply(BODY_ORIG_clean_phenotypes,2,function(x)cor(x,loc.gen))
+}
+
+BODY_ORIG_clean_candidates = cbind.data.frame(BODY_ORIG_clean_rda_out,
+                                             foo)
+
+BODY_ORIG_clean_candidates %>%
+  as_tibble() %>%
+  write_csv('BODY_ORIG_clean_RDA_outliers_methylation_correlations.csv')
+# 
+##check for duplicates
+length(BODY_ORIG_clean_candidates$loc[duplicated(BODY_ORIG_clean_candidates$loc)])
+# 
+for(i in 1:length(BODY_ORIG_clean_candidates$loc)){
+  bar = BODY_ORIG_clean_candidates[i,]
+  BODY_ORIG_clean_candidates[i,8] = names(which.max(abs(bar[4:7])))
+  BODY_ORIG_clean_candidates[i,9] = max(abs(bar[4:7]))
+}
+# 
+BODY_ORIG_clean_candidates %>% 
+  as_tibble() %>%
+  rename(Association = V8, 
+         Correlation = V9) %>%
+  write_csv("BODY_ORIG_clean_RDA_CAND_corr.csv") %>% 
+  group_by(Association) %>% 
+  summarize(n = n())
