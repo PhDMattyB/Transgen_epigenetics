@@ -1728,7 +1728,7 @@ BODY_WGP_signif_full = anova.cca(BODY_WGP_RDA_full,
 
 vif.cca(BODY_WGP_RDA_full)
 
-BODY_WGP_clean_sum = summary(BODY_BODY_WGP_RDA_full)
+BODY_WGP_clean_sum = summary(BODY_WGP_RDA_full)
 
 BODY_WGP_clean_sum$species %>%
   as_tibble() %>%
@@ -1806,7 +1806,7 @@ BODY_WGP_clean_phenotypes = BODY_WGP_clean_pheno_fish_final %>%
 # #                 2, 
 # #                 function(x)cor(x, out_loc))
 # 
-foo = matrix(nrow=(2184),
+foo = matrix(nrow=(3121),
              ncol = 4)
 # colnames(foo) = c('BODY_WGP_clean',
 #                   'eco_num', 
