@@ -1853,3 +1853,130 @@ BODY_WGP_clean_candidates %>%
   summarize(n = n())
 
 
+# body shape unaltered ----------------------------------------------------
+
+body_meta = read_csv('FLANK_body_depth_data.csv')
+
+orig_body_data = read_csv('Common_GPA_Unfilered_PCA_data.csv')
+
+
+orig_body_pheno_fish = orig_body_data %>% 
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>% 
+  select(fish)
+
+orig_body_pheno_fish_ID = orig_body_pheno_fish %>% 
+  separate_wider_regex(fish, 
+                       c(var1 = ".*?", 
+                         "_", 
+                         var2 = ".*")) %>% 
+  separate_wider_regex(var2, 
+                       c(f1_temp = ".*?", 
+                         "@", 
+                         f2_temp = ".*")) %>% 
+  separate(f2_temp, 
+           into = c('f2_temp', 
+                    'trash'), 
+           sep = '[.]') %>% 
+  select(var1, 
+         f1_temp, 
+         f2_temp) 
+
+orig_body_pheno_fish_ID$var1 = gsub("'", '', orig_body_pheno_fish_ID$var1)
+
+orig_body_pheno_fish_ID = orig_body_pheno_fish_ID %>% 
+  unite(col = 'Fish_ID', 
+        sep = '')%>% 
+  mutate(Fish_ID = gsub("Myvat", 
+                        "MYV", 
+                        Fish_ID)) 
+
+
+orig_body_pheno_fish = orig_body_data %>%
+  filter(str_detect(fish,
+                    '_#G')) %>% 
+  distinct(fish, 
+           .keep_all = T) %>%  
+  # dplyr::select(Full_ID) %>%
+  bind_cols(.,
+            orig_body_pheno_fish_ID)
+
+
+
+mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
+
+meth_fish = mvalues %>%
+  select(1)
+# 
+# meth_fish = mvalues %>% 
+#   select(1)
+# 
+meth_fish_ID = meth_fish %>% 
+  # separate(Location_data, 
+  #         into = c('garbage', 
+  #            'ID'), 
+  #          sep = '-') %>% 
+  separate_wider_regex(Location_data, 
+                       c(var1 = ".*?", 
+                         "-", 
+                         var2 = ".*")) %>% 
+  select(var2) %>% 
+  separate(var2, 
+           into = c('ID', 
+                    'ID2'), 
+           sep = '-') %>% 
+  mutate(new_vals = paste0('#G', 
+                           str_pad(ID2, 
+                                   0, 
+                                   side = 'left'))) %>% 
+  select(ID, 
+         new_vals) %>% 
+  unite(col = Fish_ID, 
+        sep = '_')
+
+
+
+
+## identifying potential issues with phenotypic data
+## 5 individuals that were sequenced did not have the #G identifier
+## Four from GTS18@12 and one from MYVC12@12
+anti_join(meth_fish_ID,
+          orig_body_pheno_fish_ID)
+
+
+orig_body_clean_pheno_fish_final = inner_join(meth_fish_ID, 
+                                         orig_body_pheno_fish) %>% 
+  arrange(Fish_ID)
+
+## now we need to order the phenotypic data and methylation data
+## they have to be in the same order otherwise this will all
+## be fucked. Right now they aren't. 
+## order the data by the Fish_ID column
+
+## Add the new id column to the methylation data
+
+orig_body_clean_mvalues_final = bind_cols(meth_fish_ID, 
+                                     mvalues) %>% 
+  arrange(Fish_ID)  %>% 
+  filter(Fish_ID != 'GTS1812_EU1_#G1', 
+         Fish_ID != 'GTS1812_EU1_#G2',
+         Fish_ID != 'GTS1812_EU1_#G3',
+         Fish_ID != 'GTS1812_EU1_#G4', 
+         Fish_ID != 'MYVC1212_EU4_#G1')
+
+orig_body_clean_mvalues_final$Fish_ID == orig_body_clean_pheno_fish_final$Fish_ID
+
+
+## need to check that everythings in order for the analyses
+## If there are any FALSE we're fucked. 
+## Shooting for all TRUES
+
+# setdiff(TGP_clean_mvalues_final$Fish_ID, 
+#         TGP_clean_pheno_fish_final$Fish_ID)
+## TGP RDA 
+orig_body_clean_mvalues_only = orig_body_clean_mvalues_final %>% 
+  # select(-1) %>% 
+  select(-Location_data, 
+         -Fish_ID)
