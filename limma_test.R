@@ -150,5 +150,15 @@ methy_fish_ID = read_csv("Methylation_meta_data_issue.csv") %>%
   arrange(Fish_ID)
 
 mvals_cleaned = mvals_cleaned %>% 
-  arrange(Fish_ID)
+  arrange(Fish_ID) %>% 
+  select(-Fish_ID)
+
+
+methy_fish_ID$F1 = factor(methy_fish_ID$F1)
+methy_fish_ID$F2 = factor(methy_fish_ID$F2)
+methy_fish_ID$ecotype = factor(methy_fish_ID$ecotype)
+methy_fish_ID$poppair = factor(methy_fish_ID$poppair)
+
+desgin = model.matrix()
+
 
