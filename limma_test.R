@@ -9,77 +9,86 @@ setwd('~/Methylation_data/')
 setwd('C:/Users/mkb6d/Documents/')
 
 # mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
-
-meta_data = read_csv('formattedDataEU.csv') %>% 
-  select(fish, 
-         ID, 
-         Full_ID, 
-         F1, 
-         F2, 
-         poppair, 
-         ecotype...13, 
-         csize_real) %>% 
-  rename(ecotype = ecotype...13) 
+# 
+meta_data = read_csv('formattedDataEU.csv') %>%
+  select(fish,
+         ID,
+         Full_ID,
+         F1,
+         F2,
+         poppair,
+         ecotype...13,
+         csize_real) %>%
+  rename(ecotype = ecotype...13)
 
 mval_small = read_csv('mvalues_chrI.csv')
 
 
-meta_fish_ID = meta_data %>% 
-  separate_wider_regex(fish, 
-                       c(var1 = ".*?", 
-                         "_", 
-                         var2 = ".*")) %>% 
-  separate_wider_regex(var2, 
-                       c(f1_temp = ".*?", 
-                         "@", 
-                         f2_temp = ".*")) %>% 
-   separate(f2_temp, 
-           into = c('f2_temp', 
-                    'trash'), 
-           sep = '[.]') %>% 
-  select(var1, 
-         f1_temp, 
-         f2_temp) 
+meta_fish_ID = meta_data %>%
+  separate_wider_regex(fish,
+                       c(var1 = ".*?",
+                         "_",
+                         var2 = ".*")) %>%
+  separate_wider_regex(var2,
+                       c(f1_temp = ".*?",
+                         "@",
+                         f2_temp = ".*")) %>%
+   separate(f2_temp,
+           into = c('f2_temp',
+                    'trash'),
+           sep = '[.]') %>%
+  select(var1,
+         f1_temp,
+         f2_temp)
 
 meta_fish_ID$var1 = gsub("'", '', meta_fish_ID$var1)
 
-meta_fish_ID = meta_fish_ID %>% 
-  unite(col = 'Fish_ID', 
-        sep = '')%>% 
-  mutate(Fish_ID = gsub("Myvat", 
-                        "MYV", 
-                        Fish_ID)) %>% 
-  separate(Fish_ID, 
-           into = c('ID', 
-                    'ID2', 
-                    'ID3'), 
-           sep = '_', 
-           remove = F) %>%
-  separate(ID3, 
-           into = c('symbol', 
-                    'ID4', 
-                    'num'), 
-           sep = '', 
-           remove = F) %>% 
-  select(-symbol) %>% 
-  mutate(new_vals = paste0('#G', 
-                           str_pad(num, 
-                                   0, 
-                                   side = 'left'))) %>% 
-  select(-ID3, 
-         -ID4, 
-         -num) %>% 
-  unite(Fish_ID2, 
-        c('ID', 
-          'ID2', 
-          'new_vals'), 
-        sep = '_') %>% 
-  select(Fish_ID2) %>% 
-  rename(Fish_ID = Fish_ID2)
+meta_fish_ID = meta_fish_ID %>%
+  unite(col = 'Fish_ID',
+        sep = '')%>%
+  mutate(Fish_ID = gsub("Myvat",
+                        "MYV",
+                        Fish_ID)) 
 
-meta_data_cleaned = bind_cols(meta_fish_ID, 
-                              meta_data)
 
+  
+  # separate(Fish_ID,
+  #          into = c('ID',
+  #                   'ID2',
+  #                   'ID3'),
+  #          sep = '_',
+  #          remove = F) %>%
+  # separate(ID3,
+  #          into = c('symbol',
+  #                   'ID4',
+  #                   'num'),
+  #          sep = '',
+  #          remove = F) %>%
+  # select(-symbol) %>%
+  # mutate(new_vals = paste0('#G',
+  #                          str_pad(num,
+  #                                  0,
+  #                                  side = 'left'))) %>%
+  # select(-ID3,
+  #        -ID4,
+  #        -num) %>%
+  # unite(Fish_ID2,
+  #       c('ID',
+  #         'ID2',
+  #         'new_vals'),
+  #       sep = '_') %>%
+  # select(Fish_ID2) %>%
+  # rename(Fish_ID = Fish_ID2)
+
+meta_data_cleaned = bind_cols(meta_fish_ID,
+                              meta_data) %>%
+  arrange(Fish_ID)%>%
+  filter(grepl('#G', Fish_ID))
+
+
+# 
+# meta_data_cleaned = read_csv('Cleaned_meta_data.csv') %>% 
+#   arrange(Fish_ID)
 
 mval_small_ID = mval_small %>% 
   select(Location_data)
@@ -105,7 +114,8 @@ methy_fish_ID = mval_small_ID %>%
   select(ID, 
          new_vals) %>% 
   unite(col = Fish_ID, 
-        sep = '_')
+        sep = '_') %>% 
+  arrange(Fish_ID) 
 
 mvals_cleaned = bind_cols(methy_fish_ID, 
                           mval_small) %>% 
@@ -113,32 +123,32 @@ mvals_cleaned = bind_cols(methy_fish_ID,
   arrange(Fish_ID)
 
 
-methy_meta_data = inner_join(meta_data_cleaned, 
-           methy_fish_ID, 
-           by = 'Fish_ID', 
-           relationship = 'many-to-many') %>% 
+meta_data_cleaned = meta_data_cleaned %>% 
+  separate(Fish_ID, 
+           into = c('G', 
+                    'num'), 
+           sep = '#') %>% 
+  filter(num %in% c('G1', 
+                    'G2', 
+                    'G3', 
+                    'G4', 
+                    'G5')) %>% 
+  unite(Fish_ID, 
+        c('G', 
+          'num'), 
+        sep = '#') %>% 
   arrange(Fish_ID)
 
-mvals_cleaned$Fish_ID == methy_meta_data$Fish_ID
+methy_fish_ID = inner_join(meta_data_cleaned, 
+           methy_fish_ID, 
+           by = 'Fish_ID')
 
+## organized data. 
 
-mvals_cleaned$Fish_ID %>% 
-  as_tibble()
+## Finally cleaned
+methy_fish_ID = read_csv("Methylation_meta_data_issue.csv") %>% 
+  arrange(Fish_ID)
 
-bind_cols(mvals_cleaned$Fish_ID, 
-          methy_meta_data$Fish_ID) %>% 
-  View()
+mvals_cleaned = mvals_cleaned %>% 
+  arrange(Fish_ID)
 
-mvals_cleaned %>%
-  select(Fish_ID) %>% 
-  View()
-
-methy_meta_data %>% 
-  select(Fish_ID) %>% 
-  View()
-
-
-# Final_IDs = inner_join(meta_fish_ID,
-#            methy_fish_ID, 
-#            by = 'Fish_ID', 
-#            relationship = 'many-to-many') %>% 
