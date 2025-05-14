@@ -89,8 +89,8 @@ mval_small = read_csv('mvalues_chrI.csv')
 
 
 # 
-# meta_data_cleaned = read_csv('Cleaned_meta_data.csv') %>% 
-#   arrange(Fish_ID)
+meta_data_cleaned = read_csv('Cleaned_meta_data.csv') %>%
+  arrange(Fish_ID)
 
 mval_small_ID = mval_small %>% 
   select(Location_data)
@@ -166,19 +166,32 @@ print(design)
 set.seed(1738)
 
 trans_methy = mvals_cleaned %>%
-  select(-fish, 
-         -ID, 
-         -Full_ID, 
-         -F1, 
-         -F2, 
-         -poppair, 
-         -ecotype, 
-         -csize_real) %>% 
-  row.names(.)
-  rownames_to_column(var = 'Fish_ID') %>% 
-  t()
-  
-trans_methy %>% 
+  select(-Fish_ID) %>% 
+  # remove_rownames() %>% 
+  # select(-fish, 
+  #        -ID, 
+  #        -Full_ID, 
+  #        -F1, 
+  #        -F2, 
+  #        -poppair, 
+  #        -ecotype, 
+  #        -csize_real) %>% 
+  # row.names(.)
+  # rownames_to_column(var = 'Fish_ID') %>% 
+  t() %>% 
   as_tibble()
+  
+mvals_cleaned %>% 
+  select(1) %>% 
+  write_tsv('mvals_small_colnames.txt')
 
-fit = lmFit(mvals_cleaned, design)
+names(mval_small) %>% 
+  as_tibble() %>% 
+  slice(-1) %>% 
+  write_tsv('mvals_small_chr_rownames.txt')
+
+fit = lmFit(trans_methy, design)
+
+ebayes_fit = eBayes(fit)
+
+topTable(ebayes_fit)
