@@ -4,52 +4,54 @@
 
 library(tidyverse)
 library(limma)
+library(edgeR)
+
 setwd('~/Methylation_data/')
 
 setwd('C:/Users/mkb6d/Documents/')
 
 # mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
 # 
-meta_data = read_csv('formattedDataEU.csv') %>%
-  select(fish,
-         ID,
-         Full_ID,
-         F1,
-         F2,
-         poppair,
-         ecotype...13,
-         csize_real) %>%
-  rename(ecotype = ecotype...13)
-
+# meta_data = read_csv('formattedDataEU.csv') %>%
+#   select(fish,
+#          ID,
+#          Full_ID,
+#          F1,
+#          F2,
+#          poppair,
+#          ecotype...13,
+#          csize_real) %>%
+#   rename(ecotype = ecotype...13)
+# 
 mval_small = read_csv('mvalues_chrI.csv')
-
-
-meta_fish_ID = meta_data %>%
-  separate_wider_regex(fish,
-                       c(var1 = ".*?",
-                         "_",
-                         var2 = ".*")) %>%
-  separate_wider_regex(var2,
-                       c(f1_temp = ".*?",
-                         "@",
-                         f2_temp = ".*")) %>%
-   separate(f2_temp,
-           into = c('f2_temp',
-                    'trash'),
-           sep = '[.]') %>%
-  select(var1,
-         f1_temp,
-         f2_temp)
-
-meta_fish_ID$var1 = gsub("'", '', meta_fish_ID$var1)
-
-meta_fish_ID = meta_fish_ID %>%
-  unite(col = 'Fish_ID',
-        sep = '')%>%
-  mutate(Fish_ID = gsub("Myvat",
-                        "MYV",
-                        Fish_ID)) 
-
+# 
+# 
+# meta_fish_ID = meta_data %>%
+#   separate_wider_regex(fish,
+#                        c(var1 = ".*?",
+#                          "_",
+#                          var2 = ".*")) %>%
+#   separate_wider_regex(var2,
+#                        c(f1_temp = ".*?",
+#                          "@",
+#                          f2_temp = ".*")) %>%
+#    separate(f2_temp,
+#            into = c('f2_temp',
+#                     'trash'),
+#            sep = '[.]') %>%
+#   select(var1,
+#          f1_temp,
+#          f2_temp)
+# 
+# meta_fish_ID$var1 = gsub("'", '', meta_fish_ID$var1)
+# 
+# meta_fish_ID = meta_fish_ID %>%
+#   unite(col = 'Fish_ID',
+#         sep = '')%>%
+#   mutate(Fish_ID = gsub("Myvat",
+#                         "MYV",
+#                         Fish_ID)) 
+# 
 
   
   # separate(Fish_ID,
@@ -80,10 +82,10 @@ meta_fish_ID = meta_fish_ID %>%
   # select(Fish_ID2) %>%
   # rename(Fish_ID = Fish_ID2)
 
-meta_data_cleaned = bind_cols(meta_fish_ID,
-                              meta_data) %>%
-  arrange(Fish_ID)%>%
-  filter(grepl('#G', Fish_ID))
+# meta_data_cleaned = bind_cols(meta_fish_ID,
+#                               meta_data) %>%
+#   arrange(Fish_ID)%>%
+#   filter(grepl('#G', Fish_ID))
 
 
 # 
@@ -149,16 +151,34 @@ methy_fish_ID = inner_join(meta_data_cleaned,
 methy_fish_ID = read_csv("Methylation_meta_data_issue.csv") %>% 
   arrange(Fish_ID)
 
-mvals_cleaned = mvals_cleaned %>% 
-  arrange(Fish_ID) %>% 
-  select(-Fish_ID)
-
 
 methy_fish_ID$F1 = factor(methy_fish_ID$F1)
 methy_fish_ID$F2 = factor(methy_fish_ID$F2)
 methy_fish_ID$ecotype = factor(methy_fish_ID$ecotype)
 methy_fish_ID$poppair = factor(methy_fish_ID$poppair)
 
-desgin = model.matrix()
+design_formula = ~0+F1*F2*ecotype*poppair
 
+design = model.matrix(design_formula, data = methy_fish_ID)
 
+print(design)
+
+set.seed(1738)
+
+trans_methy = mvals_cleaned %>%
+  select(-fish, 
+         -ID, 
+         -Full_ID, 
+         -F1, 
+         -F2, 
+         -poppair, 
+         -ecotype, 
+         -csize_real) %>% 
+  row.names(.)
+  rownames_to_column(var = 'Fish_ID') %>% 
+  t()
+  
+trans_methy %>% 
+  as_tibble()
+
+fit = lmFit(mvals_cleaned, design)
