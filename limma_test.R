@@ -6,6 +6,8 @@ library(tidyverse)
 library(limma)
 setwd('~/Methylation_data/')
 
+setwd('C:/Users/mkb6d/Documents/')
+
 # mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
 
 meta_data = read_csv('formattedDataEU.csv') %>% 
@@ -118,6 +120,22 @@ methy_meta_data = inner_join(meta_data_cleaned,
   arrange(Fish_ID)
 
 mvals_cleaned$Fish_ID == methy_meta_data$Fish_ID
+
+
+mvals_cleaned$Fish_ID %>% 
+  as_tibble()
+
+bind_cols(mvals_cleaned$Fish_ID, 
+          methy_meta_data$Fish_ID) %>% 
+  View()
+
+mvals_cleaned %>%
+  select(Fish_ID) %>% 
+  View()
+
+methy_meta_data %>% 
+  select(Fish_ID) %>% 
+  View()
 
 
 # Final_IDs = inner_join(meta_fish_ID,
