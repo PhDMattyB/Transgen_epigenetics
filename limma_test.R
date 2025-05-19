@@ -161,7 +161,12 @@ design_formula = ~0+F1*F2*ecotype*poppair
 
 design = model.matrix(design_formula, data = methy_fish_ID)
 
-print(design)
+
+design_formula2 = ~0+F1*F2*ecotype
+
+design2 = model.matrix(design_formula2, data = methy_fish_ID)
+
+# print(design)
 
 set.seed(1738)
 
@@ -190,8 +195,22 @@ names(mval_small) %>%
   slice(-1) %>% 
   write_tsv('mvals_small_chr_rownames.txt')
 
-fit = lmFit(trans_methy, design)
+fit = lmFit(trans_methy, design2)
 
 ebayes_fit = eBayes(fit)
 
-topTable(ebayes_fit)
+topTable(ebayes_fit) %>%
+  rownames_to_column() %>% 
+  as_tibble() %>% View()
+  write_csv('Refined_model_Top_table_example_df_CHRI_methylation.csv')
+
+  
+ordinary.t = fit$coefficients/fit$stdev.unscaled/fit$sigma 
+
+
+head(ordinary.t)
+
+# ebayes_fit$p.value %>% 
+#   as.data.frame() %>% 
+#   as_tibble() %>% 
+#   arrange(`F118:F218:ecotypew`)
