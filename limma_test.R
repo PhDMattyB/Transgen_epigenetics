@@ -201,7 +201,7 @@ ebayes_fit = eBayes(fit)
 
 topTable(ebayes_fit) %>%
   rownames_to_column() %>% 
-  as_tibble() %>% View()
+  as_tibble() %>% 
   write_csv('Refined_model_Top_table_example_df_CHRI_methylation.csv')
 
   
@@ -214,3 +214,80 @@ head(ordinary.t)
 #   as.data.frame() %>% 
 #   as_tibble() %>% 
 #   arrange(`F118:F218:ecotypew`)
+
+
+
+
+# glmmseq -----------------------------------------------------------------
+
+library(glmmSeq)
+
+
+disp = apply(trans_methy, 1, function(x){
+  (var(x, na.rm = T)-mean(x, na.rm = T))/(mean(x, na.rm = T)**2)
+})
+
+meta_test = methy_fish_ID %>% 
+  as.data.frame() %>% 
+  select(Fish_ID, 
+         F1, 
+         F2, 
+         ecotype, 
+         poppair)
+
+test_mvals = trans_methy %>% 
+  as.data.frame() %>% 
+  mutate(across(.cols = c(V1:V595), 
+                .fns = ~if_else(. == ., 1, 0)))
+
+
+
+
+glmm = glmmSeq(~ F1 * F2 * ecotype + (1|poppair), 
+        countdata = trans_methy, 
+        metadata = meta_test,
+        method = 'glmmTMB', 
+        returnList = T)
+
+summary(glmm)
+
+glmm = lmmSeq(~ F1 * F2 * ecotype + (1|poppair), 
+               maindata = test_mvals, 
+               metadata = meta_test)
+
+
+
+DGEList(trans_methy)
+calcNormFactors(trans_methy)
+
+test_mvals = mvals_cleaned %>% 
+  dplyr::select(-Fish_ID) %>% 
+  as.data.frame()
+
+for(i in 1:ncol(test_mvals)){
+  gene = test_mvals[,i]
+  all_others = rowSums(test_mvals[,-i])
+  Y = cbind(gene, 
+            all_others)
+  
+  Model = glmer(Y ~ F1 * F2 * ecotype + (1|poppair), 
+                family = binomial(), 
+                control = glmerControl(
+                  optimizer = 'optimx', optCtrl = list(method = 'nlminb')), 
+                data = meta_test)
+}
+
+library(glmmTMB)
+
+for(i in 1:ncol(test_mvals)){
+  gene = test_mvals[,i]
+  # all_others = rowSums(test_mvals[,-i])
+  # Y = cbind(gene, 
+            # all_others)
+  
+  Model = glmmTMB(gene ~ F1 * F2 * ecotype + (1|poppair), 
+                # family = gaussian(), 
+                # control = glmerControl(
+                  # optimizer = 'optimx', optCtrl = list(method = 'nlminb')), 
+                data = meta_test)
+}
