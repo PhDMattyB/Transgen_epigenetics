@@ -299,7 +299,7 @@ for(i in 1:ncol(test_mvals)){
   
   
   model_results_table[i, 1] = colnames(test_mvals)[i]
-  model_results_table[i, 2] = sum(test_mavals[,i]/sum(test_mvals))
+  model_results_table[i, 2] = sum(test_mvals[,i]/sum(test_mvals))
   model_results_table[i, 3] = model_results$coefficients$cond[1,1]
   model_results_table[i, 4] = model_results$coefficients$cond[2,1]
   model_results_table[i, 5] = model_results$coefficients$cond[3,1]
