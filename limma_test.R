@@ -279,6 +279,10 @@ for(i in 1:ncol(test_mvals)){
 
 library(glmmTMB)
 
+model_results_table = as.data.frame(matrix(nrow = 191662, 
+                                          ncol = 34))
+
+
 for(i in 1:ncol(test_mvals)){
   gene = test_mvals[,i]
   # all_others = rowSums(test_mvals[,-i])
