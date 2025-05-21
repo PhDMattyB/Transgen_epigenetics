@@ -290,4 +290,44 @@ for(i in 1:ncol(test_mvals)){
                 # control = glmerControl(
                   # optimizer = 'optimx', optCtrl = list(method = 'nlminb')), 
                 data = meta_test)
+  
+  model_results = summary(Model)
+  
+  
+  model_results_table[i, 1] = colnames(test_mvals)[i]
+  model_results_table[i, 2] = sum(test_mavals[,i]/sum(test_mvals))
+  model_results_table[i, 3] = model_results$coefficients$cond[1,1]
+  model_results_table[i, 4] = model_results$coefficients$cond[2,1]
+  model_results_table[i, 5] = model_results$coefficients$cond[3,1]
+  model_results_table[i, 6] = model_results$coefficients$cond[4,1]
+  model_results_table[i, 7] = model_results$coefficients$cond[5,1]
+  model_results_table[i, 8] = model_results$coefficients$cond[6,1]
+  model_results_table[i, 9] = model_results$coefficients$cond[7,1]
+  model_results_table[i, 10] = model_results$coefficients$cond[8,1]
+  model_results_table[i, 11] = model_results$coefficients$cond[1,2]
+  model_results_table[i, 12] = model_results$coefficients$cond[2,2]
+  model_results_table[i, 13] = model_results$coefficients$cond[3,2]
+  model_results_table[i, 14] = model_results$coefficients$cond[4,2]
+  model_results_table[i, 15] = model_results$coefficients$cond[5,2]
+  model_results_table[i, 16] = model_results$coefficients$cond[6,2]
+  model_results_table[i, 17] = model_results$coefficients$cond[7,2]
+  model_results_table[i, 18] = model_results$coefficients$cond[8,2]
+  model_results_table[i, 19] = model_results$coefficients$cond[1,3]
+  model_results_table[i, 20] = model_results$coefficients$cond[2,3]
+  model_results_table[i, 21] = model_results$coefficients$cond[3,3]
+  model_results_table[i, 22] = model_results$coefficients$cond[4,3]
+  model_results_table[i, 23] = model_results$coefficients$cond[5,3]
+  model_results_table[i, 24] = model_results$coefficients$cond[6,3]
+  model_results_table[i, 25] = model_results$coefficients$cond[7,3]
+  model_results_table[i, 26] = model_results$coefficients$cond[8,3]
+  model_results_table[i, 27] = model_results$coefficients$cond[1,4]
+  model_results_table[i, 28] = model_results$coefficients$cond[2,4]
+  model_results_table[i, 29] = model_results$coefficients$cond[3,4]
+  model_results_table[i, 30] = model_results$coefficients$cond[4,4]
+  model_results_table[i, 31] = model_results$coefficients$cond[5,4]
+  model_results_table[i, 32] = model_results$coefficients$cond[6,4]
+  model_results_table[i, 33] = model_results$coefficients$cond[7,4]
+  model_results_table[i, 34] = model_results$coefficients$cond[8,4]
+  
+  
 }
