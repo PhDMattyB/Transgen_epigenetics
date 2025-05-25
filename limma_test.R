@@ -227,61 +227,73 @@ disp = apply(trans_methy, 1, function(x){
   (var(x, na.rm = T)-mean(x, na.rm = T))/(mean(x, na.rm = T)**2)
 })
 
-meta_test = methy_fish_ID %>% 
-  as.data.frame() %>% 
-  select(Fish_ID, 
-         F1, 
-         F2, 
-         ecotype, 
+meta_test = methy_fish_ID %>%
+  as.data.frame() %>%
+  select(Fish_ID,
+         F1,
+         F2,
+         ecotype,
          poppair)
-
-test_mvals = trans_methy %>% 
-  as.data.frame() %>% 
-  mutate(across(.cols = c(V1:V595), 
-                .fns = ~if_else(. == ., 1, 0)))
-
-
-
-
-glmm = glmmSeq(~ F1 * F2 * ecotype + (1|poppair), 
-        countdata = trans_methy, 
-        metadata = meta_test,
-        method = 'glmmTMB', 
-        returnList = T)
-
-summary(glmm)
-
-glmm = lmmSeq(~ F1 * F2 * ecotype + (1|poppair), 
-               maindata = test_mvals, 
-               metadata = meta_test)
-
-
-
-DGEList(trans_methy)
-calcNormFactors(trans_methy)
+# 
+# test_mvals = trans_methy %>% 
+#   as.data.frame() %>% 
+#   mutate(across(.cols = c(V1:V595), 
+#                 .fns = ~if_else(. == ., 1, 0)))
+# 
+# 
+# 
+# 
+# glmm = glmmSeq(~ F1 * F2 * ecotype + (1|poppair), 
+#         countdata = trans_methy, 
+#         metadata = meta_test,
+#         method = 'glmmTMB', 
+#         returnList = T)
+# 
+# summary(glmm)
+# 
+# glmm = lmmSeq(~ F1 * F2 * ecotype + (1|poppair), 
+#                maindata = test_mvals, 
+#                metadata = meta_test)
+# 
+# 
+# 
+# DGEList(trans_methy)
+# calcNormFactors(trans_methy)
 
 test_mvals = mvals_cleaned %>% 
   dplyr::select(-Fish_ID) %>% 
   as.data.frame()
 
-for(i in 1:ncol(test_mvals)){
-  gene = test_mvals[,i]
-  all_others = rowSums(test_mvals[,-i])
-  Y = cbind(gene, 
-            all_others)
-  
-  Model = glmer(Y ~ F1 * F2 * ecotype + (1|poppair), 
-                family = binomial(), 
-                control = glmerControl(
-                  optimizer = 'optimx', optCtrl = list(method = 'nlminb')), 
-                data = meta_test)
-}
+# for(i in 1:ncol(test_mvals)){
+#   gene = test_mvals[,i]
+#   all_others = rowSums(test_mvals[,-i])
+#   Y = cbind(gene, 
+#             all_others)
+#   
+#   Model = glmer(Y ~ F1 * F2 * ecotype + (1|poppair), 
+#                 family = binomial(), 
+#                 control = glmerControl(
+#                   optimizer = 'optimx', optCtrl = list(method = 'nlminb')), 
+#                 data = meta_test)
+# }
 
 library(glmmTMB)
 
 model_results_table = as.data.frame(matrix(nrow = 191662, 
                                           ncol = 34))
 
+# gene = test_mvals[,1]
+# # all_others = rowSums(test_mvals[,-i])
+# # Y = cbind(gene, 
+# # all_others)
+# 
+# Model = glmmTMB(gene ~ F1 * F2 * ecotype + (1|poppair), 
+#                 # family = gaussian(), 
+#                 # control = glmerControl(
+#                 # optimizer = 'optimx', optCtrl = list(method = 'nlminb')), 
+#                 data = meta_test)
+# 
+# model_results = summary(Model)
 
 for(i in 1:ncol(test_mvals)){
   gene = test_mvals[,i]
@@ -335,3 +347,68 @@ for(i in 1:ncol(test_mvals)){
   
   
 }
+
+
+
+# model results table -----------------------------------------------------
+
+model_results_table = read_csv('model_results_glm_methylation.csv') %>% 
+  rename(Methy_loc = V1, 
+         expression = V2,
+         estimate_intercept = V3,
+         estimate_F1 = V4, 
+         estimate_F2 = V5, 
+         estimate_ecotype = V6, 
+         estimate_F1_F2 = V7, 
+         estimate_F1_eco = V8, 
+         estimate_F2_eco = V9, 
+         estimate_F1_F2_eco = V10,
+         std_err_intercept = V11,
+         std_err_F1 = V12, 
+         std_err_F2 = V13, 
+         std_err_eco = V14, 
+         std_err_F1_F2 = V15,
+         std_err_F1_eco = V16, 
+         std_err_F2_eco = V17, 
+         std_err_F1_F2_eco = V18,
+         zval_intercept = V19,
+         zval_F1 = V20, 
+         zval_F2 = V21, 
+         zval_eco = V22, 
+         zval_F1_F2 = V23, 
+         zval_F1_eco = V24, 
+         zval_F2_eco = V25, 
+         zval_F1_F2_eco = V26, 
+         pval_intercept = V27, 
+         pval_F1 = V28, 
+         pval_F2 = V29, 
+         pval_eco = V30, 
+         pval_F1_F2 = V31, 
+         pval_F1_eco = V32, 
+         pval_F2_eco = V33, 
+         pval_F1_F2_eco = V34) %>% 
+  separate(col = Methy_loc, 
+           into = c('Chromosome', 
+                    'Pos'), 
+           sep = '-', 
+           remove = F)
+
+
+model_results_table %>% 
+  select(Chromosome, 
+         Pos, 
+         expression,
+         pval_F1) %>% 
+  arrange(pval_F1) %>% 
+  filter(pval_F1 <= 0.05) %>% 
+  arrange(Chromosome, 
+          Pos)
+
+
+model_results_table %>% 
+  select(Methy_loc, 
+         expression,
+         pval_F1_F2_eco) %>% 
+  arrange(pval_F1_F2_eco) %>% 
+  filter(pval_F1_F2_eco <= 0.05)
+
