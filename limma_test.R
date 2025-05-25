@@ -264,18 +264,7 @@ test_mvals = mvals_cleaned %>%
   dplyr::select(-Fish_ID) %>% 
   as.data.frame()
 
-# for(i in 1:ncol(test_mvals)){
-#   gene = test_mvals[,i]
-#   all_others = rowSums(test_mvals[,-i])
-#   Y = cbind(gene, 
-#             all_others)
-#   
-#   Model = glmer(Y ~ F1 * F2 * ecotype + (1|poppair), 
-#                 family = binomial(), 
-#                 control = glmerControl(
-#                   optimizer = 'optimx', optCtrl = list(method = 'nlminb')), 
-#                 data = meta_test)
-# }
+
 
 library(glmmTMB)
 
@@ -346,6 +335,19 @@ for(i in 1:ncol(test_mvals)){
   model_results_table[i, 34] = model_results$coefficients$cond[8,4]
   
   
+}
+
+for(i in 1:ncol(test_mvals)){
+  gene = test_mvals[,i]
+  all_others = rowSums(test_mvals[,-i])
+  Y = cbind(gene,
+            all_others)
+  
+  Model2 = glmer(Y ~ F1 * F2 * ecotype + (1|poppair),
+                 family = binomial(),
+                 control = glmerControl(
+                   optimizer = 'optimx', optCtrl = list(method = 'nlminb')),
+                 data = meta_test)
 }
 
 
