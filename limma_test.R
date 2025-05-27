@@ -5,6 +5,7 @@
 library(tidyverse)
 library(limma)
 library(edgeR)
+library(qvalue)
 
 setwd('~/Methylation_data/')
 
@@ -396,21 +397,136 @@ model_results_table = read_csv('model_results_glm_methylation.csv') %>%
            remove = F)
 
 
-model_results_table %>% 
+### F1 temperature FDR
+model_F1 = model_results_table %>% 
   select(Chromosome, 
          Pos, 
          expression,
-         pval_F1) %>% 
-  arrange(pval_F1) %>% 
-  filter(pval_F1 <= 0.05) %>% 
+         pval_F1)
+F1_qvalues = qvalue(p = model_F1$pval_F1)  
+
+F1_qvalues = F1_qvalues$qvalues
+
+bind_cols(model_F1, 
+          F1_qvalues) %>% 
+  rename(F1_qvalues = 5) %>% 
+  arrange(F1_qvalues) %>% 
+  filter(F1_qvalues <= 0.05) %>% 
+  arrange(Chromosome, 
+          Pos)
+
+## F2 temperature FDR
+model_F2 = model_results_table %>% 
+  select(Chromosome, 
+         Pos, 
+         expression,
+         pval_F2)
+F2_qvalues = qvalue(p = model_F2$pval_F2)  
+
+F2_qvalues = F2_qvalues$qvalues
+
+bind_cols(model_F2, 
+          F2_qvalues) %>% 
+  rename(F2_qvalues = 5) %>% 
+  arrange(F2_qvalues) %>% 
+  filter(F2_qvalues <= 0.05) %>% 
   arrange(Chromosome, 
           Pos)
 
 
-model_results_table %>% 
-  select(Methy_loc, 
+## Ecotype FDR
+model_eco = model_results_table %>% 
+  select(Chromosome, 
+         Pos, 
          expression,
-         pval_F1_F2_eco) %>% 
-  arrange(pval_F1_F2_eco) %>% 
-  filter(pval_F1_F2_eco <= 0.05)
+         pval_eco)
+qvalues_eco = qvalue(p = model_eco$pval_eco)  
+
+qvalues_eco = qvalues_eco$qvalues
+
+bind_cols(model_eco, 
+          qvalues_eco) %>% 
+  rename(qvalues_eco = 5) %>% 
+  arrange(qvalues_eco) %>% 
+  filter(qvalues_eco <= 0.05) %>% 
+  arrange(Chromosome, 
+          Pos)
+
+
+### F1 * F2 FDR
+model_F1_F2 = model_results_table %>% 
+  select(Chromosome, 
+         Pos, 
+         expression,
+         pval_F1_F2)
+qvalues_F1_F2 = qvalue(p = model_F1_F2$pval_F1_F2)  
+
+qvalues_F1_F2 = qvalues_F1_F2$qvalues
+
+bind_cols(model_F1_F2, 
+          qvalues_F1_F2) %>% 
+  rename(qvalues_F1_F2 = 5) %>% 
+  arrange(qvalues_F1_F2) %>% 
+  filter(qvalues_F1_F2 <= 0.05) %>% 
+  arrange(Chromosome, 
+          Pos)
+
+## F1 * eco FDR
+
+model_F1_eco = model_results_table %>% 
+  select(Chromosome, 
+         Pos, 
+         expression,
+         pval_F1_eco)
+qvalues_F1_eco = qvalue(p = model_F1_eco$pval_F1_eco)  
+
+qvalues_F1_eco = qvalues_F1_eco$qvalues
+
+bind_cols(model_F1_eco, 
+          qvalues_F1_eco) %>% 
+  rename(qvalues_F1_eco = 5) %>% 
+  arrange(qvalues_F1_eco) %>% 
+  filter(qvalues_F1_eco <= 0.05) %>% 
+  arrange(Chromosome, 
+          Pos)
+
+
+## F2 * eco FDR
+
+model_F2_eco = model_results_table %>% 
+  select(Chromosome, 
+         Pos, 
+         expression,
+         pval_F2_eco)
+qvalues_F2_eco = qvalue(p = model_F2_eco$pval_F2_eco)  
+
+qvalues_F2_eco = qvalues_F2_eco$qvalues
+
+bind_cols(model_F2_eco, 
+          qvalues_F2_eco) %>% 
+  rename(qvalues_F2_eco = 5) %>% 
+  arrange(qvalues_F2_eco) %>% 
+  filter(qvalues_F2_eco <= 0.05) %>% 
+  arrange(Chromosome, 
+          Pos)
+
+
+## F1 * F2 * eco FDR
+
+model_F1_F2_eco = model_results_table %>% 
+  select(Chromosome, 
+         Pos, 
+         expression,
+         pval_F1_F2_eco)
+qvalues_F1_F2_eco = qvalue(p = model_F1_F2_eco$pval_F1_F2_eco)  
+
+qvalues_F1_F2_eco = qvalues_F1_F2_eco$qvalues
+
+bind_cols(model_F1_F2_eco, 
+          qvalues_F1_F2_eco) %>% 
+  rename(qvalues_F1_F2_eco = 5) %>% 
+  arrange(qvalues_F1_F2_eco) %>% 
+  filter(qvalues_F1_F2_eco <= 0.05) %>% 
+  arrange(Chromosome, 
+          Pos)
 
