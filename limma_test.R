@@ -9,9 +9,14 @@ library(qvalue)
 
 setwd('~/Methylation_data/')
 
-setwd('C:/Users/mkb6d/Documents/')
+# setwd('C:/Users/mkb6d/Documents/')
 
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv')
+
+
+
+
+
 # 
 # meta_data = read_csv('formattedDataEU.csv') %>%
 #   select(fish,
@@ -152,7 +157,7 @@ meta_data_cleaned = read_csv('Cleaned_meta_data.csv') %>%
 
 ## big data
 mval_ID = mvalues %>% 
-  select(Location_data)
+  dplyr::select(Location_data)
 
 methy_fish_ID = mval_ID %>% 
   # separate(Location_data, 
@@ -163,7 +168,7 @@ methy_fish_ID = mval_ID %>%
                        c(var1 = ".*?", 
                          "-", 
                          var2 = ".*")) %>% 
-  select(var2) %>% 
+  dplyr::select(var2) %>% 
   separate(var2, 
            into = c('ID', 
                     'ID2'), 
@@ -172,7 +177,7 @@ methy_fish_ID = mval_ID %>%
                            str_pad(ID2, 
                                    0, 
                                    side = 'left'))) %>% 
-  select(ID, 
+  dplyr::select(ID, 
          new_vals) %>% 
   unite(col = Fish_ID, 
         sep = '_') %>% 
@@ -180,7 +185,7 @@ methy_fish_ID = mval_ID %>%
 
 mvalues = bind_cols(methy_fish_ID, 
                           mvalues) %>% 
-  select(-Location_data) %>% 
+  dplyr::select(-Location_data) %>% 
   arrange(Fish_ID)
 
 
@@ -203,7 +208,7 @@ meta_data_cleaned = meta_data_cleaned %>%
 methy_fish_ID = inner_join(meta_data_cleaned, 
                            methy_fish_ID, 
                            by = 'Fish_ID')
-
+meta_data_cleaned$Fish_ID == methy_fish_ID$Fish_ID
 
 ## organized data. 
 
