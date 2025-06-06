@@ -118,17 +118,22 @@ set.seed(1738)
 
 
 
-# glmmseq -----------------------------------------------------------------
+# analysis  -----------------------------------------------------------------
 
 # 
-test_mvals = mvals_cleaned %>% 
-  dplyr::select(-Fish_ID) %>% 
-  as.data.frame()
+# test_mvals = mvals_cleaned %>% 
+#   dplyr::select(-Fish_ID) %>% 
+#   as.data.frame()
 
 
 
 library(glmmTMB)
 
+
+## make sure that the rows of the model results table
+## are the same as the rows in the mvalues data frame
+
+## the number of columns does not change with the output
 model_results_table = as.data.frame(matrix(nrow = 191662, 
                                           ncol = 34))
 
