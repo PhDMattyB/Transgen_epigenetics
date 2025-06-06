@@ -6,13 +6,37 @@ library(tidyverse)
 library(limma)
 library(edgeR)
 library(qvalue)
+library(glmmTMB)
 
 setwd('~/Methylation_data/')
 
 
 mvalues = read_csv('MVALUES_methylation_cleaned_data.csv') %>% 
   select(-Location_data)
-meta_data = read_csv('Methylation_meta_data.csv')
+meta_data = read_csv('Methylation_meta_data.csv')%>% 
+  mutate(ecotype = as.character(case_when(
+    poppair == 'GTS' ~ 'W',
+    poppair == 'CSWY' ~ 'C', 
+    poppair == 'SKRC' ~ 'W', 
+    poppair == 'SKRW' ~ 'C', 
+    poppair == 'MYVC' ~ 'C', 
+    poppair == 'MYVW' ~ 'W', 
+    poppair ==  'ASHNC' ~ 'C', 
+    poppair == 'ASHNW' ~ 'W'))) %>% 
+  mutate(poppair = as.character(case_when(
+    poppair == 'GTS' ~ 'GTS',
+    poppair == 'CSWY' ~ 'CSWY', 
+    poppair == 'SKRC' ~ 'SKR', 
+    poppair == 'SKRW' ~ 'SKR', 
+    poppair == 'MYVC' ~ 'MYV', 
+    poppair == 'MYVW' ~ 'MYV', 
+    poppair ==  'ASHNC' ~ 'ASHN', 
+    poppair == 'ASHNW' ~ 'ASHN'
+  )))
+
+
+meta_data$F1_temp = as.character(meta_data$F1_temp)
+meta_data$F2_temp = as.character(meta_data$F2_temp)
 
 
 
@@ -87,9 +111,11 @@ meta_data = read_csv('Methylation_meta_data.csv')
 # 
 
 
-set.seed(1738)
 
-## 
+
+## THIS SHOULD NOT BE NEEDED. 
+## THIS WAS TO TRY SOMETHING ELSE
+## WHERE I HAD TO ROTATE THE DATA SET
 # trans_methy = mvals_cleaned %>%
 #   select(-Fish_ID) %>% 
 #   # remove_rownames() %>% 
@@ -119,22 +145,15 @@ set.seed(1738)
 
 
 # analysis  -----------------------------------------------------------------
+set.seed(1738)
 
-# 
-# test_mvals = mvals_cleaned %>% 
-#   dplyr::select(-Fish_ID) %>% 
-#   as.data.frame()
-
-
-
-library(glmmTMB)
 
 
 ## make sure that the rows of the model results table
 ## are the same as the rows in the mvalues data frame
 
 ## the number of columns does not change with the output
-model_results_table = as.data.frame(matrix(nrow = 191662, 
+model_results_table = as.data.frame(matrix(nrow = 2828701, 
                                           ncol = 34))
 
 
