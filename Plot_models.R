@@ -92,7 +92,13 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv')%>%
   group_by(CHR)%>%
   mutate(BP = as.numeric(BP)) %>% 
   mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
-         end = BP+100)
+         end = BP+100) %>% 
+  filter(Association == 'BODY_WGP_clean') %>% 
+  select(CHR, 
+         BP, 
+         scores, 
+         start, 
+         end)
 
 
 setDT(Body_WGP_out)
@@ -118,7 +124,14 @@ Body_WGP_out_overlap_tib = as_tibble(Body_WGP_out_overlap) %>%
 
 Body_WGP_out_overlap_tib$gene_name %>%
   as_tibble() %>% 
-  distinct() 
+  distinct() %>% 
+  write_tsv('BODY_WGP_outlier_Genes_100bp_window.txt', 
+            col_names = F)
+
+
+Body_WGP_out_overlap_tib %>% 
+  filter(CHR == 'chrXXI') %>% 
+  distinct(gene_name)
 
 
 # Body WGP out plot -------------------------------------------------------
