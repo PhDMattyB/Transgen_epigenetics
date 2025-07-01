@@ -166,6 +166,10 @@ outs = BODY_WGP_COMBO %>%
 non_outs = BODY_WGP_COMBO %>% 
   filter(status == 'Neutral')
 
+non_outs %>% 
+  group_by(CHR) %>% 
+  distinct()
+
 
 ggplot(non_outs, 
        aes(x = POS, 
@@ -175,17 +179,18 @@ ggplot(non_outs,
              alpha = 0.8, 
              size = 1.3)+
   ## alternate colors per chromosome
-  scale_color_manual(values = rep(c("grey", "dimgrey"), 39))+
+  scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
   ## plot the outliers on top of everything
   ## currently digging this hot pink colour
   geom_point(data = outs,
-             col = out_col,
+             col = '#fb8500',
              alpha=0.8, 
              size=1.3)+
-  scale_x_continuous(label = axisdf$CHR, 
-                     breaks = axisdf$center)+
+  scale_x_continuous(label = Body_WGP_axisdf$CHR, 
+                     breaks = Body_WGP_axisdf$center)+
   scale_y_continuous(expand = c(0, 0), 
-                     limits = c(0,1.0))+
+                     limits = c(-0.05,0.05))+
+  facet_grid(~CHR)+
   # geom_hline(yintercept = 0.00043, 
   #            linetype = 2, 
   #            col = 'Black')+
@@ -193,8 +198,8 @@ ggplot(non_outs,
   # scale_y_reverse(expand = c(0, 0))+
   # remove space between plot area and x axis
   labs(x = 'Cumulative base pair', 
-       y = 'Fst', 
-       title = plot_letter)+
+       y = 'RDA score', 
+       title = 'BODY WGP')+
   theme(legend.position="none",
         # panel.border = element_blank(),
         panel.grid.major.x = element_blank(),
