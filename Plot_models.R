@@ -136,7 +136,8 @@ Body_WGP_nonout = read_csv('BODY_WGP_clean_RDA_PCaxes_nonoutliers_methylation.cs
          end = BP+100) %>% 
   stickle_CHR_reorder2() %>% 
   rename(POS = BP) %>% 
-  dist_cal()
+  mutate(status = 'Neutral')
+
 
 
 Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')%>% 
@@ -152,16 +153,56 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylatio
          end = BP+100) %>% 
   stickle_CHR_reorder2() %>% 
   rename(POS = BP) %>% 
+  mutate(status = 'Outlier')
+
+BODY_WGP_COMBO = bind_rows(Body_WGP_out, 
+                           Body_WGP_nonout)%>% 
   dist_cal()
 
-Body_WGP_out_axisdf = axis_df(Body_WGP_out)
+Body_WGP_axisdf = axis_df(BODY_WGP_COMBO)
+
+outs = BODY_WGP_COMBO %>% 
+  filter(status == 'Outlier')
+non_outs = BODY_WGP_COMBO %>% 
+  filter(status == 'Neutral')
 
 
-Fst_manhattan(outs = Body_WGP_out, 
-              axisdf = Body_WGP_out_axisdf, 
-              xval = BPcum, 
-              yval = scores, 
-              chr = Body_WGP_out$CHR, 
-              out_col = '#439a86')
+ggplot(non_outs, 
+       aes(x = POS, 
+           y = scores))+
+  # plot the non outliers in grey
+  geom_point(aes(color = as.factor(CHR)), 
+             alpha = 0.8, 
+             size = 1.3)+
+  ## alternate colors per chromosome
+  scale_color_manual(values = rep(c("grey", "dimgrey"), 39))+
+  ## plot the outliers on top of everything
+  ## currently digging this hot pink colour
+  geom_point(data = outs,
+             col = out_col,
+             alpha=0.8, 
+             size=1.3)+
+  scale_x_continuous(label = axisdf$CHR, 
+                     breaks = axisdf$center)+
+  scale_y_continuous(expand = c(0, 0), 
+                     limits = c(0,1.0))+
+  # geom_hline(yintercept = 0.00043, 
+  #            linetype = 2, 
+  #            col = 'Black')+
+  # ylim(0,1.0)+
+  # scale_y_reverse(expand = c(0, 0))+
+  # remove space between plot area and x axis
+  labs(x = 'Cumulative base pair', 
+       y = 'Fst', 
+       title = plot_letter)+
+  theme(legend.position="none",
+        # panel.border = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        axis.text.x = element_text(size = 9, 
+                                   angle = 90), 
+        axis.title = element_text(size = 14),
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 12))
 
 
