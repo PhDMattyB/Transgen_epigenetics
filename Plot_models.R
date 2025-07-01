@@ -139,13 +139,16 @@ Body_WGP_nonout = read_csv('BODY_WGP_clean_RDA_PCaxes_nonoutliers_methylation.cs
   mutate(status = 'Neutral')
 
 
-Body_WGP_out_filter = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv')
-
-Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')%>% 
+Body_WGP_out = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv') %>% 
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
            sep = '-') %>% 
+  filter(Association == 'BODY_WGP_clean') %>% 
+  select(axis, 
+         CHR, 
+         BP, 
+         scores)%>% 
   arrange(CHR,
           BP) %>% 
   group_by(CHR)%>%
@@ -155,6 +158,21 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylatio
   stickle_CHR_reorder2() %>% 
   rename(POS = BP) %>% 
   mutate(status = 'Outlier')
+
+# Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')%>% 
+#   separate(col = loc, 
+#            into = c('CHR', 
+#                     'BP'), 
+#            sep = '-') %>% 
+#   arrange(CHR,
+#           BP) %>% 
+#   group_by(CHR)%>%
+#   mutate(BP = as.numeric(BP)) %>% 
+#   mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
+#          end = BP+100) %>% 
+#   stickle_CHR_reorder2() %>% 
+#   rename(POS = BP) %>% 
+#   mutate(status = 'Outlier')
 
 BODY_WGP_COMBO = bind_rows(Body_WGP_out, 
                            Body_WGP_nonout)%>% 
