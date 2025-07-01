@@ -82,7 +82,7 @@ annotation_data = bind_cols(gene_metadata,
 # Body WGP genome data -------------------------------------------------------
 
 
-Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')%>% 
+Body_WGP_out = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv')%>% 
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
@@ -190,7 +190,7 @@ non_outs %>%
   distinct()
 
 
-ggplot(non_outs, 
+BODY_WGP_manhattan = ggplot(non_outs, 
        aes(x = POS, 
            y = scores))+
   # plot the non outliers in grey
@@ -235,3 +235,15 @@ ggplot(non_outs,
         strip.text = element_text(face = 'bold'))
 
 
+ggsave('BODY_WGP_Outliers.svg', 
+       plot = BODY_WGP_manhattan, 
+       dpi = 'retina',
+       units = 'cm',
+       height = 15, 
+       width = 30)  
+ggsave('BODY_WGP_Outliers.tiff', 
+       plot = BODY_WGP_manhattan, 
+       dpi = 'retina',
+       units = 'cm',
+       height = 15, 
+       width = 30)  
