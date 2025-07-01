@@ -134,6 +134,60 @@ Body_WGP_out_overlap_tib %>%
   distinct(gene_name)
 
 
+# Body TGP genome data ----------------------------------------------------
+Body_TGP_out = read_csv('BODY_TGP_clean_RDA_CAND_corr.csv')%>% 
+  separate(col = loc, 
+           into = c('CHR', 
+                    'BP'), 
+           sep = '-') %>% 
+  arrange(CHR,
+          BP) %>% 
+  group_by(CHR)%>%
+  mutate(BP = as.numeric(BP)) %>% 
+  mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
+         end = BP+100) %>% 
+  filter(Association == 'BODY_TGP_clean') %>% 
+  select(CHR, 
+         BP, 
+         scores, 
+         start, 
+         end)
+
+
+setDT(Body_TGP_out)
+setDT(annotation_data)
+
+setkey(Body_TGP_out, 
+       CHR, 
+       start, 
+       end)
+
+## aligns the sites of interest with the annotated genome
+Body_TGP_out_overlap = foverlaps(annotation_data,
+                                 Body_TGP_out,
+                                 # by.x = start,
+                                 # by.y = end,
+                                 type="any")
+
+Body_TGP_out_overlap_tib = as_tibble(Body_TGP_out_overlap) %>% 
+  na.omit() %>% 
+  filter(CHR != 'chrUn') %>% 
+  arrange(CHR, 
+          BP)
+
+Body_TGP_out_overlap_tib$gene_name %>%
+  as_tibble() %>% 
+  distinct() %>% 
+  write_tsv('BODY_TGP_outlier_Genes_100bp_window.txt', 
+            col_names = F)
+
+
+Body_TGP_out_overlap_tib %>% 
+  filter(CHR == 'chrXXI') %>% 
+  distinct(gene_name)
+
+
+
 # Body WGP out plot -------------------------------------------------------
 
 Body_WGP_nonout = read_csv('BODY_WGP_clean_RDA_PCaxes_nonoutliers_methylation.csv')%>% 
@@ -172,20 +226,6 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv') %>%
   rename(POS = BP) %>% 
   mutate(status = 'Outlier')
 
-# Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')%>% 
-#   separate(col = loc, 
-#            into = c('CHR', 
-#                     'BP'), 
-#            sep = '-') %>% 
-#   arrange(CHR,
-#           BP) %>% 
-#   group_by(CHR)%>%
-#   mutate(BP = as.numeric(BP)) %>% 
-#   mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
-#          end = BP+100) %>% 
-#   stickle_CHR_reorder2() %>% 
-#   rename(POS = BP) %>% 
-#   mutate(status = 'Outlier')
 
 BODY_WGP_COMBO = bind_rows(Body_WGP_out, 
                            Body_WGP_nonout)%>% 
@@ -260,3 +300,120 @@ ggsave('BODY_WGP_Outliers.tiff',
        units = 'cm',
        height = 15, 
        width = 30)  
+
+
+
+# Body TGP manhattan plot -------------------------------------------------
+
+Body_TGP_nonout = read_csv('BODY_TGP_clean_RDA_PCaxes_nonoutliers_methylation.csv')%>% 
+  separate(col = loc, 
+           into = c('CHR', 
+                    'BP'), 
+           sep = '-') %>% 
+  arrange(CHR,
+          BP) %>% 
+  group_by(CHR)%>%
+  mutate(BP = as.numeric(BP)) %>% 
+  mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
+         end = BP+100) %>% 
+  stickle_CHR_reorder2() %>% 
+  rename(POS = BP) %>% 
+  mutate(status = 'Neutral')
+
+
+Body_TGP_out = read_csv('BODY_TGP_clean_RDA_CAND_corr.csv') %>% 
+  separate(col = loc, 
+           into = c('CHR', 
+                    'BP'), 
+           sep = '-') %>% 
+  filter(Association == 'BODY_TGP_clean') %>% 
+  select(axis, 
+         CHR, 
+         BP, 
+         scores)%>% 
+  arrange(CHR,
+          BP) %>% 
+  group_by(CHR)%>%
+  mutate(BP = as.numeric(BP)) %>% 
+  mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
+         end = BP+100) %>% 
+  stickle_CHR_reorder2() %>% 
+  rename(POS = BP) %>% 
+  mutate(status = 'Outlier')
+
+
+BODY_TGP_COMBO = bind_rows(Body_TGP_out, 
+                           Body_TGP_nonout)%>% 
+  dist_cal()
+
+Body_TGP_axisdf = axis_df(BODY_TGP_COMBO)
+
+outs = BODY_TGP_COMBO %>% 
+  filter(status == 'Outlier')
+non_outs = BODY_TGP_COMBO %>% 
+  filter(status == 'Neutral')
+
+non_outs %>% 
+  group_by(CHR) %>% 
+  distinct()
+
+
+BODY_TGP_manhattan = ggplot(non_outs, 
+                            aes(x = POS, 
+                                y = scores))+
+  # plot the non outliers in grey
+  geom_point(aes(color = as.factor(CHR)), 
+             alpha = 0.8, 
+             size = 1.3)+
+  ## alternate colors per chromosome
+  scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
+  ## plot the outliers on top of everything
+  ## currently digging this hot pink colour
+  geom_point(data = outs,
+             col = '#fb8500',
+             alpha=0.8, 
+             size=1.3)+
+  scale_x_continuous(label = Body_TGP_axisdf$CHR, 
+                     breaks = Body_TGP_axisdf$center)+
+  scale_y_continuous(expand = c(0, 0), 
+                     limits = c(-0.05,0.05))+
+  facet_grid(~CHR, 
+             scales = 'free')+
+  # geom_hline(yintercept = 0.00043, 
+  #            linetype = 2, 
+  #            col = 'Black')+
+  # ylim(0,1.0)+
+  # scale_y_reverse(expand = c(0, 0))+
+  # remove space between plot area and x axis
+  labs(x = 'Cumulative base pair', 
+       y = 'RDA score', 
+       title = 'BODY TGP')+
+  theme(legend.position="none",
+        # panel.border = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        # axis.text.x = element_text(size = 9, 
+        #                            angle = 90), 
+        axis.title = element_text(size = 14),
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 12), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(face = 'bold'))
+
+
+ggsave('BODY_TGP_Outliers.svg', 
+       plot = BODY_TGP_manhattan, 
+       dpi = 'retina',
+       units = 'cm',
+       height = 15, 
+       width = 30)  
+ggsave('BODY_TGP_Outliers.tiff', 
+       plot = BODY_TGP_manhattan, 
+       dpi = 'retina',
+       units = 'cm',
+       height = 15, 
+       width = 30)  
+
+
