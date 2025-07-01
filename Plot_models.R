@@ -139,6 +139,7 @@ Body_WGP_nonout = read_csv('BODY_WGP_clean_RDA_PCaxes_nonoutliers_methylation.cs
   mutate(status = 'Neutral')
 
 
+Body_WGP_out_filter = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv')
 
 Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')%>% 
   separate(col = loc, 
