@@ -123,6 +123,22 @@ Body_WGP_out_overlap_tib$gene_name %>%
 
 # Body WGP out plot -------------------------------------------------------
 
+Body_WGP_nonout = read_csv('BODY_WGP_clean_RDA_PCaxes_nonoutliers_methylation.csv')%>% 
+  separate(col = loc, 
+           into = c('CHR', 
+                    'BP'), 
+           sep = '-') %>% 
+  arrange(CHR,
+          BP) %>% 
+  group_by(CHR)%>%
+  mutate(BP = as.numeric(BP)) %>% 
+  mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
+         end = BP+100) %>% 
+  stickle_CHR_reorder2() %>% 
+  rename(POS = BP) %>% 
+  dist_cal()
+
+
 Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylation.csv')%>% 
   separate(col = loc, 
            into = c('CHR', 
@@ -133,4 +149,19 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_outliers_AXIS1_RAW_PCaxes_methylatio
   group_by(CHR)%>%
   mutate(BP = as.numeric(BP)) %>% 
   mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
-         end = BP+100)
+         end = BP+100) %>% 
+  stickle_CHR_reorder2() %>% 
+  rename(POS = BP) %>% 
+  dist_cal()
+
+Body_WGP_out_axisdf = axis_df(Body_WGP_out)
+
+
+Fst_manhattan(outs = Body_WGP_out, 
+              axisdf = Body_WGP_out_axisdf, 
+              xval = BPcum, 
+              yval = scores, 
+              chr = Body_WGP_out$CHR, 
+              out_col = '#439a86')
+
+
