@@ -417,3 +417,13 @@ ggsave('BODY_TGP_Outliers.tiff',
        width = 30)  
 
 
+# BODY TGP and WGP overlap ------------------------------------------------
+
+BODY_TGP_WGP_overlap = inner_join(Body_WGP_out, 
+           Body_TGP_out, 
+           by = c('axis', 
+                  'CHR', 
+                  'POS', 
+                  'start',
+                  'end',
+                  'status'))
