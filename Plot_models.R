@@ -348,17 +348,17 @@ BODY_TGP_COMBO = bind_rows(Body_TGP_out,
 
 Body_TGP_axisdf = axis_df(BODY_TGP_COMBO)
 
-outs = BODY_TGP_COMBO %>% 
+tgp_outs = BODY_TGP_COMBO %>% 
   filter(status == 'Outlier')
-non_outs = BODY_TGP_COMBO %>% 
+tgp_non_outs = BODY_TGP_COMBO %>% 
   filter(status == 'Neutral')
 
-non_outs %>% 
+tgp_non_outs %>% 
   group_by(CHR) %>% 
   distinct()
 
 
-BODY_TGP_manhattan = ggplot(non_outs, 
+BODY_TGP_manhattan = ggplot(tgp_non_outs, 
                             aes(x = POS, 
                                 y = scores))+
   # plot the non outliers in grey
@@ -369,8 +369,8 @@ BODY_TGP_manhattan = ggplot(non_outs,
   scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
   ## plot the outliers on top of everything
   ## currently digging this hot pink colour
-  geom_point(data = outs,
-             col = '#fb8500',
+  geom_point(data = tgp_outs,
+             col = '#2a9d8f',
              alpha=0.8, 
              size=1.3)+
   scale_x_continuous(label = Body_TGP_axisdf$CHR, 
