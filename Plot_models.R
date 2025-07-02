@@ -507,69 +507,246 @@ wgp_outs = outliers %>%
 #                 '#b5179e', 
 #                 '#f72585')
 
- big_man_ting = ggplot(neutral_meth, 
-       aes(x = POS, 
-           y = scores))+
-  # plot the non outliers in grey
-  geom_point(aes(color = as.factor(CHR)), 
-             alpha = 0.8, 
-             size = 1.3)+
-  ## alternate colors per chromosome
-  scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
-  ## plot the outliers on top of everything
-  ## currently digging this hot pink colour
-  geom_point(data = overlap_outs,
-             col = '#4895ef',
-             alpha=0.8, 
-             size=1.3)+
-  geom_point(data = wgp_outs, 
-             col = '#b5179e', 
-             alpha = 0.8, 
-             size = 1.3)+
-  geom_point(data = tgp_outs, 
-             col = '#f72585', 
-             alpha = 0.8, 
-             size = 1.3)+
-  # scale_color_manual(values = manhat_cols)+
-  scale_x_continuous(label = axisdf$CHR, 
-                     breaks = axisdf$center)+
-  scale_y_continuous(expand = c(0, 0), 
-                     limits = c(-0.05,0.05))+
-  facet_grid(~CHR, 
-             scales = 'free')+
-  # geom_hline(yintercept = 0.00043, 
-  #            linetype = 2, 
-  #            col = 'Black')+
-  # ylim(0,1.0)+
-  # scale_y_reverse(expand = c(0, 0))+
-  # remove space between plot area and x axis
-  labs(x = 'Cumulative base pair', 
-       y = 'RDA score')+
-  theme(legend.position="none",
-        # panel.border = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        axis.text.x = element_blank(), 
-        axis.ticks.x = element_blank(),
-        # axis.text.x = element_text(size = 9, 
-        #                            angle = 90), 
-        axis.title = element_text(size = 14),
-        axis.title.x = element_blank(),
-        axis.text.y = element_text(size = 12), 
-        strip.background = element_rect(fill = 'white'), 
-        strip.text = element_text(face = 'bold'))
+ # big_man_ting = ggplot(neutral_meth, 
+ #       aes(x = POS, 
+ #           y = scores))+
+ #  # plot the non outliers in grey
+ #  geom_point(aes(color = as.factor(CHR)), 
+ #             alpha = 0.8, 
+ #             size = 1.3)+
+ #  ## alternate colors per chromosome
+ #  scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
+ #  ## plot the outliers on top of everything
+ #  ## currently digging this hot pink colour
+ #  geom_point(data = overlap_outs,
+ #             col = '#4895ef',
+ #             alpha=0.8, 
+ #             size=1.3)+
+ #  geom_point(data = wgp_outs, 
+ #             col = '#b5179e', 
+ #             alpha = 0.8, 
+ #             size = 1.3)+
+ #  geom_point(data = tgp_outs, 
+ #             col = '#f72585', 
+ #             alpha = 0.8, 
+ #             size = 1.3)+
+ #  # scale_color_manual(values = manhat_cols)+
+ #  scale_x_continuous(label = axisdf$CHR, 
+ #                     breaks = axisdf$center)+
+ #  scale_y_continuous(expand = c(0, 0), 
+ #                     limits = c(-0.05,0.05))+
+ #  facet_grid(~CHR, 
+ #             scales = 'free')+
+ #  # geom_hline(yintercept = 0.00043, 
+ #  #            linetype = 2, 
+ #  #            col = 'Black')+
+ #  # ylim(0,1.0)+
+ #  # scale_y_reverse(expand = c(0, 0))+
+ #  # remove space between plot area and x axis
+ #  labs(x = 'Cumulative base pair', 
+ #       y = 'RDA score')+
+ #  theme(legend.position="none",
+ #        # panel.border = element_blank(),
+ #        panel.grid.major.x = element_blank(),
+ #        panel.grid.minor.x = element_blank(),
+ #        axis.text.x = element_blank(), 
+ #        axis.ticks.x = element_blank(),
+ #        # axis.text.x = element_text(size = 9, 
+ #        #                            angle = 90), 
+ #        axis.title = element_text(size = 14),
+ #        axis.title.x = element_blank(),
+ #        axis.text.y = element_text(size = 12), 
+ #        strip.background = element_rect(fill = 'white'), 
+ #        strip.text = element_text(face = 'bold'))
+ # 
+ # 
+ # ggsave('BODY_Big_manhattan_plot.svg', 
+ #        plot = big_man_ting, 
+ #        dpi = 'retina',
+ #        units = 'cm',
+ #        height = 15, 
+ #        width = 30)  
+ # ggsave('Body_Big_manhattan_plot.tiff', 
+ #        plot = big_man_ting, 
+ #        dpi = 'retina',
+ #        units = 'cm',
+ #        height = 15, 
+ #        width = 30)  
+ # 
 
- 
- ggsave('BODY_Big_manhattan_plot.svg', 
-        plot = big_man_ting, 
-        dpi = 'retina',
-        units = 'cm',
-        height = 15, 
-        width = 30)  
- ggsave('Body_Big_manhattan_plot.tiff', 
-        plot = big_man_ting, 
-        dpi = 'retina',
-        units = 'cm',
-        height = 15, 
-        width = 30)  
- 
+
+
+
+big_man_overlap = ggplot(neutral_meth,
+      aes(x = POS,
+          y = scores))+
+ # plot the non outliers in grey
+ geom_point(aes(color = as.factor(CHR)),
+            alpha = 0.8,
+            size = 1.3)+
+ ## alternate colors per chromosome
+ scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
+ ## plot the outliers on top of everything
+ ## currently digging this hot pink colour
+ geom_point(data = overlap_outs,
+            col = '#4895ef',
+            alpha=0.8,
+            size=1.3)+
+ # geom_point(data = wgp_outs,
+ #            col = '#b5179e',
+ #            alpha = 0.8,
+ #            size = 1.3)+
+ # geom_point(data = tgp_outs,
+ #            col = '#f72585',
+ #            alpha = 0.8,
+ #            size = 1.3)+
+ # scale_color_manual(values = manhat_cols)+
+ scale_x_continuous(label = axisdf$CHR,
+                    breaks = axisdf$center)+
+ scale_y_continuous(expand = c(0, 0),
+                    limits = c(-0.05,0.05))+
+ facet_grid(~CHR,
+            scales = 'free')+
+ # geom_hline(yintercept = 0.00043,
+ #            linetype = 2,
+ #            col = 'Black')+
+ # ylim(0,1.0)+
+ # scale_y_reverse(expand = c(0, 0))+
+ # remove space between plot area and x axis
+ labs(x = 'Cumulative base pair',
+      y = 'RDA score')+
+ theme(legend.position="none",
+       # panel.border = element_blank(),
+       panel.grid.major.x = element_blank(),
+       panel.grid.minor.x = element_blank(),
+       axis.text.x = element_blank(),
+       axis.ticks.x = element_blank(),
+       # axis.text.x = element_text(size = 9,
+       #                            angle = 90),
+       axis.title = element_text(size = 14),
+       axis.title.x = element_blank(),
+       axis.text.y = element_text(size = 12),
+       strip.background = element_rect(fill = 'white'),
+       strip.text = element_text(face = 'bold'))
+
+big_man_wgp = ggplot(neutral_meth,
+      aes(x = POS,
+          y = scores))+
+ # plot the non outliers in grey
+ geom_point(aes(color = as.factor(CHR)),
+            alpha = 0.8,
+            size = 1.3)+
+ ## alternate colors per chromosome
+ scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
+ ## plot the outliers on top of everything
+ ## currently digging this hot pink colour
+ # geom_point(data = overlap_outs,
+ #            col = '#4895ef',
+ #            alpha=0.8,
+ #            size=1.3)+
+ geom_point(data = wgp_outs,
+            col = '#b5179e',
+            alpha = 0.8,
+            size = 1.3)+
+ # geom_point(data = tgp_outs,
+ #            col = '#f72585',
+ #            alpha = 0.8,
+ #            size = 1.3)+
+ # scale_color_manual(values = manhat_cols)+
+ scale_x_continuous(label = axisdf$CHR,
+                    breaks = axisdf$center)+
+ scale_y_continuous(expand = c(0, 0),
+                    limits = c(-0.05,0.05))+
+ facet_grid(~CHR,
+            scales = 'free')+
+ # geom_hline(yintercept = 0.00043,
+ #            linetype = 2,
+ #            col = 'Black')+
+ # ylim(0,1.0)+
+ # scale_y_reverse(expand = c(0, 0))+
+ # remove space between plot area and x axis
+ labs(x = 'Cumulative base pair',
+      y = 'RDA score')+
+ theme(legend.position="none",
+       # panel.border = element_blank(),
+       panel.grid.major.x = element_blank(),
+       panel.grid.minor.x = element_blank(),
+       axis.text.x = element_blank(),
+       axis.ticks.x = element_blank(),
+       # axis.text.x = element_text(size = 9,
+       #                            angle = 90),
+       axis.title = element_text(size = 14),
+       axis.title.x = element_blank(),
+       axis.text.y = element_text(size = 12),
+       strip.background = element_rect(fill = 'white'),
+       strip.text = element_text(face = 'bold'))
+
+big_man_tgp = ggplot(neutral_meth,
+      aes(x = POS,
+          y = scores))+
+ # plot the non outliers in grey
+ geom_point(aes(color = as.factor(CHR)),
+            alpha = 0.8,
+            size = 1.3)+
+ ## alternate colors per chromosome
+ scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
+ ## plot the outliers on top of everything
+ ## currently digging this hot pink colour
+ # geom_point(data = overlap_outs,
+ #            col = '#4895ef',
+ #            alpha=0.8,
+ #            size=1.3)+
+ # geom_point(data = wgp_outs,
+ #            col = '#b5179e',
+ #            alpha = 0.8,
+ #            size = 1.3)+
+ geom_point(data = tgp_outs,
+            col = '#f72585',
+            alpha = 0.8,
+            size = 1.3)+
+ # scale_color_manual(values = manhat_cols)+
+ scale_x_continuous(label = axisdf$CHR,
+                    breaks = axisdf$center)+
+ scale_y_continuous(expand = c(0, 0),
+                    limits = c(-0.05,0.05))+
+ facet_grid(~CHR,
+            scales = 'free')+
+ # geom_hline(yintercept = 0.00043,
+ #            linetype = 2,
+ #            col = 'Black')+
+ # ylim(0,1.0)+
+ # scale_y_reverse(expand = c(0, 0))+
+ # remove space between plot area and x axis
+ labs(x = 'Cumulative base pair',
+      y = 'RDA score')+
+ theme(legend.position="none",
+       # panel.border = element_blank(),
+       panel.grid.major.x = element_blank(),
+       panel.grid.minor.x = element_blank(),
+       axis.text.x = element_blank(),
+       axis.ticks.x = element_blank(),
+       # axis.text.x = element_text(size = 9,
+       #                            angle = 90),
+       axis.title = element_text(size = 14),
+       axis.title.x = element_blank(),
+       axis.text.y = element_text(size = 12),
+       strip.background = element_rect(fill = 'white'),
+       strip.text = element_text(face = 'bold'))
+
+big_man_ting = big_man_overlap/big_man_wgp/big_man_tgp
+
+
+# ggsave('BODY_Big_manhattan_plot.svg', 
+#        plot = big_man_ting, 
+#        dpi = 'retina',
+#        units = 'cm',
+#        height = 15, 
+#        width = 30)  
+ggsave('Body_Big_manhattan_plot.tiff',
+       plot = big_man_ting,
+       dpi = 'retina',
+       units = 'cm',
+       height = 30,
+       width = 30)
+
+
