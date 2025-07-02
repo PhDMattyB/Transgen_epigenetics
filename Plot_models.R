@@ -86,7 +86,8 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv')%>%
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
-           sep = '-') %>% 
+           sep = '-', 
+           remove = F) %>% 
   arrange(CHR,
           BP) %>% 
   group_by(CHR)%>%
@@ -94,7 +95,8 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv')%>%
   mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
          end = BP+100) %>% 
   filter(Association == 'BODY_WGP_clean') %>% 
-  select(CHR, 
+  select(loc,
+         CHR, 
          BP, 
          scores, 
          start, 
@@ -139,7 +141,8 @@ Body_TGP_out = read_csv('BODY_TGP_clean_RDA_CAND_corr.csv')%>%
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
-           sep = '-') %>% 
+           sep = '-', 
+           remove = F) %>% 
   arrange(CHR,
           BP) %>% 
   group_by(CHR)%>%
@@ -147,7 +150,8 @@ Body_TGP_out = read_csv('BODY_TGP_clean_RDA_CAND_corr.csv')%>%
   mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
          end = BP+100) %>% 
   filter(Association == 'BODY_TGP_clean') %>% 
-  select(CHR, 
+  select(loc,
+         CHR, 
          BP, 
          scores, 
          start, 
@@ -194,7 +198,8 @@ Body_WGP_nonout = read_csv('BODY_WGP_clean_RDA_PCaxes_nonoutliers_methylation.cs
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
-           sep = '-') %>% 
+           sep = '-', 
+           remove = F) %>% 
   arrange(CHR,
           BP) %>% 
   group_by(CHR)%>%
@@ -210,9 +215,11 @@ Body_WGP_out = read_csv('BODY_WGP_clean_RDA_CAND_corr.csv') %>%
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
-           sep = '-') %>% 
+           sep = '-', 
+           remove = F) %>% 
   filter(Association == 'BODY_WGP_clean') %>% 
-  select(axis, 
+  select(loc, 
+         axis, 
          CHR, 
          BP, 
          scores)%>% 
@@ -309,7 +316,8 @@ Body_TGP_nonout = read_csv('BODY_TGP_clean_RDA_PCaxes_nonoutliers_methylation.cs
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
-           sep = '-') %>% 
+           sep = '-', 
+           remove = F) %>% 
   arrange(CHR,
           BP) %>% 
   group_by(CHR)%>%
@@ -325,9 +333,11 @@ Body_TGP_out = read_csv('BODY_TGP_clean_RDA_CAND_corr.csv') %>%
   separate(col = loc, 
            into = c('CHR', 
                     'BP'), 
-           sep = '-') %>% 
+           sep = '-', 
+           remove = F) %>% 
   filter(Association == 'BODY_TGP_clean') %>% 
-  select(axis, 
+  select(loc, 
+         axis, 
          CHR, 
          BP, 
          scores)%>% 
@@ -421,9 +431,26 @@ ggsave('BODY_TGP_Outliers.tiff',
 
 BODY_TGP_WGP_overlap = inner_join(Body_WGP_out, 
            Body_TGP_out, 
-           by = c('axis', 
+           by = c('loc', 
+                  'axis', 
                   'CHR', 
                   'POS', 
                   'start',
                   'end',
                   'status'))
+
+## quantify unique TGP outliers
+BODY_TGP_out_unique = Body_TGP_out %>% 
+  anti_join(., 
+            BODY_TGP_WGP_overlap, 
+            by = 'loc')
+
+## quantify unique WGP outliers
+BODY_WGP_out_unique = Body_WGP_out %>% 
+  anti_join(., 
+            BODY_TGP_WGP_overlap, 
+            by = 'loc')
+
+
+
+  
