@@ -751,8 +751,12 @@ ggsave('Body_Big_manhattan_plot.tiff',
 
 
 # Filter based on position ------------------------------------------------
-
-
+overlap_outs = outliers %>% 
+  filter(outlier_type == 'Overlap')
+wgp_outs = outliers %>% 
+  filter(outlier_type == 'WGP unique')
+tgp_outs = outliers %>% 
+  filter(outlier_type == 'TGP unique')
 
 # unique vs overlap GO terms ----------------------------------------------
 
