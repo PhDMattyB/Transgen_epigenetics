@@ -493,8 +493,21 @@ outliers = Big_data_set %>%
 neutral_meth = Big_data_set %>% 
   filter(status == 'Neutral')
 
+overlap_outs = outliers %>% 
+  filter(outlier_type == 'Overlap')
 
-  ggplot(neutral_meth, 
+tgp_outs = outliers %>% 
+  filter(outlier_type == 'TGP unique')
+
+wgp_outs = outliers %>% 
+  filter(outlier_type == 'WGP unique')
+
+
+# manhat_cols = c('#4895ef', 
+#                 '#b5179e', 
+#                 '#f72585')
+
+ big_man_ting = ggplot(neutral_meth, 
        aes(x = POS, 
            y = scores))+
   # plot the non outliers in grey
@@ -505,10 +518,19 @@ neutral_meth = Big_data_set %>%
   scale_color_manual(values = rep(c("grey", "dimgrey"), 24))+
   ## plot the outliers on top of everything
   ## currently digging this hot pink colour
-  geom_point(data = outliers,
-             aes(col = outlier_type),
+  geom_point(data = overlap_outs,
+             col = '#4895ef',
              alpha=0.8, 
              size=1.3)+
+  geom_point(data = wgp_outs, 
+             col = '#b5179e', 
+             alpha = 0.8, 
+             size = 1.3)+
+  geom_point(data = tgp_outs, 
+             col = '#f72585', 
+             alpha = 0.8, 
+             size = 1.3)+
+  # scale_color_manual(values = manhat_cols)+
   scale_x_continuous(label = axisdf$CHR, 
                      breaks = axisdf$center)+
   scale_y_continuous(expand = c(0, 0), 
@@ -536,3 +558,18 @@ neutral_meth = Big_data_set %>%
         axis.text.y = element_text(size = 12), 
         strip.background = element_rect(fill = 'white'), 
         strip.text = element_text(face = 'bold'))
+
+ 
+ ggsave('BODY_Big_manhattan_plot.svg', 
+        plot = big_man_ting, 
+        dpi = 'retina',
+        units = 'cm',
+        height = 15, 
+        width = 30)  
+ ggsave('Body_Big_manhattan_plot.tiff', 
+        plot = big_man_ting, 
+        dpi = 'retina',
+        units = 'cm',
+        height = 15, 
+        width = 30)  
+ 
