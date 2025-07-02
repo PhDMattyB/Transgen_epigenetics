@@ -437,19 +437,23 @@ BODY_TGP_WGP_overlap = inner_join(Body_WGP_out,
                   'POS', 
                   'start',
                   'end',
-                  'status'))
+                  'status')) %>% 
+  mutate(outlier_type = 'Overlap')
 
 ## quantify unique TGP outliers
 BODY_TGP_out_unique = Body_TGP_out %>% 
   anti_join(., 
             BODY_TGP_WGP_overlap, 
-            by = 'loc')
+            by = 'loc') %>% 
+  mutate(outlier_type = 'TGP unique')
 
 ## quantify unique WGP outliers
 BODY_WGP_out_unique = Body_WGP_out %>% 
   anti_join(., 
             BODY_TGP_WGP_overlap, 
-            by = 'loc')
+            by = 'loc') %>% 
+  mutate(outlier_type = 'WGP unique')
+
 
 
 
