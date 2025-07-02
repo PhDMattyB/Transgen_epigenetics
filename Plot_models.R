@@ -438,7 +438,9 @@ BODY_TGP_WGP_overlap = inner_join(Body_WGP_out,
                   'start',
                   'end',
                   'status')) %>% 
-  mutate(outlier_type = 'Overlap')
+  mutate(outlier_type = 'Overlap') %>% 
+  select(-scores.y) %>% 
+  rename(scores = scores.x)
 
 ## quantify unique TGP outliers
 BODY_TGP_out_unique = Body_TGP_out %>% 
@@ -455,6 +457,26 @@ BODY_WGP_out_unique = Body_WGP_out %>%
   mutate(outlier_type = 'WGP unique')
 
 
+All_outliers = bind_rows(BODY_TGP_WGP_overlap, 
+                         BODY_TGP_out_unique, 
+                         BODY_WGP_out_unique)
 
 
-  
+Neutral = read_csv('BODY_TGP_clean_RDA_PCaxes_nonoutliers_methylation.csv')%>% 
+  separate(col = loc, 
+           into = c('CHR', 
+                    'BP'), 
+           sep = '-', 
+           remove = F) %>% 
+  arrange(CHR,
+          BP) %>% 
+  group_by(CHR)%>%
+  mutate(BP = as.numeric(BP)) %>% 
+  mutate(start = BP-100,   ## can change this to whatever window of interest you want around the site of interest
+         end = BP+100) %>% 
+  anti_join(.,
+            All_outliers, 
+            by = 'loc') %>% 
+  stickle_CHR_reorder2() %>% 
+  rename(POS = BP) %>% 
+  mutate(status = 'Neutral')
