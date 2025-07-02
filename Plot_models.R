@@ -750,3 +750,106 @@ ggsave('Body_Big_manhattan_plot.tiff',
        width = 30)
 
 
+# Filter based on position ------------------------------------------------
+
+
+
+# unique vs overlap GO terms ----------------------------------------------
+
+## overlap outlier gene names
+overlap_outs = outliers %>% 
+  filter(outlier_type == 'Overlap')
+
+setDT(overlap_outs)
+setDT(annotation_data)
+
+setkey(overlap_outs, 
+       CHR, 
+       start, 
+       end)
+
+## aligns the sites of interest with the annotated genome
+overlap_genes = foverlaps(annotation_data,
+                                 overlap_outs,
+                                 # by.x = start,
+                                 # by.y = end,
+                                 type="any")
+
+overlap_genes_tib = as_tibble(overlap_genes) %>% 
+  na.omit() %>% 
+  filter(CHR != 'chrUn') %>% 
+  arrange(CHR, 
+          BP)
+
+overlap_genes_tib$gene_name %>%
+  as_tibble() %>% 
+  distinct() %>% 
+  write_tsv('BODY_TGP_WGP_overlap_outlier_Genes_100bp_window.txt', 
+            col_names = F)
+
+
+## WGP outliers unique to WGP
+wgp_outs = outliers %>% 
+  filter(outlier_type == 'WGP unique')
+
+setDT(wgp_outs)
+setDT(annotation_data)
+
+setkey(wgp_outs, 
+       CHR, 
+       start, 
+       end)
+
+## aligns the sites of interest with the annotated genome
+WGP_genes = foverlaps(annotation_data,
+                          wgp_outs,
+                          # by.x = start,
+                          # by.y = end,
+                          type="any")
+
+WGP_genes_tib = as_tibble(WGP_genes) %>% 
+  na.omit() %>% 
+  filter(CHR != 'chrUn') %>% 
+  arrange(CHR, 
+          BP)
+
+WGP_genes_tib$gene_name %>%
+  as_tibble() %>% 
+  distinct() %>% 
+  write_tsv('BODY_WGP_unique_outlier_Genes_100bp_window.txt', 
+            col_names = F)
+
+## tgp unique genes
+tgp_outs = outliers %>% 
+  filter(outlier_type == 'TGP unique')
+
+setDT(tgp_outs)
+setDT(annotation_data)
+
+setkey(tgp_outs, 
+       CHR, 
+       start, 
+       end)
+
+## aligns the sites of interest with the annotated genome
+TGP_genes = foverlaps(annotation_data,
+                      tgp_outs,
+                      # by.x = start,
+                      # by.y = end,
+                      type="any")
+
+TGP_genes_tib = as_tibble(TGP_genes) %>% 
+  na.omit() %>% 
+  filter(CHR != 'chrUn') %>% 
+  arrange(CHR, 
+          BP)
+
+TGP_genes_tib$gene_name %>%
+  as_tibble() %>% 
+  distinct() %>% 
+  write_tsv('BODY_TGP_unique_outlier_Genes_100bp_window.txt', 
+            col_names = F)
+
+
+
+
