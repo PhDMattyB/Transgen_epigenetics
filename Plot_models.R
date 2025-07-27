@@ -40,15 +40,15 @@ gene_annotation = read_tsv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_An
 
 
 gene_metadata = gene_annotation %>% 
-  filter(feature == 'gene') %>% 
-  select(position,
+  # filter(feature == 'gene') %>% 
+  dplyr::select(position,
          chromosome,
          feature, 
          start, 
          end)
 
 ensemlbe_annotation_data = gene_annotation %>% 
-  filter(feature == 'gene') %>% 
+  # filter(feature == 'gene') %>% 
   pull(gene_id) %>% 
   as_tibble() %>% 
   separate(value, 
@@ -66,12 +66,12 @@ ensemble_annotation_genes = ensemlbe_annotation_data %>%
            into = c('trash', 
                     'gene_name'), 
            sep = '=') %>% 
-  select(-trash) %>% 
+  dplyr::select(-trash) %>% 
   separate(ensemble_id, 
            into = c('ensemble_name', 
                     'trash'), 
            sep = '.CDS') %>% 
-  select(-trash) 
+  dplyr::select(-trash) 
 
 annotation_data = bind_cols(gene_metadata, 
                             ensemble_annotation_genes) %>% 
