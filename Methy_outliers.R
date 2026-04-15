@@ -241,512 +241,16 @@ intersect(mapk_pathway,
           methy_genes)
 
 
-# ecotype divergence outliers ---------------------------------------------
-
-eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_Ecotype_outlier_win1000_step1000_abs0.1.csv") %>% 
-  mutate(chromosome = Chromosome, 
-         start = win_start, 
-         end = win_end)
-
-
-setDT(eco_div_outliers)
-setDT(gene_annotation)
-
-setkey(eco_div_outliers, 
-       chromosome, 
-       start, 
-       end)
-
-gene_overlap = foverlaps(gene_annotation, 
-                         eco_div_outliers, 
-                         type="any")
-
-
-gene_overlap_tib = as_tibble(gene_overlap) %>% 
-  na.omit()
-
-View(gene_overlap_tib)
-
-
-eco_gene_name_1 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = gene_name, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-eco_gene_name_2 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = parent_code, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-
-eco_methy_genes = bind_rows(eco_gene_name_1, 
-                        eco_gene_name_2) %>% 
-  arrange(chromosome, 
-          position) %>% 
-  distinct(gene_name, 
-           .keep_all = T) %>% 
-  filter(!grepl('ENSG', 
-                gene_name))%>% 
-  separate(gene_name, 
-           c('gene_name', 
-             'trash'), 
-           sep = '-') %>% 
-  dplyr::select(-trash) %>% 
-  distinct(gene_name)%>% 
-  mutate_all(., .funs = tolower)
-
-
-mapk_pathway = read_csv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annotation_features/mapk_pathway_genelist_fixed.csv')%>%
-  mutate_all(., .funs = tolower) %>% 
-  dplyr::rename(gene_name = Symbol) %>% 
-  dplyr::select(gene_name)
-
-
-eco_methy_genes %>% 
-  filter(gene_name %in% mapk_pathway$gene_name)
-
-
-# F1 eco results ----------------------------------------------------------
-
-f1_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1EcoRes_outlier_win1000_step1000_abs0.1.csv") %>% 
-  mutate(chromosome = Chromosome, 
-         start = win_start, 
-         end = win_end)
-
-
-setDT(f1_div_outliers)
-setDT(gene_annotation)
-
-setkey(f1_div_outliers, 
-       chromosome, 
-       start, 
-       end)
-
-gene_overlap = foverlaps(gene_annotation, 
-                         f1_div_outliers, 
-                         type="any")
-
-
-gene_overlap_tib = as_tibble(gene_overlap) %>% 
-  na.omit()
-
-View(gene_overlap_tib)
-
-
-F1_eco_gene_name_1 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = gene_name, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-F1_eco_gene_name_2 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = parent_code, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-
-F1_eco_methy_genes = bind_rows(F1_eco_gene_name_1, 
-                               F1_eco_gene_name_2) %>% 
-  arrange(chromosome, 
-          position) %>% 
-  distinct(gene_name, 
-           .keep_all = T) %>% 
-  filter(!grepl('ENSG', 
-                gene_name))%>% 
-  separate(gene_name, 
-           c('gene_name', 
-             'trash'), 
-           sep = '-') %>% 
-  dplyr::select(-trash) %>% 
-  distinct(gene_name)%>% 
-  mutate_all(., .funs = tolower)
-
-
-mapk_pathway = read_csv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annotation_features/mapk_pathway_genelist_fixed.csv')%>%
-  mutate_all(., .funs = tolower) %>% 
-  dplyr::rename(gene_name = Symbol) %>% 
-  dplyr::select(gene_name)
-
-
-F1_eco_methy_genes %>% 
-  filter(gene_name %in% mapk_pathway$gene_name)
-
-F1_eco_methy_genes %>% 
-  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/F1_Eco_Outlier_genes.txt', 
-            col_names = F)
-
-
-
-
-# F2 results --------------------------------------------------------------
-
-f2_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F2EcoRes_outlier_win1000_step1000_abs0.1.csv") %>% 
-  mutate(chromosome = Chromosome, 
-         start = win_start, 
-         end = win_end)
-
-
-setDT(f2_div_outliers)
-setDT(gene_annotation)
-
-setkey(f2_div_outliers, 
-       chromosome, 
-       start, 
-       end)
-
-gene_overlap = foverlaps(gene_annotation, 
-                         f2_div_outliers, 
-                         type="any")
-
-
-gene_overlap_tib = as_tibble(gene_overlap) %>% 
-  na.omit()
-
-View(gene_overlap_tib)
-
-
-F2_eco_gene_name_1 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = gene_name, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-F2_eco_gene_name_2 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = parent_code, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-
-F2_eco_methy_genes = bind_rows(F2_eco_gene_name_1, 
-                            F2_eco_gene_name_2) %>% 
-  arrange(chromosome, 
-          position) %>% 
-  distinct(gene_name, 
-           .keep_all = T) %>% 
-  filter(!grepl('ENSG', 
-                gene_name))%>% 
-  separate(gene_name, 
-           c('gene_name', 
-             'trash'), 
-           sep = '-') %>% 
-  dplyr::select(-trash) %>% 
-  distinct(gene_name)%>% 
-  mutate_all(., .funs = tolower)
-
-
-mapk_pathway = read_csv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annotation_features/mapk_pathway_genelist_fixed.csv')%>%
-  mutate_all(., .funs = tolower) %>% 
-  dplyr::rename(gene_name = Symbol) %>% 
-  dplyr::select(gene_name)
-
-
-F2_eco_methy_genes %>% 
-  filter(gene_name %in% mapk_pathway$gene_name)
-
-F2_eco_methy_genes %>% 
-  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/F2_Eco_Outlier_genes.txt', 
-            col_names = F)
-
-
-# F1 * F2 * eco results ---------------------------------------------------
-
-
-F1F2Eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1F2EcoRes_outlier_win1000_step1000_abs0.1.csv") %>% 
-  mutate(chromosome = Chromosome, 
-         start = win_start, 
-         end = win_end)
-
-
-setDT(F1F2Eco_div_outliers)
-setDT(gene_annotation)
-
-setkey(F1F2Eco_div_outliers, 
-       chromosome, 
-       start, 
-       end)
-
-gene_overlap = foverlaps(gene_annotation, 
-                         F1F2Eco_div_outliers, 
-                         type="any")
-
-
-gene_overlap_tib = as_tibble(gene_overlap) %>% 
-  na.omit()
-
-View(gene_overlap_tib)
-
-
-F1F2_eco_gene_name_1 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = gene_name, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-F1F2_eco_gene_name_2 = gene_overlap_tib %>% 
-  # pull(gene_id) %>% 
-  as_tibble() %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_id, 
-                win_mid, 
-                expression_mean, 
-                expression_sd, 
-                feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>%
-  separate(col = parent_code, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>% 
-  dplyr::select(chromosome, 
-                position, 
-                start, 
-                end, 
-                gene_name) %>% 
-  na.omit()
-
-
-F1F2_eco_methy_genes = bind_rows(F1F2_eco_gene_name_1, 
-                               F1F2_eco_gene_name_2) %>% 
-  arrange(chromosome, 
-          position) %>% 
-  distinct(gene_name, 
-           .keep_all = T) %>% 
-  filter(!grepl('ENSG', 
-                gene_name))%>% 
-  separate(gene_name, 
-           c('gene_name', 
-             'trash'), 
-           sep = '-') %>% 
-  dplyr::select(-trash) %>% 
-  distinct(gene_name)%>% 
-  mutate_all(., .funs = tolower)
-
-
-mapk_pathway = read_csv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annotation_features/mapk_pathway_genelist_fixed.csv')%>%
-  mutate_all(., .funs = tolower) %>% 
-  dplyr::rename(gene_name = Symbol) %>% 
-  dplyr::select(gene_name)
-
-
-F1F2_eco_methy_genes %>% 
-  filter(gene_name %in% mapk_pathway$gene_name)
-
-F1F2_eco_methy_genes %>% 
-  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/F1F2_Eco_Outlier_genes.txt', 
-          col_names = F)
-
-
-# gene name overlap -------------------------------------------------------
-
-eco_methy_genes
-F1_eco_methy_genes
-F2_eco_methy_genes
-F1F2_eco_methy_genes
-
-
-inner_join(eco_methy_genes, 
-           F1_eco_methy_genes)
-
-inner_join(eco_methy_genes, 
-           F2_eco_methy_genes)
-
-inner_join(eco_methy_genes, 
-           F1F2_eco_methy_genes)
-
-inner_join(F1_eco_methy_genes, 
-           F2_eco_methy_genes)
-
-inner_join(F1_eco_methy_genes, 
-           F1F2_eco_methy_genes)
-
-inner_join(F2_eco_methy_genes, 
-           F1F2_eco_methy_genes)
-
-inner_join(eco_methy_genes, 
-           F1_eco_methy_genes) %>% 
-  inner_join(., 
-             F2_eco_methy_genes) %>% 
-  inner_join(., 
-             F1F2_eco_methy_genes)
-
-
-# Outlier top5% expression distribution -----------------------------------
+# Outlier top1% expression distribution -----------------------------------
 # ecotype outliers --------------------------------------------------------
 
 
-eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_Eco_outlier_top5dist.csv") %>% 
+# eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_Eco_outlier_top5dist.csv") %>% 
+#   mutate(chromosome = Chromosome, 
+#          start = win_start, 
+#          end = win_end)
+
+eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_Eco_outlier_top1dist.csv") %>% 
   mutate(chromosome = Chromosome, 
          start = win_start, 
          end = win_end)
@@ -855,11 +359,11 @@ mapk_pathway = read_csv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annot
 
 eco_methy_genes %>% 
   filter(gene_name %in% mapk_pathway$gene_name) %>% 
-  write_tsv("~/Parsons_Postdoc/Methylation_data/GLM_results/Eco_top5_outlier_mapk_genes.txt")
+  write_tsv("~/Parsons_Postdoc/Methylation_data/GLM_results/Eco_top1_outlier_mapk_genes.txt")
 
 
 eco_methy_genes %>% 
-  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/Eco_top5_Outlier_genes.txt', 
+  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/Eco_top1_Outlier_genes.txt', 
             col_names = F)
 
 
@@ -869,7 +373,12 @@ eco_methy_genes %>%
 
 
 # F1 eco outliers -------------------------------------------------------------
-f1_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_eco_outlier_top5dist.csv") %>% 
+# f1_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_eco_outlier_top5dist.csv") %>% 
+#   mutate(chromosome = Chromosome, 
+#          start = win_start, 
+#          end = win_end)
+
+f1_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_eco_outlier_top1dist.csv") %>% 
   mutate(chromosome = Chromosome, 
          start = win_start, 
          end = win_end)
@@ -978,13 +487,13 @@ mapk_pathway = read_csv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annot
 
 F1_eco_methy_genes %>% 
   filter(gene_name %in% mapk_pathway$gene_name) %>% 
-  write_tsv("~/Parsons_Postdoc/Methylation_data/GLM_results/F1_eco_top5_outlier_mapk_genes.txt")
+  write_tsv("~/Parsons_Postdoc/Methylation_data/GLM_results/F1_eco_top1_outlier_mapk_genes.txt")
 
 ## fgf13 related to ecotype*f1 effects
 
 
 F1_eco_methy_genes %>% 
-  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/F1_Eco_top5_Outlier_genes.txt', 
+  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/F1_Eco_top1_Outlier_genes.txt', 
             col_names = F)
 
 
@@ -994,7 +503,11 @@ F1_eco_methy_genes %>%
 
 # F2 eco outliers -------------------------------------------------------------
 
-f2_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F2_eco_outlier_top5dist.csv") %>% 
+# f2_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F2_eco_outlier_top5dist.csv") %>% 
+#   mutate(chromosome = Chromosome, 
+#          start = win_start, 
+#          end = win_end)
+f2_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F2_eco_outlier_top1dist.csv") %>% 
   mutate(chromosome = Chromosome, 
          start = win_start, 
          end = win_end)
@@ -1103,18 +616,20 @@ mapk_pathway = read_csv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annot
 
 F2_eco_methy_genes %>% 
   filter(gene_name %in% mapk_pathway$gene_name) %>% 
-  write_tsv("~/Parsons_Postdoc/Methylation_data/GLM_results/F2_eco_top5_outlier_mapk_genes.txt")
+  write_tsv("~/Parsons_Postdoc/Methylation_data/GLM_results/F2_eco_top1_outlier_mapk_genes.txt")
 
 
 F2_eco_methy_genes %>% 
-  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/F2_Eco_top5_Outlier_genes.txt', 
+  write_tsv('~/Parsons_Postdoc/Methylation_data/GLM_results/F2_Eco_top1_Outlier_genes.txt', 
             col_names = F)
 
 
-
-
 # f1 f2 eco outliers ------------------------------------------------------
-F1F2Eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_F2_eco_outlier_top5dist.csv") %>% 
+# F1F2Eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_F2_eco_outlier_top5dist.csv") %>% 
+#   mutate(chromosome = Chromosome, 
+#          start = win_start, 
+#          end = win_end)
+F1F2Eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_F2_eco_outlier_top1dist.csv") %>% 
   mutate(chromosome = Chromosome, 
          start = win_start, 
          end = win_end)
@@ -1228,3 +743,105 @@ F1F2_eco_methy_genes %>%
             col_names = F)
 
 
+
+# quantify overlap between model res top1 abs outliers --------------------
+F1_eco_methy_genes
+F2_eco_methy_genes
+eco_methy_genes
+
+intersect(eco_methy_genes, 
+          F1_eco_methy_genes)
+
+intersect(eco_methy_genes, 
+          F2_eco_methy_genes)
+
+intersect(F1_eco_methy_genes, 
+          F2_eco_methy_genes)
+
+inner_join(eco_methy_genes, 
+           F1_eco_methy_genes) %>% 
+  inner_join(., 
+             F2_eco_methy_genes)
+
+
+
+
+
+# enrichR -----------------------------------------------------------------
+
+F2_eco_methy_genes_go = F2_eco_methy_genes%>%
+  summarise(
+    genes = list(unique(gene_name)),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    BP = map(genes, ~ tryCatch(run_go(.x, "BP"), error = function(e) NULL)),
+    MF = map(genes, ~ tryCatch(run_go(.x, "MF"), error = function(e) NULL)),
+    CC = map(genes, ~ tryCatch(run_go(.x, "CC"), error = function(e) NULL))
+  )%>%
+  # mutate(
+  #   BP = map(BP, simplify_GO),
+  #   MF = map(MF, simplify_GO),
+  #   CC = map(CC, simplify_GO)
+  # ) %>% 
+  pivot_longer(
+    cols = c(BP, MF, CC),
+    names_to = "ontology",
+    values_to = "go"
+  ) %>%
+  filter(!map_lgl(go, is.null)) %>%
+  mutate(go_tbl = map(go, as_tibble)) %>%
+  dplyr::select(ontology, go_tbl) %>%
+  unnest(go_tbl)
+
+
+F1_eco_methy_genes_go = F1_eco_methy_genes%>%
+  summarise(
+    genes = list(unique(gene_name)),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    BP = map(genes, ~ tryCatch(run_go(.x, "BP"), error = function(e) NULL)),
+    MF = map(genes, ~ tryCatch(run_go(.x, "MF"), error = function(e) NULL)),
+    CC = map(genes, ~ tryCatch(run_go(.x, "CC"), error = function(e) NULL))
+  )%>%
+  # mutate(
+  #   BP = map(BP, simplify_GO),
+  #   MF = map(MF, simplify_GO),
+  #   CC = map(CC, simplify_GO)
+  # ) %>% 
+  pivot_longer(
+    cols = c(BP, MF, CC),
+    names_to = "ontology",
+    values_to = "go"
+  ) %>%
+  filter(!map_lgl(go, is.null)) %>%
+  mutate(go_tbl = map(go, as_tibble)) %>%
+  dplyr::select(ontology, go_tbl) %>%
+  unnest(go_tbl)
+
+
+eco_methy_genes_go = eco_methy_genes%>%
+  summarise(
+    genes = list(unique(gene_name)),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    BP = map(genes, ~ tryCatch(run_go(.x, "BP"), error = function(e) NULL)),
+    MF = map(genes, ~ tryCatch(run_go(.x, "MF"), error = function(e) NULL)),
+    CC = map(genes, ~ tryCatch(run_go(.x, "CC"), error = function(e) NULL))
+  )%>%
+  # mutate(
+  #   BP = map(BP, simplify_GO),
+  #   MF = map(MF, simplify_GO),
+  #   CC = map(CC, simplify_GO)
+  # ) %>% 
+  pivot_longer(
+    cols = c(BP, MF, CC),
+    names_to = "ontology",
+    values_to = "go"
+  ) %>%
+  filter(!map_lgl(go, is.null)) %>%
+  mutate(go_tbl = map(go, as_tibble)) %>%
+  dplyr::select(ontology, go_tbl) %>%
+  unnest(go_tbl)
