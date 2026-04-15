@@ -845,3 +845,89 @@ eco_methy_genes_go = eco_methy_genes%>%
   mutate(go_tbl = map(go, as_tibble)) %>%
   dplyr::select(ontology, go_tbl) %>%
   unnest(go_tbl)
+
+
+
+# Outlier regions ---------------------------------------------------------
+eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_Eco_outlier_top1dist.csv") %>% 
+  mutate(chromosome = Chromosome, 
+         start = win_start, 
+         end = win_end)
+
+eco_div_outliers %>% 
+  group_by(Chromosome) %>% 
+  summarize(n = n())%>%
+  arrange(desc(n))
+
+
+f1_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_eco_outlier_top1dist.csv") %>% 
+  mutate(chromosome = Chromosome, 
+         start = win_start, 
+         end = win_end)
+
+f1_div_outliers %>% 
+  group_by(Chromosome) %>% 
+  summarize(n = n())%>%
+  arrange(desc(n))
+
+
+f2_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F2_eco_outlier_top1dist.csv") %>% 
+  mutate(chromosome = Chromosome, 
+         start = win_start, 
+         end = win_end)
+
+f2_div_outliers %>% 
+  group_by(Chromosome) %>% 
+  summarize(n = n()) %>%
+  arrange(desc(n))
+
+
+F1F2Eco_div_outliers = read_csv("~/Parsons_Postdoc/Methylation_data/GLM_results/Methylation_F1_F2_eco_outlier_top1dist.csv") %>% 
+  mutate(chromosome = Chromosome, 
+         start = win_start, 
+         end = win_end)
+
+F1F2Eco_div_outliers %>% 
+  group_by(Chromosome) %>% 
+  summarize(n = n()) %>%
+  arrange(desc(n))
+
+
+
+# CHR XVII deep dive ------------------------------------------------------
+
+eco_div_outliers %>% 
+  filter(Chromosome == 'chrXVII') %>% 
+  ggplot(aes(x = win_mid, 
+             y = expression_mean))+
+  geom_point(aes(size = expression_n))+
+  scale_x_continuous(expand = c(0, 0), 
+                     limits = c(6000000,18153500))
+
+
+f1_div_outliers %>% 
+  filter(Chromosome == 'chrXVII') %>% 
+  ggplot(aes(x = win_mid, 
+             y = expression_mean))+
+  geom_point(aes(size = expression_n))+
+  scale_x_continuous(expand = c(0, 0), 
+                     limits = c(6000000,18153500))
+
+f2_div_outliers %>% 
+  filter(Chromosome == 'chrXVII') %>% 
+  # summarize(min_bp = min(win_mid), 
+  #           max_bp = max(win_mid))
+  ggplot(aes(x = win_mid, 
+             y = expression_mean))+
+  geom_point(aes(size = expression_n))+
+  scale_x_continuous(expand = c(0, 0), 
+                     limits = c(6000000,18153500))
+
+
+F1F2Eco_div_outliers %>% 
+  filter(Chromosome == 'chrXVII') %>% 
+  ggplot(aes(x = win_mid, 
+             y = expression_mean))+
+  geom_point(aes(size = expression_n))+
+  scale_x_continuous(expand = c(0, 0), 
+                     limits = c(6000000,18153500))
