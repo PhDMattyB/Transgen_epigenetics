@@ -94,9 +94,9 @@ inner_join(F1_res,
 # sliding window ----------------------------------------------------------
 
 
-F2_res$Pos = as.integer(F2_res$Pos)
+F1_res$Pos = as.integer(F1_res$Pos)
 
-F2_test = F2_res %>% 
+F1_test = F1_res %>% 
   as.data.frame()
 
 plan(multisession, workers = 8)
@@ -292,19 +292,19 @@ ecotype_win %>%
   summarize(sum_n = sum(expression_n)) %>%
   filter(sum_n >= 40) %>% View()
 
-F2_win = read_tsv('Methylation_F2_effect_win1000_step1000.txt')
+F1_win = read_tsv('Methylation_F1_effect_win1000_step1000.txt')
 
-F2_win %>% 
+F1_win %>% 
   group_by(Chromosome, 
            win_mid) %>% 
   summarize(sum_n = sum(expression_n)) %>% 
   filter(sum_n >= 40)
 
-F2_win %>% 
+F1_win %>% 
   filter(expression_mean < 0) %>% 
   group_by(Chromosome) %>% 
   summarize(n = n())
-F2_win %>% 
+F1_win %>% 
   filter(expression_mean > 0)
 
 
@@ -321,8 +321,8 @@ F2_win %>%
 F2_win %>% 
   filter(expression_mean > 0)
 
-F2_eco_win = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt')
-F2_eco_win %>% 
+F1_eco_win = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt')
+F1_eco_win %>% 
   group_by(Chromosome, 
            win_mid) %>% 
   summarize(sum_n = sum(expression_n)) %>% 
@@ -335,29 +335,29 @@ F2_eco_win %>%
   summarize(sum_n = sum(expression_n)) %>% 
   filter(sum_n >= 40)
 
-F2_F2_win = read_tsv('Methylation_F2_F2_effect_win1000_step1000.txt')
-F2_F2_win %>% 
-  group_by(Chromosome, 
-           win_mid) %>% 
-  summarize(sum_n = sum(expression_n)) %>% 
+F1_F2_win = read_tsv('Methylation_F1_F2_effect_win1000_step1000.txt')
+F1_F2_win %>%
+  group_by(Chromosome,
+           win_mid) %>%
+  summarize(sum_n = sum(expression_n)) %>%
   filter(sum_n >= 40)
 
-F2_F2_eco_win = read_tsv('Methylation_F2_F2_eco_effect_win1000_step1000.txt')
-F2_F2_eco_win %>% 
+F1_F2_eco_win = read_tsv('Methylation_F1_F2_eco_effect_win1000_step1000.txt')
+F1_F2_eco_win %>% 
   group_by(Chromosome, 
            win_mid) %>% 
   summarize(sum_n = sum(expression_n)) %>% 
-  filter(sum_n >= 40) %>% View()
+  filter(sum_n >= 40) 
 
 
 # plot methylation sliding window -----------------------------------------
 
 neutral = read_tsv('Methylation_neutral_win1000_step1000.txt')
-F2_res = read_tsv('Methylation_F2_effect_win1000_step1000.txt') %>% 
+F1_res = read_tsv('Methylation_F1_effect_win1000_step1000.txt') %>% 
   mutate(Effect = 'F1')
 F2_res = read_tsv('Methylation_F2_effect_win1000_step1000.txt') %>% 
   mutate(effect = 'F2')
-F2_F2_res = read_tsv('Methylation_F2_F2_effect_win1000_step1000.txt') %>% 
+F1_F2_res = read_tsv('Methylation_F1_F2_effect_win1000_step1000.txt') %>% 
   mutate(effect = 'F1*F2')
 
 
@@ -368,8 +368,8 @@ ggplot(data = neutral,
   geom_point(col = '#8C8C8C', 
              size = 2)
 
-F2_plot = ggplot()+
-  geom_point(data = F2_res, 
+F1_plot = ggplot()+
+  geom_point(data = F1_res, 
              aes(x = win_mid, 
                  y = expression_mean, 
                  group = Chromosome), 
@@ -389,8 +389,8 @@ f2_plot = ggplot()+
   facet_grid(~Chromosome, 
              scales = 'free')
 
-F2_f2_plot = ggplot()+
-  geom_point(data = F2_F2_res, 
+F1_f2_plot = ggplot()+
+  geom_point(data = F1_F2_res, 
              aes(x = win_mid, 
                  y = expression_mean, 
                  group = Chromosome), 
