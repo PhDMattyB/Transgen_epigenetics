@@ -406,7 +406,8 @@ F2_plot/f2_plot/F2_f2_plot
 
 # bring in the ecotype ----------------------------------------------------
 
-
+neutral = neutral %>% 
+  mutate(Effect = 'none') 
 
 F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
   mutate(Effect = 'F1', 
@@ -652,6 +653,21 @@ F1_F2_hyper_summits <- F1_F2_hyper_regions %>%
             with_ties = FALSE) %>%
   ungroup()
 
+neutral = neutral %>% 
+  mutate(abs_effect = abs(expression_mean)) %>%
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect < threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean < threshold ~ "Neutral",
+    expression_mean > -threshold ~ "Neutral",
+    TRUE ~ "Neutral")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
 
 ggplot(data = neutral, 
        aes(win_mid, 
@@ -666,6 +682,12 @@ F1_methylation_state_cols = c('#003049',
                            '#780000')
 
 F1_eco_plot = ggplot()+
+  # geom_point(data = neutral, 
+  #            aes(x = win_mid, 
+  #                y = expression_mean, 
+  #                group = Chromosome), 
+  #            colour = '#8C8C8C', 
+  #            size  = 1)+
   geom_point(data = F1_eco_res, 
              aes(x = win_mid, 
                  y = expression_mean, 
@@ -682,7 +704,13 @@ F1_eco_plot = ggplot()+
              linetype = "dashed") +
   facet_grid(~Chromosome, 
              scales = 'free')+
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90), 
+        axis.title = element_blank(), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(face = 'bold', 
+                                  size = 10), 
+        panel.grid = element_blank(), 
+        legend.position = 'none')
 
 F1_eco_plot_peak = ggplot()+
   geom_point(data = F1_Peak_regions, 
@@ -722,7 +750,13 @@ f2_eco_plot = ggplot()+
              linetype = "dashed") +
   facet_grid(~Chromosome, 
              scales = 'free')+
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90),
+        axis.title = element_blank(), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(face = 'bold', 
+                                  size = 10), 
+        panel.grid = element_blank(), 
+        legend.position = 'none')
 
 F2_eco_plot_peak = ggplot()+
   geom_point(data = F2_Peak_regions, 
@@ -763,7 +797,13 @@ f1_f2_eco_plot = ggplot()+
              linetype = "dashed") +
   facet_grid(~Chromosome, 
              scales = 'free')+
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90), 
+        axis.title = element_blank(), 
+        strip.background = element_rect(fill = 'white'), 
+        strip.text = element_text(face = 'bold', 
+                                  size = 10), 
+        panel.grid = element_blank(), 
+        legend.position = 'none')
 
 F1_F2_eco_plot_peak = ggplot()+
   geom_point(data = F1_F2_Peak_regions, 
@@ -787,12 +827,12 @@ F1_F2_eco_plot_peak = ggplot()+
 
 F1_eco_plot/f2_eco_plot/f1_f2_eco_plot
 
-ggsave('F2_F2_interaction_sliding_window_results_22.09.2026.tiff', 
+ggsave('F2_F2_interaction_sliding_window_results_05.10.2026.tiff', 
        plot = last_plot(), 
        dpi = 'retina', 
        units = 'cm', 
        height = 25, 
-       width = 30)
+       width = 40)
 
 
 
