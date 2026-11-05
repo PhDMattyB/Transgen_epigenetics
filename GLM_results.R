@@ -10,14 +10,14 @@ library(patchwork)
 mod_results = read_table('model_results_table.tab')
 
 
-F2_res = mod_results %>% 
+F1_res = mod_results %>%
   dplyr::select(Methy_loc,
-         Chromosome, 
+         Chromosome,
          Pos,
          expression,
          estimate_F1,
-         pval_F1) %>% 
-  filter(!pval_F1 == 'NaN') %>% 
+         pval_F1) %>%
+  filter(!pval_F1 == 'NaN') %>%
   filter(pval_F1 <= 0.001)
 
 
@@ -42,15 +42,15 @@ eco_res = mod_results %>%
   filter(!pval_eco == 'NaN') %>% 
   filter(pval_eco <= 0.001)
 
-F2_eco_res = mod_results %>% 
+F1_eco_res = mod_results %>% 
   dplyr::select(Methy_loc, 
          Chromosome, 
          Pos,
          expression,
-         estimate_F2_eco,
-         pval_F2_eco) %>% 
-  filter(!pval_F2_eco == 'NaN') %>% 
-  filter(pval_F2_eco <= 0.001)
+         estimate_F1_eco,
+         pval_F1_eco) %>% 
+  filter(!pval_F1_eco == 'NaN') %>% 
+  filter(pval_F1_eco <= 0.001)
 
 F2_eco_res = mod_results %>% 
   dplyr::select(Methy_loc, 
@@ -62,29 +62,29 @@ F2_eco_res = mod_results %>%
   filter(!pval_F2_eco == 'NaN') %>% 
   filter(pval_F2_eco <= 0.001)
 
-F2_F2_res = mod_results %>% 
+F1_F2_res = mod_results %>% 
   dplyr::select(Methy_loc, 
          Chromosome, 
          Pos,
          expression,
-         estimate_F2_F2,
-         pval_F2_F2) %>% 
-  filter(!pval_F2_F2 == 'NaN') %>% 
-  filter(pval_F2_F2 <= 0.001)
+         estimate_F1_F2,
+         pval_F1_F2) %>% 
+  filter(!pval_F1_F2 == 'NaN') %>% 
+  filter(pval_F1_F2 <= 0.001)
 
-F2_F2_eco_res = mod_results %>% 
+F1_F2_eco_res = mod_results %>% 
   dplyr::select(Methy_loc,
          Chromosome, 
          Pos,
          expression,
-         estimate_F2_F2_eco,
-         pval_F2_F2_eco) %>% 
-  filter(!pval_F2_F2_eco == 'NaN') %>% 
-  filter(pval_F2_F2_eco <= 0.001)
+         estimate_F1_F2_eco,
+         pval_F1_F2_eco) %>% 
+  filter(!pval_F1_F2_eco == 'NaN') %>% 
+  filter(pval_F1_F2_eco <= 0.001)
 
 
 
-inner_join(F2_res, 
+inner_join(F1_res, 
            F2_res, 
            by = c('Methy_loc'))
 
