@@ -879,9 +879,20 @@ ggsave('F2_F2_interaction_sliding_window_results_05.10.2026.svg',
 
 # Outliers in chrxxi inversion --------------------------------------------
 
-F1_eco_res
-F2_eco_res
-F1_F2_eco_res
+F1_eco_res %>% 
+  filter(Chromosome == 'chrXXI') %>% 
+  filter(win_mid >= 9963830, 
+         win_mid <= 11574024)
+F2_eco_res %>% 
+  filter(Chromosome == 'chrXXI') %>% 
+  filter(win_mid >= 9963830, 
+         win_mid <= 11574024)
+## 7 outlier windows with 128 hypo-methylated sites
+F1_F2_eco_res %>% 
+  filter(Chromosome == 'chrXXI') %>% 
+  filter(win_mid >= 9963830, 
+         win_mid <= 11574024)
+## 2 outlier windows with 17 hyper-methylated sites
 
 
 # 9963830-11574024
