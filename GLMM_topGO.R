@@ -549,5 +549,18 @@ ggsave('GLMM_F1_F2_Ecotype_Res_topGO_plot.svg',
        plot = F1_F2_Eco_GO_plot, 
        dpi = 'retina', 
        units = 'cm', 
-       width = 30, 
+       width = 25, 
+       height = 15)
+
+
+
+# Plot combine ------------------------------------------------------------
+
+GO_combo_plots = F1_Eco_GO_plot + F2_Eco_GO_plot + F1_F2_Eco_GO_plot
+
+ggsave('GLMM_results_all_plots_combined.svg', 
+       plot = GO_combo_plots, 
+       dpi = 'retina', 
+       units = 'cm', 
+       width = 65, 
        height = 25)
