@@ -577,7 +577,7 @@ F2_Peak_regions %>%
   unite(col = genome_annotation, 
         c('Chromosome', 
           'genome_annotation'), 
-        sep = ':') %>% View()
+        sep = ':') 
 
 
 F1_F2_eco_res = read_tsv('Methylation_F1_F2_eco_effect_win1000_step1000.txt') %>% 
@@ -785,7 +785,7 @@ F1_F2_eco_plot_peak = ggplot()+
   theme(axis.text.x = element_text(angle = 90))
 
 
-F2_eco_plot/f2_eco_plot/F2_f2_eco_plot
+F1_eco_plot/f2_eco_plot/f1_f2_eco_plot
 
 ggsave('F2_F2_interaction_sliding_window_results_22.09.2026.tiff', 
        plot = last_plot(), 
