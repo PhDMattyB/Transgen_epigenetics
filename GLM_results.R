@@ -406,8 +406,7 @@ F2_plot/f2_plot/F2_f2_plot
 
 # bring in the ecotype ----------------------------------------------------
 
-neutral = neutral %>% 
-  mutate(Effect = 'none') 
+
 
 F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
   mutate(Effect = 'F1', 
@@ -653,7 +652,8 @@ F1_F2_hyper_summits <- F1_F2_hyper_regions %>%
             with_ties = FALSE) %>%
   ungroup()
 
-neutral = neutral %>% 
+f1_neutral = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'none') %>%  
   mutate(abs_effect = abs(expression_mean)) %>%
   filter(! Chromosome %in% c('chrUn')) %>% 
   filter(expression_n > 3) %>%
@@ -669,25 +669,17 @@ neutral = neutral %>%
   # Order by genomic position
   arrange(Chromosome, win_mid)
 
-ggplot(data = neutral, 
-       aes(win_mid, 
-           y = expression_mean, 
-           group = Chromosome))+
-  geom_point(col = '#8C8C8C', 
-             size = 2) +
-  facet_grid(~Chromosome, 
-             scales = 'free')
-  
+
 F1_methylation_state_cols = c('#003049', 
                            '#780000')
 
 F1_eco_plot = ggplot()+
-  # geom_point(data = neutral, 
-  #            aes(x = win_mid, 
-  #                y = expression_mean, 
-  #                group = Chromosome), 
-  #            colour = '#8C8C8C', 
-  #            size  = 1)+
+  geom_point(data = f1_neutral,
+             aes(x = win_mid,
+                 y = expression_mean,
+                 group = Chromosome),
+             colour = '#8C8C8C',
+             size  = 1)+
   geom_point(data = F1_eco_res, 
              aes(x = win_mid, 
                  y = expression_mean, 
@@ -731,10 +723,32 @@ F1_eco_plot_peak = ggplot()+
              scales = 'free')+
   theme(axis.text.x = element_text(angle = 90))
 
+f2_neutral = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'none') %>%  
+  mutate(abs_effect = abs(expression_mean)) %>%
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect < threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean < threshold ~ "Neutral",
+    expression_mean > -threshold ~ "Neutral",
+    TRUE ~ "Neutral")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
 
 F2_methylation_state_cols = c('#669bbc', 
                               '#c1121f')
 f2_eco_plot = ggplot()+
+  geom_point(data = f2_neutral,
+             aes(x = win_mid,
+                 y = expression_mean,
+                 group = Chromosome),
+             colour = '#8C8C8C',
+             size  = 1)+
   geom_point(data = F2_eco_res, 
              aes(x = win_mid, 
                  y = expression_mean, 
@@ -777,11 +791,33 @@ F2_eco_plot_peak = ggplot()+
              scales = 'free')+
   theme(axis.text.x = element_text(angle = 90))
 
+f1_f2_neutral = read_tsv('Methylation_F1_F2_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'none') %>%  
+  mutate(abs_effect = abs(expression_mean)) %>%
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect < threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean < threshold ~ "Neutral",
+    expression_mean > -threshold ~ "Neutral",
+    TRUE ~ "Neutral")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
 
 F1_F2_methylation_state_cols = c('#0f4c5c', 
                               '#e36414')
 
 f1_f2_eco_plot = ggplot()+
+  geom_point(data = f1_f2_neutral,
+             aes(x = win_mid,
+                 y = expression_mean,
+                 group = Chromosome),
+             colour = '#8C8C8C',
+             size  = 1)+
   geom_point(data = F1_F2_eco_res, 
              aes(x = win_mid, 
                  y = expression_mean, 
@@ -833,8 +869,22 @@ ggsave('F2_F2_interaction_sliding_window_results_05.10.2026.tiff',
        units = 'cm', 
        height = 25, 
        width = 40)
+ggsave('F2_F2_interaction_sliding_window_results_05.10.2026.svg', 
+       plot = last_plot(), 
+       dpi = 'retina', 
+       units = 'cm', 
+       height = 25, 
+       width = 40)
 
 
+# Outliers in chrxxi inversion --------------------------------------------
+
+F1_eco_res
+F2_eco_res
+F1_F2_eco_res
+
+
+# 9963830-11574024
 
 # outliers div -------------------------------------------------------------
 
