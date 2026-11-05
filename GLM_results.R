@@ -897,51 +897,343 @@ F1_F2_eco_res %>%
 
 # 9963830-11574024
 
-# outliers div -------------------------------------------------------------
-
-eco_res = read_tsv('Methylation_eco_effect_win1000_step1000.txt') %>% 
-  filter(expression_n > 3) 
-
-# %>%
-  
-  # 
-  # filter(abs(expression_mean) > 0.1) %>% 
-  # write_csv('Methylation_Ecotype_outlier_win1000_step1000_abs0.1.csv')
 
 
+# Outlier genes -----------------------------------------------------------
 
-F2_eco_res = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>% 
-  mutate(Effect = 'F1')%>% 
-  filter(expression_n > 3) 
-# %>%
-  # filter(abs(expression_mean) > 0.0004) %>% 
-  # write_csv('Methylation_F1EcoRes_outlier_win1000_step1000_abs0.1.csv')
-# %>%
-  # group_by(Chromosome, 
-  #          win_start, 
-  #          win_end) %>% 
-  # summarize(mean_expression = mean(expression_mean), 
-  #           max_expression = max(expression_mean))
+F1_eco_res
+
+library(data.table)
+
+## Reads in the gff file that has the stickleback gene annotations
+gene_annotation = read_tsv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annotation_features/stickleback_v5_ensembl_genes.gff3.gz', 
+                           col_names = F, 
+                           skip = 1) %>% 
+  # filter(X3 %in% c('gene', 
+  #                  'exon', 
+  #                  'CDS')) %>% 
+  group_by(X1) %>% 
+  arrange(X4, 
+          X5) %>% 
+  ## arrange each gene by its start and end points on each chromosome
+  mutate(mid = X4 + (X5-X4)/2) %>% 
+  dplyr::select(X1, 
+                X3:X5, 
+                X9:mid) %>% 
+  dplyr::rename(Chromosome = X1, 
+         feature = X3, 
+         win_start = X4, 
+         win_end = X5, 
+         gene_id = X9, 
+         win_mid = mid) %>% 
+  na.omit()
+
+## Take a look at what the functional annotations actually are
+## CDS is coding sequence, this is the actual coding region
+## gene means it's in the gene body
+## mRNA means it's associated with an mRNA transcript
+## three_prime_UTR means it's in the non-coding tail region
+## five_primte_UTR is the promoter
+
+gene_annotation %>% 
+  arrange(Chromosome) %>%
+  # filter(feature == 'gene')
+  group_by(feature) %>% 
+  distinct(feature)
 
 
 
-F2_eco_res = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>% 
-  mutate(effect = 'F2')%>% 
-  filter(expression_n > 3) 
-# %>%
-#   filter(abs(expression_mean) > 0.1) %>% 
-#   write_csv('Methylation_F2EcoRes_outlier_win1000_step1000_abs0.1.csv')
+# F1 eco res gene names ---------------------------------------------------
 
 
+setDT(F1_eco_res)
+setDT(gene_annotation)
 
-F2_F2_eco_res = read_tsv('Methylation_F2_F2_eco_effect_win1000_step1000.txt') %>% 
-  mutate(effect = 'F1*F2')%>% 
-  filter(expression_n > 3) 
-
-# %>%
-#   filter(abs(expression_mean) > 0.1)%>% 
-#   write_csv('Methylation_F1F2EcoRes_outlier_win1000_step1000_abs0.1.csv')
-
+setkey(F1_eco_res, 
+       Chromosome, 
+       win_start, 
+       win_end)
 
 
-#
+F1_eco_gene_overlap = foverlaps(gene_annotation,
+                              F1_eco_res,
+                              # by.x = start,
+                              # by.y = end,
+                              type="any")
+
+
+F1_eco_gene_overlap = as_tibble(F1_eco_gene_overlap) %>% 
+  na.omit() %>% 
+  filter(Chromosome != 'chrUn') %>% 
+  arrange(Chromosome, 
+          i.win_mid)
+
+F1_eco_res_genes = F1_eco_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start,
+                i.win_start, 
+                win_end, 
+                i.win_end,
+                gene_id,
+                feature,
+                expression_mean) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>%  
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start, 
+                i.win_start,
+                win_end, 
+                i.win_end,
+                expression_mean,
+                feature,
+                gene_name, 
+                parent_code) %>% 
+  na.omit() %>% 
+  filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
+  dplyr::select(gene_name)
+
+
+F1_eco_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start,
+                i.win_start, 
+                win_end, 
+                i.win_end,
+                gene_id,
+                feature,
+                expression_mean) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start, 
+                i.win_start,
+                win_end, 
+                i.win_end,
+                expression_mean,
+                feature,
+                gene_name, 
+                parent_code) %>% 
+  # na.omit() %>% 
+  group_by(feature) %>% 
+  summarize(n = n())
+
+
+# F2 eco res gene names ---------------------------------------------------
+
+setDT(F2_eco_res)
+setDT(gene_annotation)
+
+setkey(F2_eco_res, 
+       Chromosome, 
+       win_start, 
+       win_end)
+
+
+F2_eco_gene_overlap = foverlaps(gene_annotation,
+                                F2_eco_res,
+                                # by.x = start,
+                                # by.y = end,
+                                type="any")
+
+
+F2_eco_gene_overlap = as_tibble(F2_eco_gene_overlap) %>% 
+  na.omit() %>% 
+  filter(Chromosome != 'chrUn') %>% 
+  arrange(Chromosome, 
+          i.win_mid)
+
+F2_eco_res_genes = F2_eco_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start,
+                i.win_start, 
+                win_end, 
+                i.win_end,
+                gene_id,
+                feature,
+                expression_mean) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>%  
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start, 
+                i.win_start,
+                win_end, 
+                i.win_end,
+                expression_mean,
+                feature,
+                gene_name, 
+                parent_code) %>% 
+  na.omit() %>% 
+  filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
+  dplyr::select(gene_name)
+
+
+F2_eco_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start,
+                i.win_start, 
+                win_end, 
+                i.win_end,
+                gene_id,
+                feature,
+                expression_mean) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start, 
+                i.win_start,
+                win_end, 
+                i.win_end,
+                expression_mean,
+                feature,
+                gene_name, 
+                parent_code) %>% 
+  # na.omit() %>% 
+  group_by(feature) %>% 
+  summarize(n = n())
+
+
+# F1*F2*Eco gene names ----------------------------------------------------
+setDT(F1_F2_eco_res)
+setDT(gene_annotation)
+
+setkey(F1_F2_eco_res, 
+       Chromosome, 
+       win_start, 
+       win_end)
+
+
+F1_F2_eco_gene_overlap = foverlaps(gene_annotation,
+                                F1_F2_eco_res,
+                                # by.x = start,
+                                # by.y = end,
+                                type="any")
+
+
+F1_F2_eco_gene_overlap = as_tibble(F1_F2_eco_gene_overlap) %>% 
+  na.omit() %>% 
+  filter(Chromosome != 'chrUn') %>% 
+  arrange(Chromosome, 
+          i.win_mid)
+
+F1_F2_eco_res_genes = F1_F2_eco_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start,
+                i.win_start, 
+                win_end, 
+                i.win_end,
+                gene_id,
+                feature,
+                expression_mean) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>%  
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start, 
+                i.win_start,
+                win_end, 
+                i.win_end,
+                expression_mean,
+                feature,
+                gene_name, 
+                parent_code) %>% 
+  na.omit() %>% 
+  filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
+  dplyr::select(gene_name)
+
+
+F1_F2_eco_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start,
+                i.win_start, 
+                win_end, 
+                i.win_end,
+                gene_id,
+                feature,
+                expression_mean) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>% 
+  dplyr::select(Chromosome, 
+                win_mid, 
+                win_start, 
+                i.win_start,
+                win_end, 
+                i.win_end,
+                expression_mean,
+                feature,
+                gene_name, 
+                parent_code) %>% 
+  # na.omit() %>% 
+  group_by(feature) %>% 
+  summarize(n = n())
+
+
