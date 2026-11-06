@@ -1,8 +1,35 @@
 ## RDA results for TGP and WGP
 
 library(tidyverse)
+library(data.table)
 
 
+
+# gene annotation ---------------------------------------------------------
+
+gene_annotation = read_tsv('~/Parsons_Postdoc/Stickleback_Genomic/Stickleback_Annotation_features/stickleback_v5_ensembl_genes.gff3.gz', 
+                          col_names = F, 
+                          skip = 1) %>% 
+  # filter(X3 %in% c('gene', 
+  #                  'exon', 
+  #                  'CDS')) %>% 
+  group_by(X1) %>% 
+  arrange(X4, 
+          X5) %>% 
+  ## arrange each gene by its start and end points on each chromosome
+  mutate(mid = X4 + (X5-X4)/2) %>% 
+  dplyr::select(X1, 
+                X3:X5, 
+                X9:mid) %>% 
+  dplyr::rename(Chromosome = X1, 
+                feature = X3, 
+                win_start = X4, 
+                win_end = X5, 
+                gene_id = X9, 
+                win_mid = mid) %>% 
+  na.omit() %>% 
+  mutate(win_start_loc = win_start, 
+         win_end_loc = win_end)
 
 
 # Head WGP ----------------------------------------------------------------
@@ -50,7 +77,71 @@ head_RDA_WGP_Ecotype = inner_join(head_wgp,
                         POS <= win_end,
                         POS >= win_start),
            suffix = c("_RDA", "_Meth"),
-           relationship = "many-to-many") 
+           relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
+
+
+
+setDT(head_RDA_WGP_Ecotype)
+setDT(gene_annotation)
+
+setkey(head_RDA_WGP_Ecotype, 
+       Chromosome, 
+       win_start_loc, 
+       win_end_loc)
+
+
+head_RDA_WGP_Ecotype_gene_overlap = foverlaps(gene_annotation,
+                                head_RDA_WGP_Ecotype,
+                                # by.x = start,
+                                # by.y = end,
+                                type="any")
+
+
+head_RDA_WGP_Ecotype_gene_overlap = as_tibble(head_RDA_WGP_Ecotype_gene_overlap) %>% 
+  na.omit() %>%
+  # filter(Chromosome != 'chrUn') %>% 
+  arrange(Chromosome, 
+          i.win_mid)
+
+head_RDA_WGP_Ecotype_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  # dplyr::select(Chromosome, 
+  #               win_mid, 
+  #               win_start,
+  #               i.win_start, 
+  #               win_end, 
+  #               i.win_end,
+  #               gene_id,
+  #               feature) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>%  
+  # dplyr::select(Chromosome, 
+  #               win_mid, 
+  #               win_start, 
+  #               i.win_start,
+  #               win_end, 
+  #               i.win_end,
+  #               expression_mean,
+  #               feature,
+  #               gene_name, 
+  #               parent_code) %>% 
+  # na.omit() %>% 
+  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
+  dplyr::select(gene_name) %>% 
+  unique() %>% 
+  write_tsv('RDA_HEAD_WGP_ECO_GENES.txt')
+
 
 # Head tgp ----------------------------------------------------------------
 
@@ -142,3 +233,4 @@ head_RDA_WGP_Ecotype %>%
   group_by(Chromosome, 
            POS) %>% 
   intersect(., head_RDA_WGP_f1_f2)
+
