@@ -180,7 +180,11 @@ WC_fst_win = read_tsv("WC_Fst_1kb_3obs_window.txt") %>%
   unite(col = Chromosome, 
         c('chr', 
           'num'), 
-        sep = '')
+        sep = '') %>% 
+  mutate(fst_start = win_start,
+    fst_end = win_end,
+    buffer_start = pmax(1, win_start - 5000),
+    buffer_end = win_end + 5000)
 
 F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
   mutate(Effect = 'F1', 
@@ -237,23 +241,54 @@ F1_F2_eco_res = read_tsv('Methylation_F1_F2_eco_effect_win1000_step1000.txt') %>
 
 
 
-F1_Eco_res_FST = inner_join(WC_fst_win, 
-           F1_eco_res, 
-           by = c('Chromosome', 
-                  'win_start', 
-                  'win_end',
-                  'win_mid'))
+## put a 5kb buffer around the fst values
+## a methylation outlier window needs to be with 5kb away from an FST region
+F1_Eco_res_FST = inner_join(WC_fst_win,
+  F1_eco_res,
+  by = join_by(Chromosome,
+    buffer_start <= win_end,
+    buffer_end >= win_start),
+  suffix = c("_FST", "_Meth"),
+  relationship = "many-to-many") %>% 
+  filter(FST_zero_mean > 0.0)
 
-F2_Eco_res_FST = inner_join(WC_fst_win, 
-                            F2_eco_res, 
-                            by = c('Chromosome', 
-                                   'win_start', 
-                                   'win_end',
-                                   'win_mid'))
+F2_Eco_res_FST = inner_join(WC_fst_win,
+                             F2_eco_res,
+                             by = join_by(Chromosome,
+                                          buffer_start <= win_end,
+                                          buffer_end >= win_start),
+                             suffix = c("_FST", "_Meth"),
+                             relationship = "many-to-many")%>% 
+  filter(FST_zero_mean > 0.0)
 
-F1_F2_Eco_res_FST = inner_join(WC_fst_win, 
-                            F1_F2_eco_res, 
-                            by = c('Chromosome', 
-                                   'win_start', 
-                                   'win_end',
-                                   'win_mid'))
+F1_F2_Eco_res_FST = inner_join(WC_fst_win,
+                             F1_F2_eco_res,
+                             by = join_by(Chromosome,
+                                          buffer_start <= win_end,
+                                          buffer_end >= win_start),
+                             suffix = c("_FST", "_Meth"),
+                             relationship = "many-to-many")%>% 
+  filter(FST_zero_mean > 0.0)
+
+
+
+# F1_Eco_res_FST = inner_join(WC_fst_win, 
+#            F1_eco_res, 
+#            by = c('Chromosome', 
+#                   'win_start', 
+#                   'win_end',
+#                   'win_mid'))
+# 
+# F2_Eco_res_FST = inner_join(WC_fst_win, 
+#                             F2_eco_res, 
+#                             by = c('Chromosome', 
+#                                    'win_start', 
+#                                    'win_end',
+#                                    'win_mid'))
+# 
+# F1_F2_Eco_res_FST = inner_join(WC_fst_win, 
+#                             F1_F2_eco_res, 
+#                             by = c('Chromosome', 
+#                                    'win_start', 
+#                                    'win_end',
+#                                    'win_mid'))
