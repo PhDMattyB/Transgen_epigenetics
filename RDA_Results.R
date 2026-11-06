@@ -193,6 +193,10 @@ head_RDA_TGP_Ecotype = inner_join(head_tgp,
 
 
 
+# Head RDA F1 F2 ecotype interactions -------------------------------------
+
+
+
 F1_F2_eco_res = read_tsv('Methylation_F1_F2_eco_effect_win1000_step1000.txt') %>% 
   mutate(Effect = 'F1_F2', 
          abs_effect = abs(expression_mean)) %>% 
@@ -226,11 +230,73 @@ head_RDA_WGP_f1_f2 = inner_join(head_wgp,
                         POS <= win_end,
                         POS >= win_start),
            suffix = c("_RDA", "_Meth"),
-           relationship = "many-to-many") 
+           relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
 
 
 head_RDA_WGP_Ecotype %>% 
   group_by(Chromosome, 
            POS) %>% 
   intersect(., head_RDA_WGP_f1_f2)
+
+
+setDT(head_RDA_WGP_f1_f2)
+setDT(gene_annotation)
+
+setkey(head_RDA_WGP_f1_f2, 
+       Chromosome, 
+       win_start_loc, 
+       win_end_loc)
+
+
+head_RDA_WGP_f1_f2_gene_overlap = foverlaps(gene_annotation,
+                                head_RDA_WGP_f1_f2,
+                                # by.x = start,
+                                # by.y = end,
+                                type="any")
+
+
+head_RDA_WGP_f1_f2_gene_overlap = as_tibble(head_RDA_WGP_f1_f2_gene_overlap) %>% 
+  na.omit() %>%
+  # filter(Chromosome != 'chrUn') %>% 
+  arrange(Chromosome, 
+          i.win_mid)
+
+head_RDA_WGP_f1_f2_gene_overlap %>% 
+  # pull(gene_id) %>% 
+  # as_tibble() %>% 
+  # dplyr::select(Chromosome, 
+  #               win_mid, 
+  #               win_start,
+  #               i.win_start, 
+  #               win_end, 
+  #               i.win_end,
+  #               gene_id,
+  #               feature) %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>%  
+  # dplyr::select(Chromosome, 
+  #               win_mid, 
+  #               win_start, 
+  #               i.win_start,
+  #               win_end, 
+  #               i.win_end,
+  #               expression_mean,
+  #               feature,
+  #               gene_name, 
+  #               parent_code) %>% 
+  # na.omit() %>% 
+  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
+  dplyr::select(gene_name) %>% 
+  unique() %>% 
+  write_tsv('RDA_HEAD_F1_F2_ECO_GENES.txt')
 
