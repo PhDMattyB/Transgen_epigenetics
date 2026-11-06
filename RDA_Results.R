@@ -3,7 +3,7 @@
 library(tidyverse)
 library(data.table)
 
-
+setwd('~/Parsons_Postdoc/Methylation_data/GLM_results')
 
 # gene annotation ---------------------------------------------------------
 
@@ -449,65 +449,4 @@ body_RDA_tgp_Ecotype = inner_join(body_tgp,
                                   relationship = "many-to-many") %>% 
   mutate(win_start_loc = POS-1, 
          win_end_loc = POS+1)
-
-
-
-setDT(body_RDA_tgp_Ecotype)
-setDT(gene_annotation)
-
-setkey(body_RDA_tgp_Ecotype, 
-       Chromosome, 
-       win_start_loc, 
-       win_end_loc)
-
-
-body_RDA_tgp_Ecotype_gene_overlap = foverlaps(gene_annotation,
-                                              body_RDA_tgp_Ecotype,
-                                              # by.x = start,
-                                              # by.y = end,
-                                              type="any")
-
-
-body_RDA_tgp_Ecotype_gene_overlap = as_tibble(body_RDA_tgp_Ecotype_gene_overlap) %>% 
-  na.omit() %>%
-  # filter(Chromosome != 'chrUn') %>% 
-  arrange(Chromosome, 
-          i.win_mid)
-
-body_RDA_tgp_Ecotype_gene_overlap %>% 
-  # pull(gene_id) %>% 
-  # as_tibble() %>% 
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start,
-  #               i.win_start, 
-  #               win_end, 
-  #               i.win_end,
-  #               gene_id,
-  #               feature) %>% 
-  separate(col = gene_id, 
-           into = c('ensemble_id', 
-                    'gene_name', 
-                    'parent_code', 
-                    'gene_name2'), 
-           sep = ';') %>% 
-  separate(col = gene_name, 
-           into = c('Garbage', 
-                    'gene_name'), 
-           sep = '=') %>%  
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start, 
-  #               i.win_start,
-  #               win_end, 
-  #               i.win_end,
-  #               expression_mean,
-  #               feature,
-  #               gene_name, 
-  #               parent_code) %>% 
-  # na.omit() %>% 
-  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
-  dplyr::select(gene_name) %>% 
-  unique() %>% 
-  write_tsv('RDA_body_tgp_ECO_GENES.txt')
 
