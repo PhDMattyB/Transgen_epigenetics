@@ -408,7 +408,7 @@ body_RDA_WGP_Ecotype_gene_overlap %>%
 write_tsv('RDA_body_wgp_ECO_GENES.txt')
 
 
-# Body tgp ----------------------------------------------------------------
+# Body tgp ecotype----------------------------------------------------------------
 
 
 body_tgp = read_csv('~/Methylation_data/BODY_TGP_clean_RDA_CAND_corr.csv') %>% 
@@ -422,8 +422,8 @@ body_tgp = read_csv('~/Methylation_data/BODY_TGP_clean_RDA_CAND_corr.csv') %>%
 
 
 
-F2_eco_res = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>% 
-  mutate(Effect = 'F2', 
+F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'F1', 
          abs_effect = abs(expression_mean)) %>% 
   filter(! Chromosome %in% c('chrUn')) %>% 
   filter(expression_n > 3) %>%
@@ -441,7 +441,7 @@ F2_eco_res = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>%
 
 
 body_RDA_tgp_Ecotype = inner_join(body_tgp,
-                                  F2_eco_res,
+                                  F1_eco_res,
                                   by = join_by(Chromosome,
                                                POS <= win_end,
                                                POS >= win_start),
