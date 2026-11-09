@@ -40,18 +40,12 @@ head_wgp = read_csv('~/Methylation_data/WGP_HEAD_clean_RDA_CAND_corr.csv') %>%
            into = c('Chromosome', 
                     'POS'), 
            sep = '-') %>% 
-  filter(Association == 'WGP_HEAD_clean') %>% 
+  mutate(wgp_HEAD_clean_great = abs(WGP_HEAD_clean) > abs(eco_num) & abs(WGP_HEAD_clean) > abs(csize)) %>% 
+  filter(wgp_HEAD_clean_great == 'TRUE') %>% 
+  # filter(Association == 'WGP_HEAD_clean') %>% 
   filter(! Chromosome %in% c('chrUn')) %>% 
   mutate(POS = as.numeric(POS))
 
-
-# head_wgp %>%
-#   group_by(Association) %>% 
-#   summarize(n = n())
-
-# head_wgp %>% 
-#   filter(Chromosome == 'chrXXI') %>% 
-#   arrange(POS) %>% View()
 
 F2_eco_res = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>% 
   mutate(Effect = 'F2', 
@@ -106,16 +100,6 @@ head_RDA_WGP_Ecotype_gene_overlap = as_tibble(head_RDA_WGP_Ecotype_gene_overlap)
           i.win_mid)
 
 head_RDA_WGP_Ecotype_gene_overlap %>% 
-  # pull(gene_id) %>% 
-  # as_tibble() %>% 
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start,
-  #               i.win_start, 
-  #               win_end, 
-  #               i.win_end,
-  #               gene_id,
-  #               feature) %>% 
   separate(col = gene_id, 
            into = c('ensemble_id', 
                     'gene_name', 
@@ -126,20 +110,8 @@ head_RDA_WGP_Ecotype_gene_overlap %>%
            into = c('Garbage', 
                     'gene_name'), 
            sep = '=') %>%  
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start, 
-  #               i.win_start,
-  #               win_end, 
-  #               i.win_end,
-  #               expression_mean,
-  #               feature,
-  #               gene_name, 
-  #               parent_code) %>% 
-  # na.omit() %>% 
-  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
   dplyr::select(gene_name) %>% 
-  unique() %>% View()
+  unique() %>% 
   write_tsv('RDA_HEAD_WGP_ECO_GENES.txt')
 
 
@@ -152,17 +124,12 @@ head_tgp = read_csv('~/Methylation_data/TGP_HEAD_clean_RDA_CAND_corr.csv') %>%
            into = c('Chromosome', 
                     'POS'), 
            sep = '-')%>% 
-  filter(Association == 'TGP_HEAD_clean') %>% 
+  mutate(tgp_HEAD_clean_great = abs(TGP_HEAD_clean) > abs(eco_num) & abs(TGP_HEAD_clean) > abs(csize)) %>% 
+  filter(tgp_HEAD_clean_great == 'TRUE') %>% 
+  # filter(Association == 'TGP_HEAD_clean') %>% 
   filter(! Chromosome %in% c('chrUn')) %>% 
   mutate(POS = as.numeric(POS))
 
-# head_tgp %>%
-#   group_by(Association) %>% 
-#   summarize(n = n())
-# 
-# head_tgp %>% 
-#   filter(Chromosome == 'chrXXI') %>% 
-#   arrange(POS) 
 
 F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
   mutate(Effect = 'F1', 
@@ -330,7 +297,9 @@ body_wgp = read_csv('~/Methylation_data/BODY_WGP_clean_RDA_CAND_corr.csv') %>%
            into = c('Chromosome', 
                     'POS'), 
            sep = '-') %>% 
-  filter(Association == 'BODY_WGP_clean') %>% 
+  mutate(wgp_HEAD_clean_great = abs(BODY_WGP_clean) > abs(eco_num) & abs(BODY_WGP_clean) > abs(csize)) %>% 
+  filter(wgp_HEAD_clean_great == 'TRUE') %>% 
+  # filter(Association == 'BODY_WGP_clean') %>% 
   filter(! Chromosome %in% c('chrUn')) %>% 
   mutate(POS = as.numeric(POS))
 
@@ -412,7 +381,9 @@ body_tgp = read_csv('~/Methylation_data/BODY_TGP_clean_RDA_CAND_corr.csv') %>%
            into = c('Chromosome', 
                     'POS'), 
            sep = '-') %>% 
-  filter(Association == 'BODY_TGP_clean') %>% 
+  mutate(tgp_HEAD_clean_great = abs(BODY_TGP_clean) > abs(eco_num) & abs(BODY_TGP_clean) > abs(csize)) %>% 
+  filter(tgp_HEAD_clean_great == 'TRUE') %>% 
+  # filter(Association == 'BODY_TGP_clean') %>% 
   filter(! Chromosome %in% c('chrUn')) %>% 
   mutate(POS = as.numeric(POS))
 
@@ -453,7 +424,9 @@ wgp_whole_fish = read_csv('~/Methylation_data/WGP2_clean_RDA_CAND_corr.csv') %>%
            into = c('Chromosome', 
                     'POS'), 
            sep = '-') %>% 
-  filter(Association == 'WGP_clean') %>% 
+  mutate(wgp_whole_clean_great = abs(WGP_clean) > abs(eco_num)) %>% 
+  filter(wgp_whole_clean_great == 'TRUE') %>% 
+  # filter(Association == 'WGP_clean') %>% 
   filter(! Chromosome %in% c('chrUn')) %>% 
   mutate(POS = as.numeric(POS))
 
@@ -535,7 +508,9 @@ tgp_whole_fish = read_csv('~/Methylation_data/TGP2_clean_RDA_CAND_corr.csv') %>%
            into = c('Chromosome', 
                     'POS'), 
            sep = '-') %>% 
-  filter(Association == 'TGP_clean') %>% 
+  mutate(tgp_whole_clean_great = abs(TGP_clean) > abs(eco_num)) %>% 
+  filter(tgp_whole_clean_great == 'TRUE') %>% 
+  # filter(Association == 'TGP_clean') %>% 
   filter(! Chromosome %in% c('chrUn')) %>% 
   mutate(POS = as.numeric(POS))
 
@@ -608,4 +583,133 @@ whole_RDA_tgp_Ecotype_gene_overlap %>%
   write_tsv('RDA_wholefish_tgp_ECO_GENES.txt')
 
 
+
+# Opercular Functional trait - unmodified ---------------------------------
+orig_opercKT_fish = read_csv('~/Methylation_data/func_orig_operc_RDA_CAND_corr.csv') %>% 
+  separate(col = loc, 
+           into = c('Chromosome', 
+                    'POS'), 
+           sep = '-') %>% 
+  mutate(orig_operc_great = abs(orig_opercular_kt) > abs(eco_num) & abs(orig_opercular_kt) > abs(csize)) %>% 
+  filter(orig_operc_great == 'TRUE') %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  mutate(POS = as.numeric(POS))
+
+
+eco_res  = read_tsv('Methylation_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'Eco', 
+         abs_effect = abs(expression_mean)) %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect >= threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean > threshold ~ "Hyper",
+    expression_mean < -threshold ~ "Hypo",
+    TRUE ~ "None")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
+
+
+opercKT_RDA_orig_Ecotype = inner_join(orig_opercKT_fish,
+                                   eco_res,
+                                   by = join_by(Chromosome,
+                                                POS <= win_end,
+                                                POS >= win_start),
+                                   suffix = c("_RDA", "_Meth"),
+                                   relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
+
+
+
+
+# Opercular Functional trait - TGp ----------------------------------------
+
+tgp_opercKT_fish = read_csv('~/Methylation_data/func_TGP_operc_RDA_CAND_corr.csv') %>% 
+  separate(col = loc, 
+           into = c('Chromosome', 
+                    'POS'), 
+           sep = '-') %>% 
+  # dplyr::select(-Interaction) %>% 
+  mutate(TGP_operc_kt_great = TGP_operc_kt > eco_num & TGP_operc_kt > csize) %>% 
+  filter(TGP_operc_kt_great == 'TRUE') %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  mutate(POS = as.numeric(POS))
+
+F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'F1', 
+         abs_effect = abs(expression_mean)) %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect >= threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean > threshold ~ "Hyper",
+    expression_mean < -threshold ~ "Hypo",
+    TRUE ~ "None")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
+
+
+
+opercKT_RDA_tgp_Ecotype = inner_join(tgp_opercKT_fish,
+                                      F1_eco_res,
+                                      by = join_by(Chromosome,
+                                                   POS <= win_end,
+                                                   POS >= win_start),
+                                      suffix = c("_RDA", "_Meth"),
+                                      relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
+
+
+# Opercular Functional traits - WGP ---------------------------------------
+
+
+wgp_opercKT_fish = read_csv('~/Methylation_data/func_WGP_operc_RDA_CAND_corr.csv') %>% 
+  separate(col = loc, 
+           into = c('Chromosome', 
+                    'POS'), 
+           sep = '-') %>% 
+  # dplyr::select(-Interaction) %>% 
+  mutate(wgp_operc_kt_great = WGP_operc_kt > eco_num & WGP_operc_kt > csize) %>% 
+  filter(wgp_operc_kt_great == 'TRUE') %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  mutate(POS = as.numeric(POS))
+
+F2_eco_res = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'F2', 
+         abs_effect = abs(expression_mean)) %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect >= threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean > threshold ~ "Hyper",
+    expression_mean < -threshold ~ "Hypo",
+    TRUE ~ "None")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
+
+
+
+opercKT_RDA_wgp_Ecotype = inner_join(wgp_opercKT_fish,
+                                     F2_eco_res,
+                                     by = join_by(Chromosome,
+                                                  POS <= win_end,
+                                                  POS >= win_start),
+                                     suffix = c("_RDA", "_Meth"),
+                                     relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
 
