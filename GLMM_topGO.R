@@ -1043,3 +1043,514 @@ RDA_whole_wgp_eco_GO_plot = ggplot(data = RDA_whole_wgp_eco_GO,
   theme(axis.title.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         legend.position = 'none')
+
+
+
+# Combine wgp plots -------------------------------------------------------
+
+wgp_rda_GO_plots = RDA_head_wgp_eco_GO_plot+RDA_body_wgp_eco_GO_plot+RDA_whole_wgp_eco_GO_plot
+
+
+ggsave('RDA_WGP_GO_Plots_head_body_whole.svg', 
+       plot = wgp_rda_GO_plots, 
+       dpi = 'retina',, 
+       units = 'cm', 
+       width = 45, 
+       height = 15)
+
+
+# TGP RDA GO Results ------------------------------------------------------
+# RDA head WGP by ecotype interaction genes -------------------------------
+
+RDA_head_tgp_eco_genes = read_tsv("TGP_") %>% 
+  dplyr::rename(Gene = gene_name)
+
+RDA_head_tgp_eco_genelist = RDA_head_tgp_eco_genes$Gene
+
+geneID2GO = readMappings(file = "~/Parsons_Postdoc/SKR_Hybrid_Gene_expression/Stickleback_Gene_GO_Map.txt") 
+all_genes_universe = names(geneID2GO)
+
+all_genelist = rep(0, length(all_genes_universe))
+names(all_genelist) = all_genes_universe
+all_genelist[names(all_genelist) %in% RDA_head_tgp_eco_genelist] <- 1
+RDA_head_tgp_eco_genelist <- as.factor(all_genelist)
+
+RDA_head_tgp_eco_GOdata_BP <- new("topGOdata",
+                                  ontology = 'BP',              # Choose "BP", "MF", or "CC"
+                                  allGenes = RDA_head_tgp_eco_genelist,          # Named vector of genes
+                                  geneSelectionFun = topDiffGenes,
+                                  nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                  annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                  gene2GO = geneID2GO)
+
+RDA_head_tgp_eco_GOdata_MF <- new("topGOdata",
+                                  ontology = 'MF',              # Choose "BP", "MF", or "CC"
+                                  allGenes = RDA_head_tgp_eco_genelist,          # Named vector of genes
+                                  geneSelectionFun = topDiffGenes,
+                                  nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                  annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                  gene2GO = geneID2GO)
+
+RDA_head_tgp_eco_GOdata_CC <- new("topGOdata",
+                                  ontology = 'CC',              # Choose "BP", "MF", or "CC"
+                                  allGenes = RDA_head_tgp_eco_genelist,          # Named vector of genes
+                                  geneSelectionFun = topDiffGenes,
+                                  nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                  annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                  gene2GO = geneID2GO)
+
+RDA_head_tgp_eco_resultFisher_BP <- runTest(
+  RDA_head_tgp_eco_GOdata_BP,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_head_tgp_eco_resultFisher_MF <- runTest(
+  RDA_head_tgp_eco_GOdata_MF,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_head_tgp_eco_resultFisher_CC <- runTest(
+  RDA_head_tgp_eco_GOdata_CC,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_head_tgp_eco_GO_BP <- GenTable(
+  RDA_head_tgp_eco_GOdata_BP,
+  weight01Fisher = RDA_head_tgp_eco_resultFisher_BP,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_head_tgp_eco_resultFisher_BP)))
+
+# Molecular Function
+RDA_head_tgp_eco_GO_MF <- GenTable(
+  RDA_head_tgp_eco_GOdata_MF,
+  weight01Fisher = RDA_head_tgp_eco_resultFisher_MF,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_head_tgp_eco_resultFisher_MF)))
+
+# Cellular Component
+RDA_head_tgp_eco_GO_CC <- GenTable(
+  RDA_head_tgp_eco_GOdata_CC,
+  weight01Fisher = RDA_head_tgp_eco_resultFisher_CC,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_head_tgp_eco_resultFisher_CC)))
+
+
+RDA_head_tgp_eco_GO_BP = RDA_head_tgp_eco_GO_BP %>% 
+  as_tibble() %>% 
+  # mutate( pvalue = as.numeric(sub("^<\\s*", "", classicFisher)),
+  #         FDR = p.adjust(pvalue, method = "BH")) %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Biological Process')
+
+RDA_head_tgp_eco_GO_MF = RDA_head_tgp_eco_GO_MF %>% 
+  as_tibble() %>% 
+  # mutate( pvalue = as.numeric(sub("^<\\s*", "", classicFisher)),
+  #         FDR = p.adjust(pvalue, method = "BH")) %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Molecular Function')
+
+RDA_head_tgp_eco_GO_CC = RDA_head_tgp_eco_GO_CC %>% 
+  as_tibble() %>% 
+  # mutate( pvalue = as.numeric(sub("^<\\s*", "", classicFisher)),
+  #         FDR = p.adjust(pvalue, method = "BH")) %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Cellular Component')
+
+
+bind_rows(
+  RDA_head_tgp_eco_GO_BP, 
+  RDA_head_tgp_eco_GO_MF, 
+  RDA_head_tgp_eco_GO_CC) %>% 
+  write_csv('RDA_TopGO_head_tgp_ecotype_Genes.csv')
+
+
+
+RDA_head_tgp_eco_MF_GO_genes = genesInTerm(
+  RDA_head_tgp_eco_GOdata_MF,
+  RDA_head_tgp_eco_GO_MF$GO.ID
+)
+
+RDA_head_tgp_eco_MF_GO_genes_sig <- lapply(
+  RDA_head_tgp_eco_MF_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_head_tgp_eco_genes$Gene))
+
+
+RDA_head_tgp_eco_CC_GO_genes = genesInTerm(
+  RDA_head_tgp_eco_GOdata_CC,
+  RDA_head_tgp_eco_GO_CC$GO.ID
+)
+
+RDA_head_tgp_eco_CC_GO_genes_sig <- lapply(
+  RDA_head_tgp_eco_CC_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_head_tgp_eco_genes$Gene))
+
+
+RDA_head_tgp_eco_GO = read_csv('RDA_TopGO_head_tgp_ecotype_Genes.csv')%>% 
+  unite(col = 'GO_Term', 
+        c('GO.ID', 
+          'Term'), 
+        sep = ': ') %>% 
+  mutate(neg_log_pval = -log10(weight01Fisher), 
+         Process = factor(Process,
+                          levels = c("Biological Process", 
+                                     "Molecular Function", 
+                                     "Cellular Component")))%>% 
+  arrange(desc(Process), neg_log_pval) %>% 
+  mutate(GO_Term = factor(GO_Term,
+                          levels = unique(GO_Term)))
+
+go_colouring_noBP = c(
+  # '#006d77', 
+  '#e29578', 
+  '#83c5be')
+
+RDA_head_tgp_eco_GO_plot = ggplot(data = RDA_head_tgp_eco_GO, 
+                                  aes(y = GO_Term, 
+                                      x = neg_log_pval))+
+  geom_col(aes(fill = Process), 
+           col = 'black')+
+  labs(x = '-Log(p-value)')+
+  scale_fill_manual(values = go_colouring_noBP)+
+  theme(axis.title.y = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        legend.position = 'none')
+
+
+
+# RDA body tgp by ecotype interaction genes -------------------------------
+
+RDA_body_tgp_eco_genes = read_tsv("RDA_body_tgp_ECO_GENES.txt") %>% 
+  dplyr::rename(Gene = gene_name)
+
+RDA_body_tgp_eco_genelist = RDA_body_tgp_eco_genes$Gene
+
+geneID2GO = readMappings(file = "~/Parsons_Postdoc/SKR_Hybrid_Gene_expression/Stickleback_Gene_GO_Map.txt") 
+all_genes_universe = names(geneID2GO)
+
+all_genelist = rep(0, length(all_genes_universe))
+names(all_genelist) = all_genes_universe
+all_genelist[names(all_genelist) %in% RDA_body_tgp_eco_genelist] <- 1
+RDA_body_tgp_eco_genelist <- as.factor(all_genelist)
+
+RDA_body_tgp_eco_GOdata_BP <- new("topGOdata",
+                                  ontology = 'BP',              # Choose "BP", "MF", or "CC"
+                                  allGenes = RDA_body_tgp_eco_genelist,          # Named vector of genes
+                                  geneSelectionFun = topDiffGenes,
+                                  nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                  annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                  gene2GO = geneID2GO)
+
+RDA_body_tgp_eco_GOdata_MF <- new("topGOdata",
+                                  ontology = 'MF',              # Choose "BP", "MF", or "CC"
+                                  allGenes = RDA_body_tgp_eco_genelist,          # Named vector of genes
+                                  geneSelectionFun = topDiffGenes,
+                                  nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                  annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                  gene2GO = geneID2GO)
+
+RDA_body_tgp_eco_GOdata_CC <- new("topGOdata",
+                                  ontology = 'CC',              # Choose "BP", "MF", or "CC"
+                                  allGenes = RDA_body_tgp_eco_genelist,          # Named vector of genes
+                                  geneSelectionFun = topDiffGenes,
+                                  nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                  annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                  gene2GO = geneID2GO)
+
+RDA_body_tgp_eco_resultFisher_BP <- runTest(
+  RDA_body_tgp_eco_GOdata_BP,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_body_tgp_eco_resultFisher_MF <- runTest(
+  RDA_body_tgp_eco_GOdata_MF,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_body_tgp_eco_resultFisher_CC <- runTest(
+  RDA_body_tgp_eco_GOdata_CC,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_body_tgp_eco_GO_BP <- GenTable(
+  RDA_body_tgp_eco_GOdata_BP,
+  weight01Fisher = RDA_body_tgp_eco_resultFisher_BP,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_body_tgp_eco_resultFisher_BP)))
+
+# Molecular Function
+RDA_body_tgp_eco_GO_MF <- GenTable(
+  RDA_body_tgp_eco_GOdata_MF,
+  weight01Fisher = RDA_body_tgp_eco_resultFisher_MF,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_body_tgp_eco_resultFisher_MF)))
+
+# Cellular Component
+RDA_body_tgp_eco_GO_CC <- GenTable(
+  RDA_body_tgp_eco_GOdata_CC,
+  weight01Fisher = RDA_body_tgp_eco_resultFisher_CC,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_body_tgp_eco_resultFisher_CC)))
+
+
+RDA_body_tgp_eco_GO_BP = RDA_body_tgp_eco_GO_BP %>% 
+  as_tibble() %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Biological Process')
+
+RDA_body_tgp_eco_GO_MF = RDA_body_tgp_eco_GO_MF %>% 
+  as_tibble() %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Molecular Function')
+
+RDA_body_tgp_eco_GO_CC = RDA_body_tgp_eco_GO_CC %>% 
+  as_tibble() %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Cellular Component')
+
+
+bind_rows(
+  RDA_body_tgp_eco_GO_BP, 
+  RDA_body_tgp_eco_GO_MF, 
+  RDA_body_tgp_eco_GO_CC) %>% 
+  write_csv('RDA_TopGO_body_tgp_ecotype_Genes.csv')
+
+
+RDA_body_tgp_eco_BP_GO_genes = genesInTerm(
+  RDA_body_tgp_eco_GOdata_BP,
+  RDA_body_tgp_eco_GO_BP$GO.ID
+)
+
+RDA_body_tgp_eco_BP_GO_genes_sig <- lapply(
+  RDA_body_tgp_eco_BP_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_body_tgp_eco_genes$Gene))
+
+
+RDA_body_tgp_eco_MF_GO_genes = genesInTerm(
+  RDA_body_tgp_eco_GOdata_MF,
+  RDA_body_tgp_eco_GO_MF$GO.ID
+)
+
+RDA_body_tgp_eco_MF_GO_genes_sig <- lapply(
+  RDA_body_tgp_eco_MF_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_body_tgp_eco_genes$Gene))
+
+
+RDA_body_tgp_eco_CC_GO_genes = genesInTerm(
+  RDA_body_tgp_eco_GOdata_CC,
+  RDA_body_tgp_eco_GO_CC$GO.ID
+)
+
+RDA_body_tgp_eco_CC_GO_genes_sig <- lapply(
+  RDA_body_tgp_eco_CC_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_body_tgp_eco_genes$Gene))
+
+
+RDA_body_tgp_eco_GO = read_csv('RDA_TopGO_body_tgp_ecotype_Genes.csv')%>% 
+  unite(col = 'GO_Term', 
+        c('GO.ID', 
+          'Term'), 
+        sep = ': ') %>% 
+  mutate(neg_log_pval = -log10(weight01Fisher), 
+         Process = factor(Process,
+                          levels = c("Biological Process", 
+                                     "Molecular Function", 
+                                     "Cellular Component")))%>% 
+  arrange(desc(Process), neg_log_pval) %>% 
+  mutate(GO_Term = factor(GO_Term,
+                          levels = unique(GO_Term)))
+
+go_colouring_noBP = c(
+  # '#006d77', 
+  '#e29578', 
+  '#83c5be')
+
+RDA_body_tgp_eco_GO_plot = ggplot(data = RDA_body_tgp_eco_GO, 
+                                  aes(y = GO_Term, 
+                                      x = neg_log_pval))+
+  geom_col(aes(fill = Process), 
+           col = 'black')+
+  labs(x = '-Log(p-value)')+
+  scale_fill_manual(values = go_colouring_noBP)+
+  theme(axis.title.y = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        legend.position = 'none')
+
+
+# RDA whole tgp by ecotype interaction genes -------------------------------
+
+RDA_whole_tgp_eco_genes = read_tsv("RDA_wholefish_tgp_ECO_GENES.txt") %>% 
+  dplyr::rename(Gene = gene_name)
+
+RDA_whole_tgp_eco_genelist = RDA_whole_tgp_eco_genes$Gene
+
+geneID2GO = readMappings(file = "~/Parsons_Postdoc/SKR_Hybrid_Gene_expression/Stickleback_Gene_GO_Map.txt") 
+all_genes_universe = names(geneID2GO)
+
+all_genelist = rep(0, length(all_genes_universe))
+names(all_genelist) = all_genes_universe
+all_genelist[names(all_genelist) %in% RDA_whole_tgp_eco_genelist] <- 1
+RDA_whole_tgp_eco_genelist <- as.factor(all_genelist)
+
+RDA_whole_tgp_eco_GOdata_BP <- new("topGOdata",
+                                   ontology = 'BP',              # Choose "BP", "MF", or "CC"
+                                   allGenes = RDA_whole_tgp_eco_genelist,          # Named vector of genes
+                                   geneSelectionFun = topDiffGenes,
+                                   nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                   annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                   gene2GO = geneID2GO)
+
+RDA_whole_tgp_eco_GOdata_MF <- new("topGOdata",
+                                   ontology = 'MF',              # Choose "BP", "MF", or "CC"
+                                   allGenes = RDA_whole_tgp_eco_genelist,          # Named vector of genes
+                                   geneSelectionFun = topDiffGenes,
+                                   nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                   annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                   gene2GO = geneID2GO)
+
+RDA_whole_tgp_eco_GOdata_CC <- new("topGOdata",
+                                   ontology = 'CC',              # Choose "BP", "MF", or "CC"
+                                   allGenes = RDA_whole_tgp_eco_genelist,          # Named vector of genes
+                                   geneSelectionFun = topDiffGenes,
+                                   nodeSize = 5,                # Minimum number of annotated genes per GO term (e.g., >= 10)
+                                   annot = annFUN.gene2GO,       # Use custom gene-to-GO mapping
+                                   gene2GO = geneID2GO)
+
+RDA_whole_tgp_eco_resultFisher_BP <- runTest(
+  RDA_whole_tgp_eco_GOdata_BP,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_whole_tgp_eco_resultFisher_MF <- runTest(
+  RDA_whole_tgp_eco_GOdata_MF,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_whole_tgp_eco_resultFisher_CC <- runTest(
+  RDA_whole_tgp_eco_GOdata_CC,
+  algorithm = "weight01",
+  statistic = "fisher")
+
+RDA_whole_tgp_eco_GO_BP <- GenTable(
+  RDA_whole_tgp_eco_GOdata_BP,
+  weight01Fisher = RDA_whole_tgp_eco_resultFisher_BP,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_whole_tgp_eco_resultFisher_BP)))
+
+# Molecular Function
+RDA_whole_tgp_eco_GO_MF <- GenTable(
+  RDA_whole_tgp_eco_GOdata_MF,
+  weight01Fisher = RDA_whole_tgp_eco_resultFisher_MF,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_whole_tgp_eco_resultFisher_MF)))
+
+# Cellular Component
+RDA_whole_tgp_eco_GO_CC <- GenTable(
+  RDA_whole_tgp_eco_GOdata_CC,
+  weight01Fisher = RDA_whole_tgp_eco_resultFisher_CC,
+  orderBy = "weight01Fisher",
+  ranksOf = "weight01Fisher",
+  topNodes = length(score(RDA_whole_tgp_eco_resultFisher_CC)))
+
+
+RDA_whole_tgp_eco_GO_BP = RDA_whole_tgp_eco_GO_BP %>% 
+  as_tibble() %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Biological Process')
+
+RDA_whole_tgp_eco_GO_MF = RDA_whole_tgp_eco_GO_MF %>% 
+  as_tibble() %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Molecular Function')
+
+RDA_whole_tgp_eco_GO_CC = RDA_whole_tgp_eco_GO_CC %>% 
+  as_tibble() %>% 
+  filter(weight01Fisher <= 0.05) %>% 
+  mutate(Process = 'Cellular Component')
+
+
+bind_rows(
+  RDA_whole_tgp_eco_GO_BP, 
+  RDA_whole_tgp_eco_GO_MF, 
+  RDA_whole_tgp_eco_GO_CC) %>% 
+  write_csv('RDA_TopGO_whole_tgp_ecotype_Genes.csv')
+
+
+RDA_whole_tgp_eco_BP_GO_genes = genesInTerm(
+  RDA_whole_tgp_eco_GOdata_BP,
+  RDA_whole_tgp_eco_GO_BP$GO.ID
+)
+
+RDA_whole_tgp_eco_BP_GO_genes_sig <- lapply(
+  RDA_whole_tgp_eco_BP_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_whole_tgp_eco_genes$Gene))
+
+
+RDA_whole_tgp_eco_MF_GO_genes = genesInTerm(
+  RDA_whole_tgp_eco_GOdata_MF,
+  RDA_whole_tgp_eco_GO_MF$GO.ID
+)
+
+RDA_whole_tgp_eco_MF_GO_genes_sig <- lapply(
+  RDA_whole_tgp_eco_MF_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_whole_tgp_eco_genes$Gene))
+
+
+RDA_whole_tgp_eco_CC_GO_genes = genesInTerm(
+  RDA_whole_tgp_eco_GOdata_CC,
+  RDA_whole_tgp_eco_GO_CC$GO.ID
+)
+
+RDA_whole_tgp_eco_CC_GO_genes_sig <- lapply(
+  RDA_whole_tgp_eco_CC_GO_genes,
+  function(genes) dplyr::intersect(genes, RDA_whole_tgp_eco_genes$Gene))
+
+
+RDA_whole_tgp_eco_GO = read_csv('RDA_TopGO_whole_tgp_ecotype_Genes.csv')%>% 
+  unite(col = 'GO_Term', 
+        c('GO.ID', 
+          'Term'), 
+        sep = ': ') %>% 
+  mutate(neg_log_pval = -log10(weight01Fisher), 
+         Process = factor(Process,
+                          levels = c("Biological Process", 
+                                     "Molecular Function", 
+                                     "Cellular Component")))%>% 
+  arrange(desc(Process), neg_log_pval) %>% 
+  mutate(GO_Term = factor(GO_Term,
+                          levels = unique(GO_Term)))
+
+
+RDA_whole_tgp_eco_GO_plot = ggplot(data = RDA_whole_tgp_eco_GO, 
+                                   aes(y = GO_Term, 
+                                       x = neg_log_pval))+
+  geom_col(aes(fill = Process), 
+           col = 'black')+
+  labs(x = '-Log(p-value)')+
+  scale_fill_manual(values = go_colouring_noBP)+
+  theme(axis.title.y = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        legend.position = 'none')
+
+
+
+# Combine tgp plots -------------------------------------------------------
+
+tgp_rda_GO_plots = RDA_body_tgp_eco_GO_plot+RDA_whole_tgp_eco_GO_plot
+
+
+ggsave('RDA_tgp_GO_Plots_body_whole.svg', 
+       plot = tgp_rda_GO_plots, 
+       dpi = 'retina',, 
+       units = 'cm', 
+       width = 35, 
+       height = 15)
+
+
