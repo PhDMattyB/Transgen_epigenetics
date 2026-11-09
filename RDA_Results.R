@@ -216,13 +216,6 @@ F1_F2_eco_res = read_tsv('Methylation_F1_F2_eco_effect_win1000_step1000.txt') %>
 
 
 
-head_RDA_TGP_f1_f2 = inner_join(head_tgp,
-           F1_F2_eco_res,
-           by = join_by(Chromosome,
-                        POS <= win_end,
-                        POS >= win_start),
-           suffix = c("_RDA", "_Meth"),
-           relationship = "many-to-many") 
 
 head_RDA_WGP_f1_f2 = inner_join(head_wgp,
            F1_F2_eco_res,
@@ -264,16 +257,6 @@ head_RDA_WGP_f1_f2_gene_overlap = as_tibble(head_RDA_WGP_f1_f2_gene_overlap) %>%
           i.win_mid)
 
 head_RDA_WGP_f1_f2_gene_overlap %>% 
-  # pull(gene_id) %>% 
-  # as_tibble() %>% 
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start,
-  #               i.win_start, 
-  #               win_end, 
-  #               i.win_end,
-  #               gene_id,
-  #               feature) %>% 
   separate(col = gene_id, 
            into = c('ensemble_id', 
                     'gene_name', 
@@ -284,25 +267,60 @@ head_RDA_WGP_f1_f2_gene_overlap %>%
            into = c('Garbage', 
                     'gene_name'), 
            sep = '=') %>%  
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start, 
-  #               i.win_start,
-  #               win_end, 
-  #               i.win_end,
-  #               expression_mean,
-  #               feature,
-  #               gene_name, 
-  #               parent_code) %>% 
-  # na.omit() %>% 
-  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
   dplyr::select(gene_name) %>% 
   unique() %>% 
-  write_tsv('RDA_HEAD_F1_F2_ECO_GENES.txt')
+  write_tsv('RDA_WGP_HEAD_F1_F2_ECO_GENES.txt')
+
+
+head_RDA_TGP_f1_f2 = inner_join(head_tgp,
+                                F1_F2_eco_res,
+                                by = join_by(Chromosome,
+                                             POS <= win_end,
+                                             POS >= win_start),
+                                suffix = c("_RDA", "_Meth"),
+                                relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
 
 
 
 
+setDT(head_RDA_TGP_f1_f2)
+setDT(gene_annotation)
+
+setkey(head_RDA_TGP_f1_f2, 
+       Chromosome, 
+       win_start_loc, 
+       win_end_loc)
+
+
+head_RDA_TGP_f1_f2_gene_overlap = foverlaps(gene_annotation,
+                                            head_RDA_TGP_f1_f2,
+                                            # by.x = start,
+                                            # by.y = end,
+                                            type="any")
+
+
+head_RDA_TGP_f1_f2_gene_overlap = as_tibble(head_RDA_TGP_f1_f2_gene_overlap) %>% 
+  na.omit() %>%
+  # filter(Chromosome != 'chrUn') %>% 
+  arrange(Chromosome, 
+          i.win_mid)
+
+head_RDA_TGP_f1_f2_gene_overlap %>% 
+  separate(col = gene_id, 
+           into = c('ensemble_id', 
+                    'gene_name', 
+                    'parent_code', 
+                    'gene_name2'), 
+           sep = ';') %>% 
+  separate(col = gene_name, 
+           into = c('Garbage', 
+                    'gene_name'), 
+           sep = '=') %>%  
+  dplyr::select(gene_name) %>% 
+  unique() %>% 
+  write_tsv('RDA_TGP_HEAD_F1_F2_ECO_GENES.txt')
 
 # Body wgp ----------------------------------------------------------------
 
@@ -371,16 +389,6 @@ body_RDA_WGP_Ecotype_gene_overlap = as_tibble(body_RDA_WGP_Ecotype_gene_overlap)
           i.win_mid)
 
 body_RDA_WGP_Ecotype_gene_overlap %>% 
-  # pull(gene_id) %>% 
-  # as_tibble() %>% 
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start,
-  #               i.win_start, 
-  #               win_end, 
-  #               i.win_end,
-  #               gene_id,
-  #               feature) %>% 
   separate(col = gene_id, 
            into = c('ensemble_id', 
                     'gene_name', 
@@ -391,18 +399,6 @@ body_RDA_WGP_Ecotype_gene_overlap %>%
            into = c('Garbage', 
                     'gene_name'), 
            sep = '=') %>%  
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start, 
-  #               i.win_start,
-  #               win_end, 
-  #               i.win_end,
-  #               expression_mean,
-  #               feature,
-  #               gene_name, 
-  #               parent_code) %>% 
-  # na.omit() %>% 
-  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
   dplyr::select(gene_name) %>% 
   unique() %>% 
 write_tsv('RDA_body_wgp_ECO_GENES.txt')
@@ -515,16 +511,6 @@ whole_RDA_WGP_Ecotype_gene_overlap = as_tibble(whole_RDA_WGP_Ecotype_gene_overla
           i.win_mid)
 
 whole_RDA_WGP_Ecotype_gene_overlap %>% 
-  # pull(gene_id) %>% 
-  # as_tibble() %>% 
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start,
-  #               i.win_start, 
-  #               win_end, 
-  #               i.win_end,
-  #               gene_id,
-  #               feature) %>% 
   separate(col = gene_id, 
            into = c('ensemble_id', 
                     'gene_name', 
@@ -535,18 +521,6 @@ whole_RDA_WGP_Ecotype_gene_overlap %>%
            into = c('Garbage', 
                     'gene_name'), 
            sep = '=') %>%  
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start, 
-  #               i.win_start,
-  #               win_end, 
-  #               i.win_end,
-  #               expression_mean,
-  #               feature,
-  #               gene_name, 
-  #               parent_code) %>% 
-  # na.omit() %>% 
-  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
   dplyr::select(gene_name) %>% 
   unique() %>% 
   write_tsv('RDA_wholefish_wgp_ECO_GENES.txt')
@@ -556,47 +530,6 @@ whole_RDA_WGP_Ecotype_gene_overlap %>%
 # TGP whole fish ----------------------------------------------------------
 
 
-body_tgp = read_csv('~/Methylation_data/BODY_TGP_clean_RDA_CAND_corr.csv') %>% 
-  separate(col = loc, 
-           into = c('Chromosome', 
-                    'POS'), 
-           sep = '-') %>% 
-  filter(Association == 'BODY_TGP_clean') %>% 
-  filter(! Chromosome %in% c('chrUn')) %>% 
-  mutate(POS = as.numeric(POS))
-
-
-
-F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
-  mutate(Effect = 'F1', 
-         abs_effect = abs(expression_mean)) %>% 
-  filter(! Chromosome %in% c('chrUn')) %>% 
-  filter(expression_n > 3) %>%
-  group_by(Chromosome) %>%
-  mutate(threshold = quantile(abs_effect,
-                              0.99,
-                              na.rm = TRUE)) %>%
-  filter(abs_effect >= threshold) %>% 
-  mutate(direction = case_when(
-    expression_mean > threshold ~ "Hyper",
-    expression_mean < -threshold ~ "Hypo",
-    TRUE ~ "None")) %>%
-  # Order by genomic position
-  arrange(Chromosome, win_mid)
-
-
-body_RDA_tgp_Ecotype = inner_join(body_tgp,
-                                  F1_eco_res,
-                                  by = join_by(Chromosome,
-                                               POS <= win_end,
-                                               POS >= win_start),
-                                  suffix = c("_RDA", "_Meth"),
-                                  relationship = "many-to-many") %>% 
-  mutate(win_start_loc = POS-1, 
-         win_end_loc = POS+1)
-
-
-# WGP whole fish ----------------------------------------------------------
 tgp_whole_fish = read_csv('~/Methylation_data/TGP2_clean_RDA_CAND_corr.csv') %>% 
   separate(col = loc, 
            into = c('Chromosome', 
@@ -660,16 +593,6 @@ whole_RDA_tgp_Ecotype_gene_overlap = as_tibble(whole_RDA_tgp_Ecotype_gene_overla
           i.win_mid)
 
 whole_RDA_tgp_Ecotype_gene_overlap %>% 
-  # pull(gene_id) %>% 
-  # as_tibble() %>% 
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start,
-  #               i.win_start, 
-  #               win_end, 
-  #               i.win_end,
-  #               gene_id,
-  #               feature) %>% 
   separate(col = gene_id, 
            into = c('ensemble_id', 
                     'gene_name', 
@@ -680,18 +603,6 @@ whole_RDA_tgp_Ecotype_gene_overlap %>%
            into = c('Garbage', 
                     'gene_name'), 
            sep = '=') %>%  
-  # dplyr::select(Chromosome, 
-  #               win_mid, 
-  #               win_start, 
-  #               i.win_start,
-  #               win_end, 
-  #               i.win_end,
-  #               expression_mean,
-  #               feature,
-  #               gene_name, 
-  #               parent_code) %>% 
-  # na.omit() %>% 
-  # filter(!if_any(gene_name, ~ grepl('ENSG', .))) %>% 
   dplyr::select(gene_name) %>% 
   unique() %>% 
   write_tsv('RDA_wholefish_tgp_ECO_GENES.txt')
