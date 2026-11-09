@@ -172,7 +172,7 @@ WC_fst_win %>%
 # windowed Fst data -------------------------------------------------------
 
 WC_fst_win = read_tsv("WC_Fst_1kb_3obs_window.txt") %>% 
-  rename(Chromosome = CHR) %>% 
+  dplyr::rename(Chromosome = CHR) %>% 
   separate(col = Chromosome, 
            into = c('chr', 
                     'num'), 
@@ -250,7 +250,9 @@ F1_Eco_res_FST = inner_join(WC_fst_win,
     buffer_end >= win_start),
   suffix = c("_FST", "_Meth"),
   relationship = "many-to-many") %>% 
-  filter(FST_zero_mean > 0.0)
+  filter(FST_zero_mean > 0.01)
+
+## 4 methylation sites with high fst
 
 F2_Eco_res_FST = inner_join(WC_fst_win,
                              F2_eco_res,
@@ -259,7 +261,9 @@ F2_Eco_res_FST = inner_join(WC_fst_win,
                                           buffer_end >= win_start),
                              suffix = c("_FST", "_Meth"),
                              relationship = "many-to-many")%>% 
-  filter(FST_zero_mean > 0.0)
+  filter(FST_zero_mean > 0.01)
+
+## 212 methylation sites with high Fst
 
 F1_F2_Eco_res_FST = inner_join(WC_fst_win,
                              F1_F2_eco_res,
@@ -268,9 +272,9 @@ F1_F2_Eco_res_FST = inner_join(WC_fst_win,
                                           buffer_end >= win_start),
                              suffix = c("_FST", "_Meth"),
                              relationship = "many-to-many")%>% 
-  filter(FST_zero_mean > 0.0)
+  filter(FST_zero_mean > 0.01)
 
-
+## 38 methylation sites with high Fst
 
 # F1_Eco_res_FST = inner_join(WC_fst_win, 
 #            F1_eco_res, 
