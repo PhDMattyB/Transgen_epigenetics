@@ -713,3 +713,134 @@ opercKT_RDA_wgp_Ecotype = inner_join(wgp_opercKT_fish,
   mutate(win_start_loc = POS-1, 
          win_end_loc = POS+1)
 
+
+
+# Premax Functional trait - unmodified ---------------------------------
+orig_premaxKT_fish = read_csv('~/Methylation_data/func_orig_premax_RDA_CAND_corr.csv') %>% 
+  separate(col = loc, 
+           into = c('Chromosome', 
+                    'POS'), 
+           sep = '-') %>% 
+  mutate(orig_premax_great = abs(orig_premax_kt) > abs(eco_num) & abs(orig_premax_kt) > abs(csize)) %>% 
+  filter(orig_premax_great == 'TRUE') %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  mutate(POS = as.numeric(POS))
+
+
+eco_res  = read_tsv('Methylation_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'Eco', 
+         abs_effect = abs(expression_mean)) %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect >= threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean > threshold ~ "Hyper",
+    expression_mean < -threshold ~ "Hypo",
+    TRUE ~ "None")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
+
+
+premaxKT_RDA_orig_Ecotype = inner_join(orig_premaxKT_fish,
+                                      eco_res,
+                                      by = join_by(Chromosome,
+                                                   POS <= win_end,
+                                                   POS >= win_start),
+                                      suffix = c("_RDA", "_Meth"),
+                                      relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
+
+
+
+
+# premaxular Functional trait - TGp ----------------------------------------
+
+tgp_premaxKT_fish = read_csv('~/Methylation_data/func_TGP_premax_RDA_CAND_corr.csv') %>% 
+  separate(col = loc, 
+           into = c('Chromosome', 
+                    'POS'), 
+           sep = '-') %>% 
+  # dplyr::select(-Interaction) %>% 
+  mutate(TGP_premax_kt_great = TGP_premax_kt > eco_num & TGP_premax_kt > csize) %>% 
+  filter(TGP_premax_kt_great == 'TRUE') %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  mutate(POS = as.numeric(POS))
+
+F1_eco_res = read_tsv('Methylation_F1_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'F1', 
+         abs_effect = abs(expression_mean)) %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect >= threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean > threshold ~ "Hyper",
+    expression_mean < -threshold ~ "Hypo",
+    TRUE ~ "None")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
+
+
+
+premaxKT_RDA_tgp_Ecotype = inner_join(tgp_premaxKT_fish,
+                                     F1_eco_res,
+                                     by = join_by(Chromosome,
+                                                  POS <= win_end,
+                                                  POS >= win_start),
+                                     suffix = c("_RDA", "_Meth"),
+                                     relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
+
+
+# premaxular Functional traits - WGP ---------------------------------------
+
+
+wgp_premaxKT_fish = read_csv('~/Methylation_data/func_WGP_premax_RDA_CAND_corr.csv') %>% 
+  separate(col = loc, 
+           into = c('Chromosome', 
+                    'POS'), 
+           sep = '-') %>% 
+  # dplyr::select(-Interaction) %>% 
+  mutate(wgp_premax_kt_great = WGP_premax_kt > eco_num & WGP_premax_kt > csize) %>% 
+  filter(wgp_premax_kt_great == 'TRUE') %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  mutate(POS = as.numeric(POS))
+
+F2_eco_res = read_tsv('Methylation_F2_eco_effect_win1000_step1000.txt') %>% 
+  mutate(Effect = 'F2', 
+         abs_effect = abs(expression_mean)) %>% 
+  filter(! Chromosome %in% c('chrUn')) %>% 
+  filter(expression_n > 3) %>%
+  group_by(Chromosome) %>%
+  mutate(threshold = quantile(abs_effect,
+                              0.99,
+                              na.rm = TRUE)) %>%
+  filter(abs_effect >= threshold) %>% 
+  mutate(direction = case_when(
+    expression_mean > threshold ~ "Hyper",
+    expression_mean < -threshold ~ "Hypo",
+    TRUE ~ "None")) %>%
+  # Order by genomic position
+  arrange(Chromosome, win_mid)
+
+
+
+premaxKT_RDA_wgp_Ecotype = inner_join(wgp_premaxKT_fish,
+                                     F2_eco_res,
+                                     by = join_by(Chromosome,
+                                                  POS <= win_end,
+                                                  POS >= win_start),
+                                     suffix = c("_RDA", "_Meth"),
+                                     relationship = "many-to-many") %>% 
+  mutate(win_start_loc = POS-1, 
+         win_end_loc = POS+1)
+
